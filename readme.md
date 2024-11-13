@@ -11,11 +11,11 @@ To compile the code into your own .prg and .lst files, you will need [`dasm`](ht
 
 ## Directory Structure
 
-- `/data/` - Contains level screen data and title data for the game, and the code used to generate them.
+- `/data/` - Contains level data and title screen data for the game, and the code used to generate them.
   - `/data/titleScreenData_compressed` - Run-length encoded binary data for the title screen.
   - `/data/levels` Contains all level-related code and data. More on this further down.
 - `/src/` - Contains source code to Squarebot. The entry point is `main.s`.
-- `Makefile` - To simplify the workflow of divid
+- `/out/` - Pre-compiled output of Makefile; use to run Squarebot via `xvic` if you don't want to compile it yourself.
 
 
 ## Levels
