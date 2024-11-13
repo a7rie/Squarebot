@@ -14,6 +14,7 @@ level_completed ds.b 1
 level_data_index ds.b 1 ; for temporarily saving index registers
 temp ds.b 1 ; for temporarily saving index registers
 current_time ds 3 ; store only the last byte of the jiffy clock
+character_set_begin = $1c00
 
   seg
 
@@ -39,14 +40,17 @@ SECRET_KEY = $0d ; translates to "P"
 user_memory_start = $1001
 currently_pressed_key =  $c5
 jiffy_clock = $A0
-
-
+character_info_register = $9005
 
   ; begin location counter at 4096 (user memory)
   org user_memory_start
   include "stub.s" ; stub contains BASIC sys cmd to run the machine language code
 
 start  
+  ; use combination of RAM (first 128 chars at 7168) & ROM character set
+  lda #255
+  sta character_info_register
+
   ; initialize some variables in the zero page
   lda #1
   sta level_reset
@@ -112,3 +116,16 @@ level_data_start
   incbin "../data/levels/binary_levels/4"
 
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
+
+
+  org character_set_begin
+  BYTE 129,255,255,129,129,255,255,129 ; ladder 0
+  BYTE 255,129,165,129,189,165,129,255 ; squarebot 1
+  BYTE 255,255,0,0,0,0,0,0 ; platform 2
+  BYTE 255,255,255,255,255,255,255,255 ; wall 3
+  BYTE 126,231,129,129,225,129,129,255 ; exit (door) 4
+  BYTE 24,36,24,24,30,24,30,24 ; key 5 
+  BYTE 255,255,239,239,239,227,255,255 ;locked wall 6
+  BYTE 255,189,253,183,127,239,231,255 ; breakable wall 7
+  BYTE 0,0,24,60,126,126,0,0 ; spike powerup 8
+  BYTE 0,112,72,120,72,72,112,0 ; booster powerup 9

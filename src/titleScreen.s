@@ -42,6 +42,8 @@ draw_character
   ; store current char at screen cursor location
   ldy #0 
   lda compressed_screen_data_start+1,X ; load cur char to draw
+  clc
+  adc #128
   sta (screen_cursor),Y ; draw it on screen
 
   ; add color to the screen location if it's not a space

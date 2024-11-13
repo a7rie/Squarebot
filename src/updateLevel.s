@@ -26,16 +26,16 @@ KEY_COLOR = 0
 SPIKE_COLOR = 0
 BOOSTER_COLOR = 0
 
-BLANK_SPACE_CHAR = $20
-WALL_CHAR = 'W-64 
-BREAKABLE_WALL_CHAR = 'T-64 
-LOCKED_WALL_CHAR = 'L-64  
-LADDER_CHAR = $23 
-EXIT_CHAR = 'E-64 
-PLATFORM_CHAR = $64
-KEY_CHAR =  'K-64
-SPIKE_CHAR = 'S-64 
-BOOSTER_CHAR = 'B-64
+BLANK_SPACE_CHAR = $20 
+WALL_CHAR = $3
+BREAKABLE_WALL_CHAR = $7
+LOCKED_WALL_CHAR = $6
+LADDER_CHAR = $0  
+EXIT_CHAR = $4
+PLATFORM_CHAR = $2
+KEY_CHAR =  $5
+SPIKE_CHAR = $8
+BOOSTER_CHAR = $9
 
 
 update_level
@@ -150,7 +150,7 @@ draw_high_bits
 check_if_starting_point
   cmp #STARTING_POINT
   bne check_if_wall
-  lda #0+48 ; fix later will need to update squarre bot position
+  lda #$1 ; fix later will need to update squarre bot position
   ldx #0
   jsr draw_char_in_accumulator
   rts
