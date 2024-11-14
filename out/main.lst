@@ -32,7 +32,7 @@
      31  1c50 ????						; beginning of color memory
      32  1c50 ????	       00 00	   COLOR_CURSOR_BEGINNING_LOW_BYTE =	$00
      33  1c50 ????	       00 96	   COLOR_CURSOR_BEGINNING_HIGH_BYTE =	$96
-     34  1c50 ????	       00 02	   RED_COLOR_CODE =	2
+     34  1c50 ????	       00 00	   RED_COLOR_CODE =	0
      35  1c50 ????	       00 20	   SPACE_KEY  =	$20
      36  1c50 ????
      37  1c50 ????	       00 0d	   SECRET_KEY =	$0d	; translates to "P"
@@ -131,7 +131,7 @@
      51  1062							; and avoid adding color data
      52  1062		       c9 20		      cmp	#BLANK_CHAR
      53  1064		       f0 04		      beq	dont_color
-     54  1066		       a9 02		      lda	#RED_COLOR_CODE
+     54  1066		       a9 00		      lda	#RED_COLOR_CODE
      55  1068		       91 02		      sta	(color_cursor),Y
      56  106a
      57  106a				   dont_color

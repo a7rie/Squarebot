@@ -34,8 +34,8 @@ Here's a mapping of how we map each four bit pattern to level element:
 | 0101 | Ladder | #  |
 | 0110 | Exit (complete current level) | E  |
 | 0111 | Jump-through platform | _ |
+| 1001 | Spike | S |
 | 1000 | Key powerup |  K |
-| 1001 | Spike powerup | S |
 | 1011 | Booster powerup | B |
 
 Raw level data (see `data/levels/ascii_levels/`) are 506 characters on a 22x23 grid, essentially representing what you'd see on the VIC-20. The table above tells us which characters map to which level elements. 

@@ -31,7 +31,7 @@ END_OF_SCREEN_HIGH_BYTE = $1f
 ; beginning of color memory
 COLOR_CURSOR_BEGINNING_LOW_BYTE = $00
 COLOR_CURSOR_BEGINNING_HIGH_BYTE = $96
-RED_COLOR_CODE = 2
+RED_COLOR_CODE = 0
 SPACE_KEY = $20
 
 SECRET_KEY = $0d ; translates to "P"
@@ -124,8 +124,8 @@ level_data_start
   BYTE 255,255,0,0,0,0,0,0 ; platform 2
   BYTE 255,255,255,255,255,255,255,255 ; wall 3
   BYTE 126,231,129,129,225,129,129,255 ; exit (door) 4
-  BYTE 24,36,24,24,30,24,30,24 ; key 5 
+  BYTE 24,36,24,24,30,24,30,24 ; key powerup 5 
   BYTE 255,255,239,239,239,227,255,255 ;locked wall 6
   BYTE 255,189,253,183,127,239,231,255 ; breakable wall 7
-  BYTE 0,0,24,60,126,126,0,0 ; spike powerup 8
+  BYTE 0,0,24,60,126,126,0,0 ; spike 8
   BYTE 0,112,72,120,72,72,112,0 ; booster powerup 9

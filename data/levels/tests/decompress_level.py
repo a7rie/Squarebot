@@ -13,8 +13,8 @@ byte_to_ascii = {
     80: '#', # ladder
     96: 'E', # exit (go to next level)
     112: '_', # jump-through platform
+    144: 'S', # spike 
     128: 'K', # key powerup
-    144: 'S', # spike powerup
     160: 'B', # booster powerup
 }
 

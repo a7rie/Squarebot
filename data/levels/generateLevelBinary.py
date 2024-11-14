@@ -17,8 +17,8 @@ ascii_to_byte = {
     '#': 0b00000101, # ladder
     'E': 0b00000110, # exit (go to next level)
     '_': 0b00000111, # jump-through platform
+    'S': 0b00001001, # spike
     'K': 0b00001000, # key powerup
-    'S': 0b00001001, # spike powerup
     'B': 0b00001010, # booster powerup
 }
 
