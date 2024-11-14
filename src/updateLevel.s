@@ -19,12 +19,12 @@ BOOSTER = 160 ;  10100000
 WALL_COLOR = 0
 BREAKABLE_WALL_COLOR = 0
 LOCKED_WALL_COLOR = 0
-LADDER_COLOR = 0
-EXIT_COLOR = 0
-PLATFORM_COLOR = 0
-KEY_COLOR = 0
-SPIKE_COLOR = 0
-BOOSTER_COLOR = 0
+LADDER_COLOR = 8
+EXIT_COLOR = 2
+PLATFORM_COLOR = 2
+KEY_COLOR = 7
+SPIKE_COLOR = 6
+BOOSTER_COLOR = 3
 
 BLANK_SPACE_CHAR = $20 
 WALL_CHAR = $3
@@ -150,9 +150,24 @@ draw_high_bits
 check_if_starting_point
   cmp #STARTING_POINT
   bne check_if_wall
-  lda #$1 ; fix later will need to update squarre bot position
-  ldx #0
+  
+   ; set squarebot to starting point
+  lda screen_cursor
+  sta squarebot_position
+  lda screen_cursor+1
+  sta squarebot_position+1
+
+  lda color_cursor
+  sta squarebot_color_position
+  lda color_cursor+1
+  sta squarebot_color_position+1
+
+  lda #$1 
+  ldx #SQUAREBOT_COLOR
   jsr draw_char_in_accumulator
+
+ 
+  
   rts
 
 check_if_wall

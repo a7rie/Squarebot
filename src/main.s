@@ -13,9 +13,15 @@ level_reset ds.b 1
 level_completed ds.b 1
 level_data_index ds.b 1 ; for temporarily saving index registers
 temp ds.b 1 ; for temporarily saving index registers
-current_time ds 3 ; store only the last byte of the jiffy clock
-character_set_begin = $1c00
-
+new_position ds.w 1 ; use to store position of (proposed) new location for squarebot
+new_color_position ds.w 1 ; use to store position of (proposed) new location for squarebot
+current_time ds.b 1 ; store only the last byte of the jiffy clock
+squarebot_position ds.w 1
+squarebot_color_position ds.w 1
+has_key ds.b 1
+has_booster ds.b 1
+num_chars_jumped ds.b 1 
+jump_direction ds.b 1 ; 0 - going down, 1 - going up
   seg
 
 ; constants
@@ -32,15 +38,21 @@ END_OF_SCREEN_HIGH_BYTE = $1f
 COLOR_CURSOR_BEGINNING_LOW_BYTE = $00
 COLOR_CURSOR_BEGINNING_HIGH_BYTE = $96
 RED_COLOR_CODE = 0
-SPACE_KEY = $20
 
-SECRET_KEY = $0d ; translates to "P"
+SPACE_KEY = $20
+W_KEY = $09
+A_KEY = $11
+S_KEY = $29
+D_KEY = $12
+SECRET_KEY = $0d ; press P to skip to next  level
+
 
 ; memory locations
 user_memory_start = $1001
 currently_pressed_key =  $c5
 jiffy_clock = $A0
 character_info_register = $9005
+character_set_begin = $1c00
 
   ; begin location counter at 4096 (user memory)
   org user_memory_start
@@ -73,7 +85,7 @@ gameLoop
   jsr update_level
   lda #0
   sta level_reset
-
+  jsr update_game_state
   jsr check_for_secret_key
   jsr wait_until_next_frame
   jsr wait_until_next_frame
@@ -104,7 +116,7 @@ check_for_secret_key_return
   rts
 
   include "updateLevel.s"
-
+  include "updateGameState.s"
 
 compressed_screen_data_start
   incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
