@@ -61,6 +61,9 @@ check_if_d_pressed
 check_if_new_position_valid
   ldy #0
   lda (new_position),y
+  cmp #EXIT_CHAR
+  beq level_has_finished
+
   cmp #BLANK_CHAR
   bne handle_jump_logic
   jsr update_squarebot_position
@@ -84,6 +87,10 @@ handle_no_jumps_remaining ; if no jumps left, then start jump if space is presse
 ; check if character below is blank; if so dont allow us to set jump_remaining
   ldy #ROW_SIZE
   lda (squarebot_position),y
+  
+  cmp #EXIT_CHAR
+  beq level_has_finished
+  
   cmp #BLANK_SPACE_CHAR
   beq handle_gravity
 
@@ -95,6 +102,9 @@ handle_jumps_remaining
   jsr move_new_position_up
   ldy #0
   lda (new_position),y
+  cmp #EXIT_CHAR
+  beq level_has_finished
+  
   cmp #BLANK_CHAR
   bne jump_is_invalid ; cant continue moving up; somethings in the way
   
@@ -120,6 +130,10 @@ handle_gravity ; on first row - do nothing
 
   ldy #0
   lda (new_position),y
+
+  cmp #EXIT_CHAR
+  beq level_has_finished
+  
   cmp #BLANK_CHAR
   bne do_nothing
 
@@ -141,7 +155,7 @@ update_squarebot_position
   sta squarebot_color_position
   lda new_color_position+1
   sta squarebot_color_position+1
-  
+
   ldy #0
   lda #SQUAREBOT_CHAR
   sta (squarebot_position),y
@@ -150,6 +164,11 @@ update_squarebot_position
   
   rts
 
+level_has_finished
+  lda #1
+  sta level_completed
+  sta level_reset
+  rts 
 
 move_new_position_to_right
   clc
@@ -220,17 +239,6 @@ move_new_position_down
   sta new_color_position+1
   rts
 
-reset_new_position
-  lda squarebot_position
-  sta new_position
-  lda squarebot_position+1
-  sta new_position+1
-  
-  lda squarebot_color_position
-  sta new_color_position
-  lda squarebot_color_position+1
-  sta squarebot_color_position+1
-  rts
 
 remove_char ; remove squarebot from current screen location
   ldy #0

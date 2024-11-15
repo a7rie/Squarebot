@@ -44,9 +44,9 @@ A_KEY = $11
 S_KEY = $29
 D_KEY = $12
 SECRET_KEY = $0d ; press P to skip to next  level
-JUMP_SIZE = $3 ; number of characters a jump causes
+RESET_KEY = $34
+JUMP_SIZE = $4 ; number of characters a jump causes
 ROW_SIZE = $16
-
 ; memory locations
 user_memory_start = $1001
 currently_pressed_key =  $c5
@@ -87,6 +87,9 @@ gameLoop
   sta level_reset
   jsr update_game_state
   jsr check_for_secret_key
+  jsr check_for_reset_key
+  jsr wait_until_next_frame
+  jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
@@ -112,6 +115,16 @@ check_for_secret_key
   sta level_reset
 
 check_for_secret_key_return
+  rts
+
+
+check_for_reset_key
+  lda currently_pressed_key
+  cmp #RESET_KEY
+  bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
+  lda #1
+  sta level_reset
+check_for_reset_key_return
   rts
 
   include "updateLevel.s"
