@@ -82,6 +82,9 @@ To create a custom level, you must have Python (script was developed with Python
 4. Run Squarebot; your custom level will be the first to show.
 
 
-## Other
+## Controls
 
-- Secret key is `P`; press this to immediately skip to the next level.
+- At title screen, press `Spacebar` to begin the first level. 
+- `A` to move left, `D` move right, `Spacebar` to jump.
+- `P`: Press this to immediately skip to the next level.
+- `O`: Press this to immediately reset the current level.

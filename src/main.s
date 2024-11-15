@@ -76,7 +76,9 @@ start
 
   lda #0
   sta jump_remaining
-
+  sta has_booster
+  sta has_key
+  
   include "titleScreen.s"  
 
 
@@ -88,8 +90,6 @@ gameLoop
   jsr update_game_state
   jsr check_for_secret_key
   jsr check_for_reset_key
-  jsr wait_until_next_frame
-  jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
@@ -134,6 +134,9 @@ compressed_screen_data_start
   incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
 
 level_data_start
+  incbin "../data/levels/binary_levels/booster_test"
+  incbin "../data/levels/binary_levels/key_test"
+
   incbin "../data/levels/binary_levels/1"
   incbin "../data/levels/binary_levels/2"
   incbin "../data/levels/binary_levels/3"
