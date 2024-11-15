@@ -20,8 +20,7 @@ squarebot_position ds.w 1
 squarebot_color_position ds.w 1
 has_key ds.b 1
 has_booster ds.b 1
-num_chars_jumped ds.b 1 
-jump_direction ds.b 1 ; 0 - going down, 1 - going up
+jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
   seg
 
 ; constants
@@ -45,7 +44,8 @@ A_KEY = $11
 S_KEY = $29
 D_KEY = $12
 SECRET_KEY = $0d ; press P to skip to next  level
-
+JUMP_SIZE = $3 ; number of characters a jump causes
+ROW_SIZE = $16
 
 ; memory locations
 user_memory_start = $1001
@@ -75,7 +75,7 @@ start
   sta current_level+1
 
   lda #0
-
+  sta jump_remaining
 
   include "titleScreen.s"  
 
@@ -87,7 +87,6 @@ gameLoop
   sta level_reset
   jsr update_game_state
   jsr check_for_secret_key
-  jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
