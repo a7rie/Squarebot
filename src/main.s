@@ -78,7 +78,7 @@ start
   sta jump_remaining
   sta has_booster
   sta has_key
-  
+
   include "titleScreen.s"  
 
 
@@ -124,6 +124,11 @@ check_for_reset_key
   bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
   lda #1
   sta level_reset
+  lda #0
+  sta has_booster
+  sta has_key
+  sta jump_remaining
+  
 check_for_reset_key_return
   rts
 
@@ -134,13 +139,14 @@ compressed_screen_data_start
   incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
 
 level_data_start
+  incbin "../data/levels/binary_levels/1"
   incbin "../data/levels/binary_levels/booster_test"
   incbin "../data/levels/binary_levels/key_test"
-
-  incbin "../data/levels/binary_levels/1"
   incbin "../data/levels/binary_levels/2"
   incbin "../data/levels/binary_levels/3"
   incbin "../data/levels/binary_levels/4"
+  incbin "../data/levels/binary_levels/5"
+  incbin "../data/levels/binary_levels/6"
 
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
