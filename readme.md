@@ -1,6 +1,6 @@
 # Squarebot
 
-Retro puzzle game for the VIC-20, written in 6502 Assembly. Developed by Amin Elnasri, Jesse Dirks, and Gui Marques.
+Retro puzzle game for the unexpanded VIC-20, written in 6502 Assembly. Developed by Amin Elnasri, Jesse Dirks, and Gui Marques.
 
 
 ## How to Run
@@ -18,6 +18,31 @@ To compile the code into your own .prg and .lst files, you will need [`dasm`](ht
 - `/out/` - Pre-compiled output of Makefile; use to run Squarebot via `xvic` if you don't want to compile it yourself.
 
 
+
+## Gameplay and Controls
+
+At the title screen, press `Spacebar` to begin the first level. 
+- `A` to move left, `D` move right, `Spacebar` to jump.
+- `P`: Press this to immediately skip to the next level.
+- `O`: Press this to immediately reset the current level.
+
+
+The goal of each level is to move Squarebot into the position of the exit door. The way to do this various with each level. Some will require the clever use of the available powerups, while others may test you on more mechanical skills.
+
+There are no inherent borders on the screen (although these can be added by just adding surrounding walls in your levels). The game only verifies that Squarebot is moving into a position within valid screen memory range (0x1e00 to 0x1ff9). This is intentional, and provides another mechanic to use when solving each level.
+ 
+
+It's possible that it becomes unable to progress in certain levels (soft-locked). For example, this may happen if a provided powerup wasn't used correctly. In this case, the Level Reset button ("O") will prove to be very useful.
+
+
+### Powerups
+
+There are currently two powerups implemented in Squarebot.
+- **Booster**: After getting the booster (colliding with the booster powerup character), your next jump will be twice as high.
+- **Key**: After getting the key, the next locked door that you collide with will disappear, allowing you to access whatever space (if any) it may have been blocking.
+
+Only one of each powerup can be held at a time, although levels may have multiple of the same powerups.
+
 ## Levels
 
 Levels are essentially frames of the VIC-20's screen, compressed with run-length encoding.  In the level data, each byte represents two consecutive characters on the screen. The first four bits represent the “element” of the first character, and the next four bits represent the element of the character directly after.
@@ -33,7 +58,7 @@ Here's a mapping of how we map each four bit pattern to level element:
 | 0100 | Locked Wall |  L |
 | 0101 | Ladder | #  |
 | 0110 | Exit (complete current level) | E  |
-| 0111 | Jump-through platform | _ |
+| 0111 | Platform | _ |
 | 1001 | Spike | S |
 | 1000 | Key powerup |  K |
 | 1011 | Booster powerup | B |
@@ -79,12 +104,5 @@ To create a custom level, you must have Python (script was developed with Python
 
 3. In main.s, find the `include` directive where the first level is included. Replace the file path here to the path of the binary outputted by `generateLevelBinary.py` (do NOT use the path to your ASCII file).
 
-4. Run Squarebot; your custom level will be the first to show.
+4. Run `make` in the base directory of the repository to build a new .prg file with your custom level. Run this via `make run` or `xvic <path to generated prg file>`.
 
-
-## Controls
-
-- At title screen, press `Spacebar` to begin the first level. 
-- `A` to move left, `D` move right, `Spacebar` to jump.
-- `P`: Press this to immediately skip to the next level.
-- `O`: Press this to immediately reset the current level.
