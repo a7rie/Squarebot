@@ -76,7 +76,8 @@ continue_update
   ldx #0
   ldy #0
   sty level_data_index
-  ; draw (or redraw) the current level
+
+  ; draw (or redraw on reset) the current level
 draw_level_loop
 ; y stores our index in the current level data
   ldy level_data_index
@@ -106,7 +107,6 @@ draw_level_loop
   
 
 
-; i love writing decompression code in assembly. i love writing decompression code in assembly. i love writing decompression code in assembly. 
 draw_sequence
 ; if acc == 0, return; otherwise subtract 1, draw the next 2 chars
   beq draw_sequence_end

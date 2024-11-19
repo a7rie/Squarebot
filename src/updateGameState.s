@@ -6,37 +6,6 @@ SQUAREBOT_COLOR = $2
 START_OF_FIRST_ROW_LOW_BYTE = $e4
 START_OF_FIRST_ROW_HIGH_BYTE = $1f
 
-; handle player input, update current state of game objects
-; some pseudocode to provide a better idea of what we're doing here:
-
-; new_position = squarebot_position
-; if A pressed
-;   new_position += 1 (move right one char)
-; if D pressed
-;   new_position -= 1 (move left one char)
-; if not valid(new_position)
-;   new_position = squarebot_position
-
-; if jump_remaining = 0 and space not pressed:
-;   return
-; if jump_remaining = 0 and space is pressed:
-;   jump remaining = JUMP_SIZE
-
-
-; if jump_remaining > 0
-;   new_position -= 22 (go up one)
-;   if not valid(new_position):
-;     new_position = squarebot_position
-;     jump_remaining = 0
-; else
-;   new_position += 22 (go down one)
-;   jump_remaining -= 1
-;   if not valid(new_position):
-;     jump_remaining = 0
-;     new_position = o
-; 
-;
-
 update_game_state
   lda squarebot_position
   sta new_position
@@ -99,7 +68,7 @@ handle_no_jumps_remaining ; if no jumps left, then start jump if space is presse
   bcs handle_gravity
 
 skip_validity_check
-  lda has_booster
+  lda has_booster ; if we have the booster, set jump_remaining to twice as high, then get rid of the booster
   cmp #1
   bne regular_jump
   lda #JUMP_SIZE*2
