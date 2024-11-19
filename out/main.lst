@@ -326,37 +326,37 @@
      76  1116		       a2 00		      ldx	#0
      77  1118		       a0 00		      ldy	#0
      78  111a		       84 0a		      sty	level_data_index
-     79  111c							; draw (or redraw) the current level
-     80  111c				   draw_level_loop
-     81  111c							; y stores our index in the current level data
-     82  111c		       a4 0a		      ldy	level_data_index
-     83  111e		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
-     84  1120
-     85  1120		       20 3c 11 	      jsr	draw_sequence
-     86  1123
-     87  1123		       a4 0a		      ldy	level_data_index
-     88  1125		       c8		      iny		; set y to point to next length byte (iterate 2 at a time)
-     89  1126		       c8		      iny
-     90  1127		       84 0a		      sty	level_data_index
-     91  1129
+     79  111c
+     80  111c							; draw (or redraw on reset) the current level
+     81  111c				   draw_level_loop
+     82  111c							; y stores our index in the current level data
+     83  111c		       a4 0a		      ldy	level_data_index
+     84  111e		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
+     85  1120
+     86  1120		       20 3c 11 	      jsr	draw_sequence
+     87  1123
+     88  1123		       a4 0a		      ldy	level_data_index
+     89  1125		       c8		      iny		; set y to point to next length byte (iterate 2 at a time)
+     90  1126		       c8		      iny
+     91  1127		       84 0a		      sty	level_data_index
      92  1129
-     93  1129		       20 93 10 	      jsr	check_if_screen_cursor_at_end
-     94  112c		       90 ee		      bcc	draw_level_loop
-     95  112e
+     93  1129
+     94  1129		       20 93 10 	      jsr	check_if_screen_cursor_at_end
+     95  112c		       90 ee		      bcc	draw_level_loop
      96  112e
-     97  112e							; update next level pointer to point to byte after current level
-     98  112e		       a5 04		      lda	current_level
-     99  1130		       18		      clc
-    100  1131		       65 0a		      adc	level_data_index
-    101  1133		       85 06		      sta	next_level
-    102  1135		       a5 05		      lda	current_level+1
-    103  1137		       69 00		      adc	#0
-    104  1139		       85 07		      sta	next_level+1
-    105  113b		       60		      rts
-    106  113c
+     97  112e
+     98  112e							; update next level pointer to point to byte after current level
+     99  112e		       a5 04		      lda	current_level
+    100  1130		       18		      clc
+    101  1131		       65 0a		      adc	level_data_index
+    102  1133		       85 06		      sta	next_level
+    103  1135		       a5 05		      lda	current_level+1
+    104  1137		       69 00		      adc	#0
+    105  1139		       85 07		      sta	next_level+1
+    106  113b		       60		      rts
     107  113c
     108  113c
-    109  113c							; i love writing decompression code in assembly. i love writing decompression code in assembly. i love writing decompression code in assembly. 
+    109  113c
     110  113c				   draw_sequence
     111  113c							; if acc == 0, return; otherwise subtract 1, draw the next 2 chars
     112  113c		       f0 1c		      beq	draw_sequence_end
@@ -514,310 +514,279 @@
       6  11f8		       00 e4	   START_OF_FIRST_ROW_LOW_BYTE =	$e4
       7  11f8		       00 1f	   START_OF_FIRST_ROW_HIGH_BYTE =	$1f
       8  11f8
-      9  11f8							; handle player input, update current state of game objects
-     10  11f8							; some pseudocode to provide a better idea of what we're doing here:
-     11  11f8
-     12  11f8							; new_position = squarebot_position
-     13  11f8							; if A pressed
-     14  11f8							;   new_position += 1 (move right one char)
-     15  11f8							; if D pressed
-     16  11f8							;   new_position -= 1 (move left one char)
-     17  11f8							; if not valid(new_position)
-     18  11f8							;   new_position = squarebot_position
-     19  11f8
-     20  11f8							; if jump_remaining = 0 and space not pressed:
-     21  11f8							;   return
-     22  11f8							; if jump_remaining = 0 and space is pressed:
-     23  11f8							;   jump remaining = JUMP_SIZE
-     24  11f8
-     25  11f8
-     26  11f8							; if jump_remaining > 0
-     27  11f8							;   new_position -= 22 (go up one)
-     28  11f8							;   if not valid(new_position):
-     29  11f8							;     new_position = squarebot_position
-     30  11f8							;     jump_remaining = 0
-     31  11f8							; else
-     32  11f8							;   new_position += 22 (go down one)
-     33  11f8							;   jump_remaining -= 1
-     34  11f8							;   if not valid(new_position):
-     35  11f8							;     jump_remaining = 0
-     36  11f8							;     new_position = o
-     37  11f8							; 
-     38  11f8							;
-     39  11f8
-     40  11f8				   update_game_state
-     41  11f8		       a5 11		      lda	squarebot_position
-     42  11fa		       85 0c		      sta	new_position
-     43  11fc		       a5 12		      lda	squarebot_position+1
-     44  11fe		       85 0d		      sta	new_position+1
-     45  1200		       a5 13		      lda	squarebot_color_position
-     46  1202		       85 0e		      sta	new_color_position
-     47  1204		       a5 14		      lda	squarebot_color_position+1
-     48  1206		       85 0f		      sta	new_color_position+1
-     49  1208
-     50  1208		       a5 c5		      lda	currently_pressed_key
-     51  120a		       c9 11		      cmp	#A_KEY
-     52  120c		       d0 06		      bne	check_if_d_pressed
-     53  120e		       20 db 12 	      jsr	move_new_position_to_left
-     54  1211		       4c 1b 12 	      jmp	check_if_new_position_valid
-     55  1214
-     56  1214				   check_if_d_pressed
-     57  1214		       c9 12		      cmp	#D_KEY
-     58  1216		       d0 03		      bne	check_if_new_position_valid
-     59  1218		       20 c0 12 	      jsr	move_new_position_to_right
-     60  121b
-     61  121b				   check_if_new_position_valid
-     62  121b		       a0 00		      ldy	#0
-     63  121d		       b1 0c		      lda	(new_position),y
-     64  121f		       c9 04		      cmp	#EXIT_CHAR
-     65  1221		       d0 04		      bne	continue_level
-     66  1223		       20 b9 12 	      jsr	level_has_finished
-     67  1226		       60		      rts
-     68  1227
-     69  1227				   continue_level
-     70  1227		       20 37 13 	      jsr	collision_handler
-     71  122a		       90 03		      bcc	handle_jump_logic
-     72  122c
-     73  122c		       20 9b 12 	      jsr	update_squarebot_position
-     74  122f
-     75  122f				   handle_jump_logic
-     76  122f		       a5 17		      lda	jump_remaining	; how many more upward motions for current jump
-     77  1231		       c9 00		      cmp	#0
-     78  1233		       d0 2d		      bne	handle_jumps_remaining
-     79  1235
-     80  1235
-     81  1235				   handle_no_jumps_remaining		; if no jumps left, then start jump if space is pressed, otherwise just skip and handle gravity
-     82  1235		       a5 c5		      lda	currently_pressed_key
-     83  1237		       c9 20		      cmp	#SPACE_KEY
-     84  1239		       d0 47		      bne	handle_gravity
-     85  123b
-     86  123b
-     87  123b
-     88  123b		       20 62 13 	      jsr	squarebot_on_first_row	; if on first row, we dont care about what character lies below
-     89  123e		       b0 0d		      bcs	skip_validity_check
-     90  1240
-     91  1240							; check if character below is blank; if so dont allow us to set jump_remaining
-     92  1240		       a0 16		      ldy	#ROW_SIZE
-     93  1242		       b1 11		      lda	(squarebot_position),y
-     94  1244
-     95  1244		       c9 04		      cmp	#EXIT_CHAR
-     96  1246		       f0 71		      beq	level_has_finished
-     97  1248
-     98  1248		       20 37 13 	      jsr	collision_handler
-     99  124b		       b0 35		      bcs	handle_gravity
-    100  124d
-    101  124d				   skip_validity_check
-    102  124d		       a5 16		      lda	has_booster
-    103  124f		       c9 01		      cmp	#1
-    104  1251		       d0 0b		      bne	regular_jump
-    105  1253		       a9 08		      lda	#JUMP_SIZE*2
-    106  1255		       85 17		      sta	jump_remaining
-    107  1257		       a9 00		      lda	#0
-    108  1259		       85 16		      sta	has_booster
-    109  125b		       4c 62 12 	      jmp	handle_jumps_remaining
-    110  125e
-    111  125e
-    112  125e				   regular_jump
-    113  125e		       a9 04		      lda	#JUMP_SIZE
-    114  1260		       85 17		      sta	jump_remaining
-    115  1262
-    116  1262				   handle_jumps_remaining
-    117  1262		       20 f6 12 	      jsr	move_new_position_up
-    118  1265		       a0 00		      ldy	#0
-    119  1267		       b1 0c		      lda	(new_position),y
-    120  1269		       c9 04		      cmp	#EXIT_CHAR
-    121  126b		       f0 4c		      beq	level_has_finished
-    122  126d
-    123  126d		       20 37 13 	      jsr	collision_handler
-    124  1270		       90 0b		      bcc	jump_is_invalid
-    125  1272
-    126  1272		       20 9b 12 	      jsr	update_squarebot_position
-    127  1275
-    128  1275		       a5 17		      lda	jump_remaining
-    129  1277		       38		      sec
-    130  1278		       e9 01		      sbc	#1
-    131  127a		       85 17		      sta	jump_remaining
-    132  127c		       60		      rts		; no gravity effect after moving upwards from jump
-    133  127d
-    134  127d
-    135  127d				   jump_is_invalid
-    136  127d		       a9 00		      lda	#0
-    137  127f		       85 17		      sta	jump_remaining
-    138  1281		       60		      rts
-    139  1282
-    140  1282				   handle_gravity		; on first row - do nothing
-    141  1282		       20 11 13 	      jsr	move_new_position_down
-    142  1285
-    143  1285		       20 62 13 	      jsr	squarebot_on_first_row
-    144  1288		       b0 10		      bcs	do_nothing
-    145  128a
-    146  128a		       a0 00		      ldy	#0
-    147  128c		       b1 0c		      lda	(new_position),y
-    148  128e
-    149  128e		       c9 04		      cmp	#EXIT_CHAR
-    150  1290		       f0 27		      beq	level_has_finished
-    151  1292
-    152  1292		       20 37 13 	      jsr	collision_handler
-    153  1295		       90 03		      bcc	do_nothing
-    154  1297
-    155  1297
-    156  1297		       20 9b 12 	      jsr	update_squarebot_position
-    157  129a
-    158  129a				   do_nothing
-    159  129a		       60		      rts
-    160  129b
-    161  129b				   update_squarebot_position
-    162  129b		       20 2c 13 	      jsr	remove_char
-    163  129e							; new positions are valid; set them to current positions
-    164  129e
-    165  129e		       a5 0c		      lda	new_position
-    166  12a0		       85 11		      sta	squarebot_position
-    167  12a2		       a5 0d		      lda	new_position+1
-    168  12a4		       85 12		      sta	squarebot_position+1
-    169  12a6
-    170  12a6		       a5 0e		      lda	new_color_position
-    171  12a8		       85 13		      sta	squarebot_color_position
-    172  12aa		       a5 0f		      lda	new_color_position+1
-    173  12ac		       85 14		      sta	squarebot_color_position+1
-    174  12ae
-    175  12ae		       a0 00		      ldy	#0
-    176  12b0		       a9 01		      lda	#SQUAREBOT_CHAR
-    177  12b2		       91 11		      sta	(squarebot_position),y
-    178  12b4		       a9 02		      lda	#SQUAREBOT_COLOR
-    179  12b6		       91 13		      sta	(squarebot_color_position),y
-    180  12b8
-    181  12b8		       60		      rts
-    182  12b9
-    183  12b9				   level_has_finished
-    184  12b9		       a9 01		      lda	#1
-    185  12bb		       85 09		      sta	level_completed
-    186  12bd		       85 08		      sta	level_reset
-    187  12bf		       60		      rts
-    188  12c0
-    189  12c0				   move_new_position_to_right
-    190  12c0		       18		      clc
-    191  12c1		       a5 0c		      lda	new_position	; load and add to low byte
-    192  12c3		       69 01		      adc	#$1
-    193  12c5		       85 0c		      sta	new_position
-    194  12c7		       a5 0d		      lda	new_position+1
-    195  12c9		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    196  12cb		       85 0d		      sta	new_position+1
-    197  12cd		       18		      clc
-    198  12ce		       a5 0e		      lda	new_color_position	; load and add to low byte
-    199  12d0		       69 01		      adc	#$1
-    200  12d2		       85 0e		      sta	new_color_position
-    201  12d4		       a5 0f		      lda	new_color_position+1
-    202  12d6		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    203  12d8		       85 0f		      sta	new_color_position+1
-    204  12da		       60		      rts
-    205  12db
-    206  12db				   move_new_position_to_left
-    207  12db		       38		      sec
-    208  12dc		       a5 0c		      lda	new_position
-    209  12de		       e9 01		      sbc	#$1
-    210  12e0		       85 0c		      sta	new_position
-    211  12e2		       a5 0d		      lda	new_position+1
-    212  12e4		       e9 00		      sbc	#$0
-    213  12e6		       85 0d		      sta	new_position+1
-    214  12e8		       38		      sec
-    215  12e9		       a5 0e		      lda	new_color_position
-    216  12eb		       e9 01		      sbc	#$1
-    217  12ed		       85 0e		      sta	new_color_position
-    218  12ef		       a5 0f		      lda	new_color_position+1
-    219  12f1		       e9 00		      sbc	#$0
-    220  12f3		       85 0f		      sta	new_color_position+1
-    221  12f5		       60		      rts
-    222  12f6
-    223  12f6
-    224  12f6				   move_new_position_up
-    225  12f6		       38		      sec
-    226  12f7		       a5 0c		      lda	new_position
-    227  12f9		       e9 16		      sbc	#ROW_SIZE
-    228  12fb		       85 0c		      sta	new_position
-    229  12fd		       a5 0d		      lda	new_position+1
-    230  12ff		       e9 00		      sbc	#$0
-    231  1301		       85 0d		      sta	new_position+1
-    232  1303		       38		      sec
-    233  1304		       a5 0e		      lda	new_color_position
-    234  1306		       e9 16		      sbc	#ROW_SIZE
-    235  1308		       85 0e		      sta	new_color_position
-    236  130a		       a5 0f		      lda	new_color_position+1
-    237  130c		       e9 00		      sbc	#$0
-    238  130e		       85 0f		      sta	new_color_position+1
-    239  1310		       60		      rts
-    240  1311
-    241  1311				   move_new_position_down
-    242  1311		       18		      clc
-    243  1312		       a5 0c		      lda	new_position	; load and add to low byte
-    244  1314		       69 16		      adc	#ROW_SIZE
-    245  1316		       85 0c		      sta	new_position
-    246  1318		       a5 0d		      lda	new_position+1
-    247  131a		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    248  131c		       85 0d		      sta	new_position+1
-    249  131e		       18		      clc
-    250  131f		       a5 0e		      lda	new_color_position	; load and add to low byte
-    251  1321		       69 16		      adc	#ROW_SIZE
-    252  1323		       85 0e		      sta	new_color_position
-    253  1325		       a5 0f		      lda	new_color_position+1
-    254  1327		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    255  1329		       85 0f		      sta	new_color_position+1
-    256  132b		       60		      rts
-    257  132c
-    258  132c
-    259  132c				   remove_char		; remove squarebot from current screen location
-    260  132c		       a0 00		      ldy	#0
-    261  132e		       a9 20		      lda	#BLANK_CHAR
-    262  1330		       91 11		      sta	(squarebot_position),Y
-    263  1332		       a9 01		      lda	#1
-    264  1334		       91 13		      sta	(squarebot_color_position),Y
-    265  1336		       60		      rts
-    266  1337
-    267  1337				   collision_handler		; accumulator is the character (the actual character code) in the position that squarbeot wants to move to
-    268  1337							; set carry flag if we can move to this char, otherwise clear it
-    269  1337		       c9 20		      cmp	#BLANK_CHAR
-    270  1339		       f0 33		      beq	return_true
-    271  133b
-    272  133b		       c9 09		      CMP	#BOOSTER_CHAR
-    273  133d		       d0 07		      bne	key_check
-    274  133f		       a9 01		      lda	#1
-    275  1341		       85 16		      sta	has_booster
-    276  1343		       4c 6e 13 	      jmp	return_true
-    277  1346
-    278  1346				   key_check
-    279  1346		       c9 05		      cmp	#KEY_CHAR
-    280  1348		       d0 07		      bne	locked_wall_check
-    281  134a		       a9 01		      lda	#1
-    282  134c		       85 15		      sta	has_key
-    283  134e		       4c 6e 13 	      jmp	return_true
-    284  1351
-    285  1351				   locked_wall_check
-    286  1351		       c9 06		      cmp	#LOCKED_WALL_CHAR
-    287  1353		       d0 1b		      bne	return_false
-    288  1355
-    289  1355		       a5 15		      lda	has_key	; if locked wall, but player doesnt have key, cant do anything
-    290  1357		       c9 00		      cmp	#0
-    291  1359		       f0 15		      beq	return_false
-    292  135b
-    293  135b		       a9 00		      lda	#0	; but if locked wall and has key, get rid of the locked wall and the key
-    294  135d		       85 15		      sta	has_key
-    295  135f		       4c 6e 13 	      jmp	return_true
-    296  1362
-    297  1362
-    298  1362				   squarebot_on_first_row		; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
-    299  1362		       a5 12		      lda	squarebot_position+1
-    300  1364		       c9 1f		      cmp	#START_OF_FIRST_ROW_HIGH_BYTE
-    301  1366		       90 08		      bcc	return_false	; compare high bits; return false if current position high bit is smaller than high bit of leftmost position on first row
-    302  1368		       a5 11		      lda	squarebot_position
-    303  136a		       c9 e4		      cmp	#START_OF_FIRST_ROW_LOW_BYTE
-    304  136c		       90 02		      bcc	return_false
-    305  136e
-    306  136e				   return_true
-    307  136e		       38		      sec
-    308  136f		       60		      rts
-    309  1370
-    310  1370				   return_false
-    311  1370		       18		      clc
-    312  1371		       60		      rts
+      9  11f8				   update_game_state
+     10  11f8		       a5 11		      lda	squarebot_position
+     11  11fa		       85 0c		      sta	new_position
+     12  11fc		       a5 12		      lda	squarebot_position+1
+     13  11fe		       85 0d		      sta	new_position+1
+     14  1200		       a5 13		      lda	squarebot_color_position
+     15  1202		       85 0e		      sta	new_color_position
+     16  1204		       a5 14		      lda	squarebot_color_position+1
+     17  1206		       85 0f		      sta	new_color_position+1
+     18  1208
+     19  1208		       a5 c5		      lda	currently_pressed_key
+     20  120a		       c9 11		      cmp	#A_KEY
+     21  120c		       d0 06		      bne	check_if_d_pressed
+     22  120e		       20 db 12 	      jsr	move_new_position_to_left
+     23  1211		       4c 1b 12 	      jmp	check_if_new_position_valid
+     24  1214
+     25  1214				   check_if_d_pressed
+     26  1214		       c9 12		      cmp	#D_KEY
+     27  1216		       d0 03		      bne	check_if_new_position_valid
+     28  1218		       20 c0 12 	      jsr	move_new_position_to_right
+     29  121b
+     30  121b				   check_if_new_position_valid
+     31  121b		       a0 00		      ldy	#0
+     32  121d		       b1 0c		      lda	(new_position),y
+     33  121f		       c9 04		      cmp	#EXIT_CHAR
+     34  1221		       d0 04		      bne	continue_level
+     35  1223		       20 b9 12 	      jsr	level_has_finished
+     36  1226		       60		      rts
+     37  1227
+     38  1227				   continue_level
+     39  1227		       20 37 13 	      jsr	collision_handler
+     40  122a		       90 03		      bcc	handle_jump_logic
+     41  122c
+     42  122c		       20 9b 12 	      jsr	update_squarebot_position
+     43  122f
+     44  122f				   handle_jump_logic
+     45  122f		       a5 17		      lda	jump_remaining	; how many more upward motions for current jump
+     46  1231		       c9 00		      cmp	#0
+     47  1233		       d0 2d		      bne	handle_jumps_remaining
+     48  1235
+     49  1235
+     50  1235				   handle_no_jumps_remaining		; if no jumps left, then start jump if space is pressed, otherwise just skip and handle gravity
+     51  1235		       a5 c5		      lda	currently_pressed_key
+     52  1237		       c9 20		      cmp	#SPACE_KEY
+     53  1239		       d0 47		      bne	handle_gravity
+     54  123b
+     55  123b
+     56  123b
+     57  123b		       20 62 13 	      jsr	squarebot_on_first_row	; if on first row, we dont care about what character lies below
+     58  123e		       b0 0d		      bcs	skip_validity_check
+     59  1240
+     60  1240							; check if character below is blank; if so dont allow us to set jump_remaining
+     61  1240		       a0 16		      ldy	#ROW_SIZE
+     62  1242		       b1 11		      lda	(squarebot_position),y
+     63  1244
+     64  1244		       c9 04		      cmp	#EXIT_CHAR
+     65  1246		       f0 71		      beq	level_has_finished
+     66  1248
+     67  1248		       20 37 13 	      jsr	collision_handler
+     68  124b		       b0 35		      bcs	handle_gravity
+     69  124d
+     70  124d				   skip_validity_check
+     71  124d		       a5 16		      lda	has_booster	; if we have the booster, set jump_remaining to twice as high, then get rid of the booster
+     72  124f		       c9 01		      cmp	#1
+     73  1251		       d0 0b		      bne	regular_jump
+     74  1253		       a9 08		      lda	#JUMP_SIZE*2
+     75  1255		       85 17		      sta	jump_remaining
+     76  1257		       a9 00		      lda	#0
+     77  1259		       85 16		      sta	has_booster
+     78  125b		       4c 62 12 	      jmp	handle_jumps_remaining
+     79  125e
+     80  125e
+     81  125e				   regular_jump
+     82  125e		       a9 04		      lda	#JUMP_SIZE
+     83  1260		       85 17		      sta	jump_remaining
+     84  1262
+     85  1262				   handle_jumps_remaining
+     86  1262		       20 f6 12 	      jsr	move_new_position_up
+     87  1265		       a0 00		      ldy	#0
+     88  1267		       b1 0c		      lda	(new_position),y
+     89  1269		       c9 04		      cmp	#EXIT_CHAR
+     90  126b		       f0 4c		      beq	level_has_finished
+     91  126d
+     92  126d		       20 37 13 	      jsr	collision_handler
+     93  1270		       90 0b		      bcc	jump_is_invalid
+     94  1272
+     95  1272		       20 9b 12 	      jsr	update_squarebot_position
+     96  1275
+     97  1275		       a5 17		      lda	jump_remaining
+     98  1277		       38		      sec
+     99  1278		       e9 01		      sbc	#1
+    100  127a		       85 17		      sta	jump_remaining
+    101  127c		       60		      rts		; no gravity effect after moving upwards from jump
+    102  127d
+    103  127d
+    104  127d				   jump_is_invalid
+    105  127d		       a9 00		      lda	#0
+    106  127f		       85 17		      sta	jump_remaining
+    107  1281		       60		      rts
+    108  1282
+    109  1282				   handle_gravity		; on first row - do nothing
+    110  1282		       20 11 13 	      jsr	move_new_position_down
+    111  1285
+    112  1285		       20 62 13 	      jsr	squarebot_on_first_row
+    113  1288		       b0 10		      bcs	do_nothing
+    114  128a
+    115  128a		       a0 00		      ldy	#0
+    116  128c		       b1 0c		      lda	(new_position),y
+    117  128e
+    118  128e		       c9 04		      cmp	#EXIT_CHAR
+    119  1290		       f0 27		      beq	level_has_finished
+    120  1292
+    121  1292		       20 37 13 	      jsr	collision_handler
+    122  1295		       90 03		      bcc	do_nothing
+    123  1297
+    124  1297
+    125  1297		       20 9b 12 	      jsr	update_squarebot_position
+    126  129a
+    127  129a				   do_nothing
+    128  129a		       60		      rts
+    129  129b
+    130  129b				   update_squarebot_position
+    131  129b		       20 2c 13 	      jsr	remove_char
+    132  129e							; new positions are valid; set them to current positions
+    133  129e
+    134  129e		       a5 0c		      lda	new_position
+    135  12a0		       85 11		      sta	squarebot_position
+    136  12a2		       a5 0d		      lda	new_position+1
+    137  12a4		       85 12		      sta	squarebot_position+1
+    138  12a6
+    139  12a6		       a5 0e		      lda	new_color_position
+    140  12a8		       85 13		      sta	squarebot_color_position
+    141  12aa		       a5 0f		      lda	new_color_position+1
+    142  12ac		       85 14		      sta	squarebot_color_position+1
+    143  12ae
+    144  12ae		       a0 00		      ldy	#0
+    145  12b0		       a9 01		      lda	#SQUAREBOT_CHAR
+    146  12b2		       91 11		      sta	(squarebot_position),y
+    147  12b4		       a9 02		      lda	#SQUAREBOT_COLOR
+    148  12b6		       91 13		      sta	(squarebot_color_position),y
+    149  12b8
+    150  12b8		       60		      rts
+    151  12b9
+    152  12b9				   level_has_finished
+    153  12b9		       a9 01		      lda	#1
+    154  12bb		       85 09		      sta	level_completed
+    155  12bd		       85 08		      sta	level_reset
+    156  12bf		       60		      rts
+    157  12c0
+    158  12c0				   move_new_position_to_right
+    159  12c0		       18		      clc
+    160  12c1		       a5 0c		      lda	new_position	; load and add to low byte
+    161  12c3		       69 01		      adc	#$1
+    162  12c5		       85 0c		      sta	new_position
+    163  12c7		       a5 0d		      lda	new_position+1
+    164  12c9		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    165  12cb		       85 0d		      sta	new_position+1
+    166  12cd		       18		      clc
+    167  12ce		       a5 0e		      lda	new_color_position	; load and add to low byte
+    168  12d0		       69 01		      adc	#$1
+    169  12d2		       85 0e		      sta	new_color_position
+    170  12d4		       a5 0f		      lda	new_color_position+1
+    171  12d6		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    172  12d8		       85 0f		      sta	new_color_position+1
+    173  12da		       60		      rts
+    174  12db
+    175  12db				   move_new_position_to_left
+    176  12db		       38		      sec
+    177  12dc		       a5 0c		      lda	new_position
+    178  12de		       e9 01		      sbc	#$1
+    179  12e0		       85 0c		      sta	new_position
+    180  12e2		       a5 0d		      lda	new_position+1
+    181  12e4		       e9 00		      sbc	#$0
+    182  12e6		       85 0d		      sta	new_position+1
+    183  12e8		       38		      sec
+    184  12e9		       a5 0e		      lda	new_color_position
+    185  12eb		       e9 01		      sbc	#$1
+    186  12ed		       85 0e		      sta	new_color_position
+    187  12ef		       a5 0f		      lda	new_color_position+1
+    188  12f1		       e9 00		      sbc	#$0
+    189  12f3		       85 0f		      sta	new_color_position+1
+    190  12f5		       60		      rts
+    191  12f6
+    192  12f6
+    193  12f6				   move_new_position_up
+    194  12f6		       38		      sec
+    195  12f7		       a5 0c		      lda	new_position
+    196  12f9		       e9 16		      sbc	#ROW_SIZE
+    197  12fb		       85 0c		      sta	new_position
+    198  12fd		       a5 0d		      lda	new_position+1
+    199  12ff		       e9 00		      sbc	#$0
+    200  1301		       85 0d		      sta	new_position+1
+    201  1303		       38		      sec
+    202  1304		       a5 0e		      lda	new_color_position
+    203  1306		       e9 16		      sbc	#ROW_SIZE
+    204  1308		       85 0e		      sta	new_color_position
+    205  130a		       a5 0f		      lda	new_color_position+1
+    206  130c		       e9 00		      sbc	#$0
+    207  130e		       85 0f		      sta	new_color_position+1
+    208  1310		       60		      rts
+    209  1311
+    210  1311				   move_new_position_down
+    211  1311		       18		      clc
+    212  1312		       a5 0c		      lda	new_position	; load and add to low byte
+    213  1314		       69 16		      adc	#ROW_SIZE
+    214  1316		       85 0c		      sta	new_position
+    215  1318		       a5 0d		      lda	new_position+1
+    216  131a		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    217  131c		       85 0d		      sta	new_position+1
+    218  131e		       18		      clc
+    219  131f		       a5 0e		      lda	new_color_position	; load and add to low byte
+    220  1321		       69 16		      adc	#ROW_SIZE
+    221  1323		       85 0e		      sta	new_color_position
+    222  1325		       a5 0f		      lda	new_color_position+1
+    223  1327		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    224  1329		       85 0f		      sta	new_color_position+1
+    225  132b		       60		      rts
+    226  132c
+    227  132c
+    228  132c				   remove_char		; remove squarebot from current screen location
+    229  132c		       a0 00		      ldy	#0
+    230  132e		       a9 20		      lda	#BLANK_CHAR
+    231  1330		       91 11		      sta	(squarebot_position),Y
+    232  1332		       a9 01		      lda	#1
+    233  1334		       91 13		      sta	(squarebot_color_position),Y
+    234  1336		       60		      rts
+    235  1337
+    236  1337				   collision_handler		; accumulator is the character (the actual character code) in the position that squarbeot wants to move to
+    237  1337							; set carry flag if we can move to this char, otherwise clear it
+    238  1337		       c9 20		      cmp	#BLANK_CHAR
+    239  1339		       f0 33		      beq	return_true
+    240  133b
+    241  133b		       c9 09		      CMP	#BOOSTER_CHAR
+    242  133d		       d0 07		      bne	key_check
+    243  133f		       a9 01		      lda	#1
+    244  1341		       85 16		      sta	has_booster
+    245  1343		       4c 6e 13 	      jmp	return_true
+    246  1346
+    247  1346				   key_check
+    248  1346		       c9 05		      cmp	#KEY_CHAR
+    249  1348		       d0 07		      bne	locked_wall_check
+    250  134a		       a9 01		      lda	#1
+    251  134c		       85 15		      sta	has_key
+    252  134e		       4c 6e 13 	      jmp	return_true
+    253  1351
+    254  1351				   locked_wall_check
+    255  1351		       c9 06		      cmp	#LOCKED_WALL_CHAR
+    256  1353		       d0 1b		      bne	return_false
+    257  1355
+    258  1355		       a5 15		      lda	has_key	; if locked wall, but player doesnt have key, cant do anything
+    259  1357		       c9 00		      cmp	#0
+    260  1359		       f0 15		      beq	return_false
+    261  135b
+    262  135b		       a9 00		      lda	#0	; but if locked wall and has key, get rid of the locked wall and the key
+    263  135d		       85 15		      sta	has_key
+    264  135f		       4c 6e 13 	      jmp	return_true
+    265  1362
+    266  1362
+    267  1362				   squarebot_on_first_row		; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
+    268  1362		       a5 12		      lda	squarebot_position+1
+    269  1364		       c9 1f		      cmp	#START_OF_FIRST_ROW_HIGH_BYTE
+    270  1366		       90 08		      bcc	return_false	; compare high bits; return false if current position high bit is smaller than high bit of leftmost position on first row
+    271  1368		       a5 11		      lda	squarebot_position
+    272  136a		       c9 e4		      cmp	#START_OF_FIRST_ROW_LOW_BYTE
+    273  136c		       90 02		      bcc	return_false
+    274  136e
+    275  136e				   return_true
+    276  136e		       38		      sec
+    277  136f		       60		      rts
+    278  1370
+    279  1370				   return_false
+    280  1370		       18		      clc
+    281  1371		       60		      rts
 ------- FILE src/main.s
     137  1372
     138  1372				   compressed_screen_data_start
@@ -831,23 +800,23 @@
     146  141e					      incbin	"../data/levels/binary_levels/3"
     147  1476					      incbin	"../data/levels/binary_levels/4"
     148  14a2					      incbin	"../data/levels/binary_levels/5"
-    149  14d0					      incbin	"../data/levels/binary_levels/6"
-    150  1502
+    149  14ce					      incbin	"../data/levels/binary_levels/6"
+    150  1500
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1502					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1502		       05 01	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1502		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 1281 bytes used
-      3  1502					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  5378
-      4  1502					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1502				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1502				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1502				  -	      err
-      8  1502					      endif
+      0  1500					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  1500		       04 ff	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  1500		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 1279 bytes used
+      3  1500					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  5376
+      4  1500					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  1500				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  1500				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  1500				  -	      err
+      8  1500					      endif
 ------- FILE src/main.s
-    152  1502
-    153  1502
+    152  1500
+    153  1500
     154  1c00					      org	character_set_begin
     155  1c00		       81 ff ff 81*	      BYTE.b	129,255,255,129,129,255,255,129	; ladder 0
     156  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,189,165,129,255	; squarebot 1
