@@ -44,7 +44,7 @@ A_KEY = $11
 S_KEY = $29
 D_KEY = $12
 SECRET_KEY = $0d ; press P to skip to next  level
-RESET_KEY = $34
+RESET_KEY = $0a ; press R to restart level i assume
 JUMP_SIZE = $4 ; number of characters a jump causes
 ROW_SIZE = $16
 ; memory locations
@@ -90,6 +90,8 @@ gameLoop
   jsr update_game_state
   jsr check_for_secret_key
   jsr check_for_reset_key
+  jsr wait_until_next_frame
+  jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
@@ -152,13 +154,13 @@ level_data_start
 
 
   org character_set_begin
-  BYTE 129,255,255,129,129,255,255,129 ; ladder 0
-  BYTE 255,129,165,129,189,165,129,255 ; squarebot 1
-  BYTE 255,255,0,0,0,0,0,0 ; platform 2
-  BYTE 255,255,255,255,255,255,255,255 ; wall 3
-  BYTE 126,231,129,129,225,129,129,255 ; exit (door) 4
-  BYTE 24,36,24,24,30,24,30,24 ; key powerup 5 
-  BYTE 255,255,239,239,239,227,255,255 ;locked wall 6
-  BYTE 255,189,253,183,127,239,231,255 ; breakable wall 7
-  BYTE 0,0,24,60,126,126,0,0 ; spike 8
-  BYTE 0,112,72,120,72,72,112,0 ; booster powerup 9
+  BYTE $7E, $42, $7E, $42, $7E, $42, $7E, $42 ; ladder 0
+  BYTE $FF, $81, $A5, $81, $BD, $81, $81, $FF ; squarebot 1
+  BYTE $FF, $5A, $00, $00, $00, $00, $00, $00 ; platform 2
+  BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; wall 3
+  BYTE $FF, $9D, $A3, $AC, $A5, $99, $C3, $FF ; exit (door) 4
+  BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 5 
+  BYTE $FF, $E7, $C3, $E7, $E7, $C3, $81, $FF ; locked wall 6
+  BYTE $FF, $EE, $F1, $EF, $57, $8F, $F3, $FF ; breakable wall 7
+  BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike 8
+  BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 9

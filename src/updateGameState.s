@@ -26,6 +26,7 @@ check_if_d_pressed
   cmp #D_KEY
   bne check_if_new_position_valid
   jsr move_new_position_to_right
+  jmp check_if_new_position_valid
 
 check_if_new_position_valid
   ldy #0
@@ -233,7 +234,7 @@ remove_char ; remove squarebot from current screen location
   sta (squarebot_color_position),Y
   rts
 
-collision_handler ; accumulator is the character (the actual character code) in the position that squarbeot wants to move to
+collision_handler ; accumulator is the character (the actual character code) in the position that squarebot wants to move to
 ; set carry flag if we can move to this char, otherwise clear it
   cmp #BLANK_CHAR
   beq return_true
@@ -279,3 +280,19 @@ return_true
 return_false
   clc
   rts
+
+
+;plan for attachable powerups
+;5 variables to store the 5 tiles the player is on: tileU, tileD, tileR, tileL, tileM
+;maybe combine to save space?
+;4 characters to store each powerup spot: charU, charD, charR, charL
+
+;when moving the character right: ASSUMING THIS DOESN'T FLICKER
+;  delete L, U and D and draw original tiles there
+;  tileU = new, tileD = new, tileL = tileM, tileM = tileR, tileR = new
+;  update chars
+;  draw chars in the new place
+;same deal for moving in any direction
+
+
+;for moving while jumping, something about register 028C which counts down until a refresh on the button or something
