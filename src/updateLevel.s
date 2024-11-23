@@ -22,7 +22,7 @@ LOCKED_WALL_COLOR = 0
 LADDER_COLOR = 8
 EXIT_COLOR = 2
 PLATFORM_COLOR = 2
-KEY_COLOR = 7
+KEY_COLOR = 3
 SPIKE_COLOR = 6
 BOOSTER_COLOR = 3
 
@@ -166,9 +166,8 @@ check_if_starting_point
   ldx #SQUAREBOT_COLOR
   jsr draw_char_in_accumulator
 
- 
-  
   rts
+
 
 check_if_wall
   cmp #WALL
