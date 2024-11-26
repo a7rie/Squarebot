@@ -802,23 +802,23 @@
     148  14a2					      incbin	"../data/levels/binary_levels/5"
     149  14ce					      incbin	"../data/levels/binary_levels/6"
     150  14fe					      incbin	"../data/levels/binary_levels/7"
-    151  1562					      incbin	"../data/levels/binary_levels/8"
-    152  15ec
+    151  156e					      incbin	"../data/levels/binary_levels/8"
+    152  15f6
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  15ec					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  15ec		       05 eb	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  15ec		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 1515 bytes used
-      3  15ec					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  5612
-      4  15ec					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  15ec				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  15ec				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  15ec				  -	      err
-      8  15ec					      endif
+      0  15f6					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  15f6		       05 f5	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  15f6		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 1525 bytes used
+      3  15f6					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  5622
+      4  15f6					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  15f6				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  15f6				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  15f6				  -	      err
+      8  15f6					      endif
 ------- FILE src/main.s
-    154  15ec
-    155  15ec
+    154  15f6
+    155  15f6
     156  1c00					      org	character_set_begin
     157  1c00		       81 ff ff 81*	      BYTE.b	129,255,255,129,129,255,255,129	; ladder 0
     158  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,189,165,129,255	; squarebot 1
