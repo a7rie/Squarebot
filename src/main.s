@@ -21,6 +21,8 @@ squarebot_color_position ds.w 1
 has_key ds.b 1
 has_booster ds.b 1
 jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
+tileStore ds.b 3 ; 5 bits for the 4 powerup tiles, 4 bits for squarebot tile since many tiles can't go there. ordered U,D,L,R,M
+attached_powerups ds.w 1; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=key 3=spike 4=shield
   seg
 
 ; constants
@@ -130,6 +132,7 @@ check_for_reset_key
   sta has_booster
   sta has_key
   sta jump_remaining
+  sta attached_powerups
   
 check_for_reset_key_return
   rts
@@ -160,7 +163,17 @@ level_data_start
   BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; wall 3
   BYTE $FF, $9D, $A3, $AC, $A5, $99, $C3, $FF ; exit (door) 4
   BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 5 
-  BYTE $FF, $E7, $C3, $E7, $E7, $C3, $81, $FF ; locked wall 6
+  BYTE $FF, $FF, $C3, $C3, $E7, $E7, $E7, $FF ; locked wall 6
   BYTE $FF, $EE, $F1, $EF, $57, $8F, $F3, $FF ; breakable wall 7
   BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike 8
   BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 9
+  BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R)
+  BYTE $08, $38, $F0, $FD, $FA, $F0, $38, $08 ; booster attachment (R)
+  BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R)
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charD
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charL
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charR
+
+; there appears to be no simple way to turn the characters
+; but its still worth since storing 24 more bytes for each powerup probably takes more space than brute force flip/rotate array.

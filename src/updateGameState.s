@@ -239,14 +239,14 @@ collision_handler ; accumulator is the character (the actual character code) in 
   cmp #BLANK_CHAR
   beq return_true
   
-  CMP #BOOSTER_CHAR
+  CMP #BOOSTER_P_CHAR
   bne key_check
   lda #1
   sta has_booster
   jmp return_true
 
 key_check
-  cmp #KEY_CHAR
+  cmp #KEY_P_CHAR
   bne locked_wall_check
   lda #1
   sta has_key
@@ -286,6 +286,7 @@ return_false
 ;5 variables to store the 5 tiles the player is on: tileU, tileD, tileR, tileL, tileM
 ;maybe combine to save space?
 ;4 characters to store each powerup spot: charU, charD, charR, charL
+;1 variable to store character's current powerups: attached_powerups
 
 ;when moving the character right: ASSUMING THIS DOESN'T FLICKER
 ;  delete L, U and D and draw original tiles there
@@ -296,3 +297,96 @@ return_false
 
 
 ;for moving while jumping, something about register 028C which counts down until a refresh on the button or something
+
+
+;this is for drawing the attachable powerup.
+;first draw the tile onto the character
+
+;set x to the address of the attachment
+;set y to 1
+;go to nestedloop
+
+;outerloop:
+;if y && 128 = 1 end loop
+;otherwise shift y right 1
+;run nestedloop
+
+;nestedloop:
+  ;lda [character_set_begin+[16*8]]^[[character_set_begin+[16*8]]&arithTemp]
+
+;target row = targetrow ^ [x & y]
+;go through each row at x, check if x && y = 1
+;if yes, XOR the correct bit on the character with 1 I think xor is ^
+;if the loop is done go to outerloop
+;otherwise nestedloop
+
+
+;option 2:
+
+;store each row of charL ^ powerup in tempArith
+;load tempArith into accumulator and store it in charL
+;clear tempArith
+
+;so
+;for each a=1 a<<1 a < 129
+;and charL
+
+;I don't think there is a generalized way to do this
+;it has to be brute force, unique for each direction i think
+;there is no simple way to store the fact that a bit is 1 and dynamically figure out how to change the character accordingly
+;unless?
+
+
+
+;variables: position (first 4 bits are byte position, second 4 bits are bit position)
+;good gosh you can't shift accumulator multiple bits at a time.
+
+;check each bit of the attachment, if its 1 set accumulator to 1 - nested for loop
+;go to directional implementation
+
+;right
+;shift accumulator to the correct bit - for loop since accumulator only shifts 1 bit at a time
+; ldx -1
+;shiftloop:
+; inx
+; asl
+; cpx [position>>4]%16
+; bne shiftloop
+
+;eor accumulator with the correct row in charR - EOR charR+[position%16]
+;increase position
+
+;
+
+;lets figure out the rest of the logic.
+;start of level need to set the tiles and chars and everything, and when you reset too
+
+;check if you press a or d:
+; check tile if you can move
+; if you can't, jump to fall
+; otherwise, move new position and apply powerup if you collide with one
+; refresh tiles
+; call powerup logic for each powerup.
+; draw powerup characters
+; delete old character
+; display character and powerups
+; wait a jiffy probably
+; booster check, if booster activated do this move again
+
+;check if you are falling or jumping
+; basically do all the same stuff but for up and down
+
+
+
+
+
+;powerup logic:
+
+
+
+;feedback:
+;more intermediate levels
+;jump left and jump right (uncontrollable jump movement)
+;better colored powerups
+;tutorial text
+;jumping animation? change his face.

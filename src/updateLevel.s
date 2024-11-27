@@ -19,23 +19,29 @@ BOOSTER = 160 ;  10100000
 WALL_COLOR = 0
 BREAKABLE_WALL_COLOR = 0
 LOCKED_WALL_COLOR = 0
-LADDER_COLOR = 8
-EXIT_COLOR = 2
-PLATFORM_COLOR = 2
-KEY_COLOR = 3
-SPIKE_COLOR = 6
-BOOSTER_COLOR = 3
+LADDER_COLOR = 6
+EXIT_COLOR = 6
+PLATFORM_COLOR = 4
+SPIKE_COLOR = 2
+KEY_P_COLOR = 7
+SPIKE_P_COLOR = 6
+BOOSTER_P_COLOR = 6
 
-BLANK_SPACE_CHAR = $20 
-WALL_CHAR = $3
-BREAKABLE_WALL_CHAR = $7
-LOCKED_WALL_CHAR = $6
-LADDER_CHAR = $0  
-EXIT_CHAR = $4
+BLANK_SPACE_CHAR = $20
+LADDER_CHAR = $0
+; no $1?
 PLATFORM_CHAR = $2
-KEY_CHAR =  $5
-SPIKE_CHAR = $8
-BOOSTER_CHAR = $9
+WALL_CHAR = $3
+EXIT_CHAR = $4
+KEY_P_CHAR =  $5
+LOCKED_WALL_CHAR = $6
+BREAKABLE_WALL_CHAR = $7
+SPIKE_P_CHAR = $8
+BOOSTER_P_CHAR = $9
+CHAR_U = $11 ; 17-20 in hex
+CHAR_D = $12
+CHAR_L = $13
+CHAR_R = $14
 
 
 update_level
@@ -221,22 +227,22 @@ check_if_platform
 check_if_key
   cmp #KEY
   bne check_if_spike
-  lda #KEY_CHAR
-  ldx #KEY_COLOR
+  lda #KEY_P_CHAR
+  ldx #KEY_P_COLOR
   jsr draw_char_in_accumulator
   rts
 
 check_if_spike
   cmp #SPIKE
   bne check_if_booster
-  lda #SPIKE_CHAR
-  ldx #SPIKE_COLOR
+  lda #SPIKE_P_CHAR
+  ldx #SPIKE_P_COLOR
   jsr draw_char_in_accumulator
   rts
   
 check_if_booster
-  lda #BOOSTER_CHAR
-  ldx #BOOSTER_COLOR
+  lda #BOOSTER_P_CHAR
+  ldx #BOOSTER_P_COLOR
   jsr draw_char_in_accumulator
   rts
 
