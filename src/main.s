@@ -28,6 +28,7 @@ BLANK_CHAR = $20
 
 SCREEN_CURSOR_BEGINNING_LOW_BYTE = $00
 SCREEN_CURSOR_BEGINNING_HIGH_BYTE = $1e
+BACKGROUND_COLOR_BYTE = $900f
 
 ; last screen location
 END_OF_SCREEN_LOW_BYTE = $fa
@@ -39,6 +40,7 @@ COLOR_CURSOR_BEGINNING_HIGH_BYTE = $96
 RED_COLOR_CODE = 0
 
 SPACE_KEY = $20
+ENTER_KEY = $0f
 W_KEY = $09
 A_KEY = $11
 S_KEY = $29
@@ -59,6 +61,9 @@ character_set_begin = $1c00
   include "stub.s" ; stub contains BASIC sys cmd to run the machine language code
 
 start  
+  LDA #24
+  STA BACKGROUND_COLOR_BYTE
+
   ; use combination of RAM (first 128 chars at 7168) & ROM character set
   lda #255
   sta character_info_register
@@ -155,7 +160,7 @@ level_data_start
 
   org character_set_begin
   BYTE 129,255,255,129,129,255,255,129 ; ladder 0
-  BYTE 255,129,165,129,189,165,129,255 ; squarebot 1
+  BYTE 255,129,165,129,165,153,129,255 ; squarebot 1
   BYTE 255,255,0,0,0,0,0,0 ; platform 2
   BYTE 255,255,255,255,255,255,255,255 ; wall 3
   BYTE 126,231,129,129,225,129,129,255 ; exit (door) 4

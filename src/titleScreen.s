@@ -12,22 +12,24 @@ display_title_screen
   ldy #$0 ; to use for indirect indexed addressing
   ldx #$0
 
-  jsr draw_title_screen_loop
+  jsr draw_title_screen_chars_loop
+  ldy #$0 ; to use for indirect indexed addressing
+  ldx #$0
 
 infinite_loop
   lda currently_pressed_key
-  cmp #SPACE_KEY
+  cmp #ENTER_KEY
   beq gameLoop
   jmp infinite_loop
 
 
-draw_title_screen_loop
+draw_title_screen_chars_loop
   lda compressed_screen_data_start,X ; accumulator stores num times to repeat the byte
   jsr draw_character ; draw the character that many times
   inx 
   inx
   jsr check_if_screen_cursor_at_end
-  bcc draw_title_screen_loop
+  bcc draw_title_screen_chars_loop
   rts
 
 
@@ -42,15 +44,23 @@ draw_character
   ; store current char at screen cursor location
   ldy #0 
   lda compressed_screen_data_start+1,X ; load cur char to draw
+
+  cmp #$a0
+  bne dont_convert_a0_to_3
+  lda #129
   clc
+
+dont_convert_a0_to_3
   adc #128
   sta (screen_cursor),Y ; draw it on screen
 
+  
   ; add color to the screen location if it's not a space
   ; because our title screen only has one color, and only displays it for characters that arent space, we can get away with this "optimization",
   ; and avoid adding color data
   cmp #BLANK_CHAR
   beq dont_color
+
   lda #RED_COLOR_CODE
   sta (color_cursor),Y
 
@@ -61,7 +71,6 @@ dont_color
 
 draw_character_end
   rts
-
 
 
 add_one_to_screen_cursor
@@ -99,3 +108,4 @@ check_if_screen_cursor_at_end_return_false
 check_if_screen_cursor_at_end_return_true
   sec
   rts 
+
