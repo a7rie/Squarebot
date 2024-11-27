@@ -51,7 +51,7 @@ JUMP_SIZE = $4 ; number of characters a jump causes
 ROW_SIZE = $16
 ; memory locations
 user_memory_start = $1001
-currently_pressed_key =  $c5
+currently_pressed_key =  $c5 ;proposed fix: mem editor 028 abc space bar loops
 jiffy_clock = $A0
 character_info_register = $9005
 character_set_begin = $1c00
