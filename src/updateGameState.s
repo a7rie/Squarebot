@@ -7,14 +7,7 @@ START_OF_FIRST_ROW_LOW_BYTE = $e4
 START_OF_FIRST_ROW_HIGH_BYTE = $1f
 
 update_game_state
-  lda squarebot_position
-  sta new_position
-  lda squarebot_position+1
-  sta new_position+1
-  lda squarebot_color_position
-  sta new_color_position
-  lda squarebot_color_position+1
-  sta new_color_position+1
+  jsr reset_new_position
 
   lda currently_pressed_key
   cmp #A_KEY
@@ -107,6 +100,7 @@ jump_is_invalid
   rts
 
 handle_gravity ; on first row - do nothing
+  jsr reset_new_position
   jsr move_new_position_down
 
   jsr squarebot_on_first_row
@@ -278,4 +272,15 @@ return_true
 
 return_false
   clc
+  rts
+
+reset_new_position
+  lda squarebot_position
+  sta new_position
+  lda squarebot_position+1
+  sta new_position+1
+  lda squarebot_color_position
+  sta new_color_position
+  lda squarebot_color_position+1
+  sta new_color_position+1
   rts
