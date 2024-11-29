@@ -817,39 +817,37 @@
     146  1430
     147  1430				   level_data_start
     148  1430					      incbin	"../data/levels/binary_levels/1"
-    149  1438					      incbin	"../data/levels/binary_levels/booster_test"
-    150  1446					      incbin	"../data/levels/binary_levels/key_test"
-    151  145c					      incbin	"../data/levels/binary_levels/2"
-    152  1474					      incbin	"../data/levels/binary_levels/3"
-    153  14cc					      incbin	"../data/levels/binary_levels/4"
-    154  14f8					      incbin	"../data/levels/binary_levels/5"
-    155  1524					      incbin	"../data/levels/binary_levels/6"
-    156  1554					      incbin	"../data/levels/binary_levels/7"
-    157  15c4					      incbin	"../data/levels/binary_levels/8"
-    158  164c
+    149  1438					      incbin	"../data/levels/binary_levels/2"
+    150  1450					      incbin	"../data/levels/binary_levels/3"
+    151  1462					      incbin	"../data/levels/binary_levels/4"
+    152  148a					      incbin	"../data/levels/binary_levels/5"
+    153  149e					      incbin	"../data/levels/binary_levels/6"
+    154  14bc					      incbin	"../data/levels/binary_levels/7"
+    155  14d8					      incbin	"../data/levels/binary_levels/8"
+    156  14fc
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  164c					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  164c		       06 4b	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  164c		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 1611 bytes used
-      3  164c					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  5708
-      4  164c					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  164c				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  164c				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  164c				  -	      err
-      8  164c					      endif
+      0  14fc					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  14fc		       04 fb	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  14fc		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 1275 bytes used
+      3  14fc					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  5372
+      4  14fc					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  14fc				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  14fc				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  14fc				  -	      err
+      8  14fc					      endif
 ------- FILE src/main.s
-    160  164c
-    161  164c
-    162  1c00					      org	character_set_begin
-    163  1c00		       81 ff ff 81*	      BYTE.b	129,255,255,129,129,255,255,129	; ladder 0
-    164  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,165,153,129,255	; squarebot 1
-    165  1c10		       ff ff 00 00*	      BYTE.b	255,255,0,0,0,0,0,0	; platform 2
-    166  1c18		       ff ff ff ff*	      BYTE.b	255,255,255,255,255,255,255,255	; wall 3
-    167  1c20		       7e e7 81 81*	      BYTE.b	126,231,129,129,225,129,129,255	; exit (door) 4
-    168  1c28		       18 24 18 18*	      BYTE.b	24,36,24,24,30,24,30,24	; key powerup 5 
-    169  1c30		       ff ff ef ef*	      BYTE.b	255,255,239,239,239,227,255,255	;locked wall 6
-    170  1c38		       ff bd fd b7*	      BYTE.b	255,189,253,183,127,239,231,255	; breakable wall 7
-    171  1c40		       00 00 18 3c*	      BYTE.b	0,0,24,60,126,126,0,0	; spike 8
-    172  1c48		       00 70 48 78*	      BYTE.b	0,112,72,120,72,72,112,0	; booster powerup 9
+    158  14fc
+    159  14fc
+    160  1c00					      org	character_set_begin
+    161  1c00		       81 ff ff 81*	      BYTE.b	129,255,255,129,129,255,255,129	; ladder 0
+    162  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,165,153,129,255	; squarebot 1
+    163  1c10		       ff ff 00 00*	      BYTE.b	255,255,0,0,0,0,0,0	; platform 2
+    164  1c18		       ff ff ff ff*	      BYTE.b	255,255,255,255,255,255,255,255	; wall 3
+    165  1c20		       7e e7 81 81*	      BYTE.b	126,231,129,129,225,129,129,255	; exit (door) 4
+    166  1c28		       18 24 18 18*	      BYTE.b	24,36,24,24,30,24,30,24	; key powerup 5 
+    167  1c30		       ff ff ef ef*	      BYTE.b	255,255,239,239,239,227,255,255	;locked wall 6
+    168  1c38		       ff bd fd b7*	      BYTE.b	255,189,253,183,127,239,231,255	; breakable wall 7
+    169  1c40		       00 00 18 3c*	      BYTE.b	0,0,24,60,126,126,0,0	; spike 8
+    170  1c48		       00 70 48 78*	      BYTE.b	0,112,72,120,72,72,112,0	; booster powerup 9

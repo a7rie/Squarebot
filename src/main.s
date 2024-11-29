@@ -146,8 +146,6 @@ compressed_screen_data_start
 
 level_data_start
   incbin "../data/levels/binary_levels/1"
-  incbin "../data/levels/binary_levels/booster_test"
-  incbin "../data/levels/binary_levels/key_test"
   incbin "../data/levels/binary_levels/2"
   incbin "../data/levels/binary_levels/3"
   incbin "../data/levels/binary_levels/4"
