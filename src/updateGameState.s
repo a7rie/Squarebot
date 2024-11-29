@@ -259,6 +259,10 @@ spike_check
   cmp #SPIKE_CHAR
   bne return_false
 
+  lda #RED_COLOR_CODE
+  ldy #0
+  sta (squarebot_color_position),y
+
   lda #1
   sta level_reset
   bne return_false
