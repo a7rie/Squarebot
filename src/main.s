@@ -49,6 +49,7 @@ SECRET_KEY = $0d ; press P to skip to next  level
 RESET_KEY = $34
 JUMP_SIZE = $4 ; number of characters a jump causes
 ROW_SIZE = $16
+
 ; memory locations
 user_memory_start = $1001
 currently_pressed_key =  $c5
@@ -61,7 +62,7 @@ character_set_begin = $1c00
   include "stub.s" ; stub contains BASIC sys cmd to run the machine language code
 
 start  
-  LDA #24
+  LDA #14 ; black screen blue border
   STA BACKGROUND_COLOR_BYTE
 
   ; use combination of RAM (first 128 chars at 7168) & ROM character set

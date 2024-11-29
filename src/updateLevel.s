@@ -16,15 +16,17 @@ KEY = 128 ; 10000000
 SPIKE = 144 ; 10010000
 BOOSTER = 160 ;  10100000
 
-WALL_COLOR = 0
+BLANK_SPACE_COLOR = 0
+WALL_COLOR = 6
 BREAKABLE_WALL_COLOR = 0
 LOCKED_WALL_COLOR = 7
 LADDER_COLOR = 8
 EXIT_COLOR = 5
-PLATFORM_COLOR = 0
+PLATFORM_COLOR = 6
 KEY_COLOR = 7
 SPIKE_COLOR = 2
 BOOSTER_COLOR = 3
+SQUAREBOT_COLOR = #1
 
 BLANK_SPACE_CHAR = $20 
 WALL_CHAR = $3
@@ -36,7 +38,7 @@ PLATFORM_CHAR = $2
 KEY_CHAR =  $5
 SPIKE_CHAR = $8
 BOOSTER_CHAR = $9
-
+SQUAREBOT_CHAR = $1
 
 update_level
   ; check if the level is completed; set current_level to next_level if so
@@ -117,7 +119,7 @@ draw_sequence
   ldy level_data_index
   iny ; (so we can access the "element" byte after the length byte)
   lda (current_level),y ; get formatted byte (see squarebot doc)
-  asl ; lol
+  asl 
   asl
   asl
   asl 
@@ -142,8 +144,8 @@ draw_high_bits
 
   cmp #BLANK_SPACE
   bne check_if_starting_point
-  lda #BLANK_SPACE_CHAR ; todo; replace with actual chars
-  ldx #1
+  lda #BLANK_SPACE_CHAR
+  ldx #BLANK_SPACE_COLOR
   jsr draw_char_in_accumulator
   rts
 

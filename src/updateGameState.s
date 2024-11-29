@@ -1,8 +1,6 @@
 
 MOVE_LEFT = 1
 MOVE_RIGHT = 2
-SQUAREBOT_CHAR = $1
-SQUAREBOT_COLOR = $0
 START_OF_FIRST_ROW_LOW_BYTE = $e4
 START_OF_FIRST_ROW_HIGH_BYTE = $1f
 
@@ -223,7 +221,7 @@ remove_char ; remove squarebot from current screen location
   ldy #0
   lda #BLANK_CHAR
   sta (squarebot_position),Y
-  lda #1
+  lda #BLANK_SPACE_COLOR
   sta (squarebot_color_position),Y
   rts
 
