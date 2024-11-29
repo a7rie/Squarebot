@@ -245,7 +245,7 @@ key_check
 
 locked_wall_check
   cmp #LOCKED_WALL_CHAR
-  bne return_false
+  bne spike_check
 
   lda has_key ; if locked wall, but player doesnt have key, cant do anything
   cmp #0
@@ -254,6 +254,14 @@ locked_wall_check
   lda #0 ; but if locked wall and has key, get rid of the locked wall and the key
   sta has_key
   jmp return_true
+
+spike_check
+  cmp #SPIKE_CHAR
+  bne return_false
+
+  lda #1
+  sta level_reset
+  bne return_false
 
 
 squarebot_on_first_row ; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1

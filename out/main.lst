@@ -86,7 +86,7 @@
      75  101b		       a9 00		      lda	#0
      76  101d		       85 09		      sta	level_completed
      77  101f
-     78  101f		       a9 30		      lda	#<level_data_start
+     78  101f		       a9 3a		      lda	#<level_data_start
      79  1021		       85 04		      sta	current_level
      80  1023		       a9 14		      lda	#>level_data_start
      81  1025		       85 05		      sta	current_level+1
@@ -126,7 +126,7 @@
      26  1053
      27  1053
      28  1053				   draw_title_screen_chars_loop
-     29  1053		       bd 88 13 	      lda	compressed_screen_data_start,X	; accumulator stores num times to repeat the byte
+     29  1053		       bd 92 13 	      lda	compressed_screen_data_start,X	; accumulator stores num times to repeat the byte
      30  1056		       20 61 10 	      jsr	draw_character	; draw the character that many times
      31  1059		       e8		      inx
      32  105a		       e8		      inx
@@ -145,7 +145,7 @@
      45  1067
      46  1067							; store current char at screen cursor location
      47  1067		       a0 00		      ldy	#0
-     48  1069		       bd 89 13 	      lda	compressed_screen_data_start+1,X	; load cur char to draw
+     48  1069		       bd 93 13 	      lda	compressed_screen_data_start+1,X	; load cur char to draw
      49  106c
      50  106c		       c9 a0		      cmp	#$a0
      51  106e		       d0 03		      bne	dont_convert_a0_to_3
@@ -533,7 +533,7 @@
       5  1207		       00 1f	   START_OF_FIRST_ROW_HIGH_BYTE =	$1f
       6  1207
       7  1207				   update_game_state
-      8  1207		       20 77 13 	      jsr	reset_new_position
+      8  1207		       20 81 13 	      jsr	reset_new_position
       9  120a
      10  120a		       a5 c5		      lda	currently_pressed_key
      11  120c		       c9 11		      cmp	#A_KEY
@@ -573,7 +573,7 @@
      45  123d
      46  123d
      47  123d
-     48  123d		       20 67 13 	      jsr	squarebot_on_first_row	; if on first row, we dont care about what character lies below
+     48  123d		       20 71 13 	      jsr	squarebot_on_first_row	; if on first row, we dont care about what character lies below
      49  1240		       b0 0d		      bcs	skip_validity_check
      50  1242
      51  1242							; check if character below is blank; if so dont allow us to set jump_remaining
@@ -626,10 +626,10 @@
      98  1283		       60		      rts
      99  1284
     100  1284				   handle_gravity		; on first row - do nothing
-    101  1284		       20 77 13 	      jsr	reset_new_position
+    101  1284		       20 81 13 	      jsr	reset_new_position
     102  1287		       20 16 13 	      jsr	move_new_position_down
     103  128a
-    104  128a		       20 67 13 	      jsr	squarebot_on_first_row
+    104  128a		       20 71 13 	      jsr	squarebot_on_first_row
     105  128d		       b0 10		      bcs	do_nothing
     106  128f
     107  128f		       a0 00		      ldy	#0
@@ -756,99 +756,108 @@
     228  133c				   collision_handler		; accumulator is the character (the actual character code) in the position that squarbeot wants to move to
     229  133c							; set carry flag if we can move to this char, otherwise clear it
     230  133c		       c9 20		      cmp	#BLANK_CHAR
-    231  133e		       f0 33		      beq	return_true
+    231  133e		       f0 3d		      beq	return_true
     232  1340
     233  1340		       c9 09		      CMP	#BOOSTER_CHAR
     234  1342		       d0 07		      bne	key_check
     235  1344		       a9 01		      lda	#1
     236  1346		       85 16		      sta	has_booster
-    237  1348		       4c 73 13 	      jmp	return_true
+    237  1348		       4c 7d 13 	      jmp	return_true
     238  134b
     239  134b				   key_check
     240  134b		       c9 05		      cmp	#KEY_CHAR
     241  134d		       d0 07		      bne	locked_wall_check
     242  134f		       a9 01		      lda	#1
     243  1351		       85 15		      sta	has_key
-    244  1353		       4c 73 13 	      jmp	return_true
+    244  1353		       4c 7d 13 	      jmp	return_true
     245  1356
     246  1356				   locked_wall_check
     247  1356		       c9 06		      cmp	#LOCKED_WALL_CHAR
-    248  1358		       d0 1b		      bne	return_false
+    248  1358		       d0 0d		      bne	spike_check
     249  135a
     250  135a		       a5 15		      lda	has_key	; if locked wall, but player doesnt have key, cant do anything
     251  135c		       c9 00		      cmp	#0
-    252  135e		       f0 15		      beq	return_false
+    252  135e		       f0 1f		      beq	return_false
     253  1360
     254  1360		       a9 00		      lda	#0	; but if locked wall and has key, get rid of the locked wall and the key
     255  1362		       85 15		      sta	has_key
-    256  1364		       4c 73 13 	      jmp	return_true
+    256  1364		       4c 7d 13 	      jmp	return_true
     257  1367
-    258  1367
-    259  1367				   squarebot_on_first_row		; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
-    260  1367		       a5 12		      lda	squarebot_position+1
-    261  1369		       c9 1f		      cmp	#START_OF_FIRST_ROW_HIGH_BYTE
-    262  136b		       90 08		      bcc	return_false	; compare high bits; return false if current position high bit is smaller than high bit of leftmost position on first row
-    263  136d		       a5 11		      lda	squarebot_position
-    264  136f		       c9 e4		      cmp	#START_OF_FIRST_ROW_LOW_BYTE
-    265  1371		       90 02		      bcc	return_false
-    266  1373
-    267  1373				   return_true
-    268  1373		       38		      sec
-    269  1374		       60		      rts
-    270  1375
-    271  1375				   return_false
-    272  1375		       18		      clc
-    273  1376		       60		      rts
-    274  1377
-    275  1377				   reset_new_position
-    276  1377		       a5 11		      lda	squarebot_position
-    277  1379		       85 0c		      sta	new_position
-    278  137b		       a5 12		      lda	squarebot_position+1
-    279  137d		       85 0d		      sta	new_position+1
-    280  137f		       a5 13		      lda	squarebot_color_position
-    281  1381		       85 0e		      sta	new_color_position
-    282  1383		       a5 14		      lda	squarebot_color_position+1
-    283  1385		       85 0f		      sta	new_color_position+1
-    284  1387		       60		      rts
+    258  1367				   spike_check
+    259  1367		       c9 08		      cmp	#SPIKE_CHAR
+    260  1369		       d0 14		      bne	return_false
+    261  136b
+    262  136b		       a9 01		      lda	#1
+    263  136d		       85 08		      sta	level_reset
+    264  136f		       d0 0e		      bne	return_false
+    265  1371
+    266  1371
+    267  1371				   squarebot_on_first_row		; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
+    268  1371		       a5 12		      lda	squarebot_position+1
+    269  1373		       c9 1f		      cmp	#START_OF_FIRST_ROW_HIGH_BYTE
+    270  1375		       90 08		      bcc	return_false	; compare high bits; return false if current position high bit is smaller than high bit of leftmost position on first row
+    271  1377		       a5 11		      lda	squarebot_position
+    272  1379		       c9 e4		      cmp	#START_OF_FIRST_ROW_LOW_BYTE
+    273  137b		       90 02		      bcc	return_false
+    274  137d
+    275  137d				   return_true
+    276  137d		       38		      sec
+    277  137e		       60		      rts
+    278  137f
+    279  137f				   return_false
+    280  137f		       18		      clc
+    281  1380		       60		      rts
+    282  1381
+    283  1381				   reset_new_position
+    284  1381		       a5 11		      lda	squarebot_position
+    285  1383		       85 0c		      sta	new_position
+    286  1385		       a5 12		      lda	squarebot_position+1
+    287  1387		       85 0d		      sta	new_position+1
+    288  1389		       a5 13		      lda	squarebot_color_position
+    289  138b		       85 0e		      sta	new_color_position
+    290  138d		       a5 14		      lda	squarebot_color_position+1
+    291  138f		       85 0f		      sta	new_color_position+1
+    292  1391		       60		      rts
 ------- FILE src/main.s
-    143  1388
-    144  1388				   compressed_screen_data_start
-    145  1388					      incbin	"../data/titleScreenData_compressed"	; got via 'bsave ""'
-    146  1430
-    147  1430				   level_data_start
-    148  1430					      incbin	"../data/levels/binary_levels/1"
-    149  1438					      incbin	"../data/levels/binary_levels/2"
-    150  1450					      incbin	"../data/levels/binary_levels/3"
-    151  1462					      incbin	"../data/levels/binary_levels/4"
-    152  148a					      incbin	"../data/levels/binary_levels/5"
-    153  149e					      incbin	"../data/levels/binary_levels/6"
-    154  14bc					      incbin	"../data/levels/binary_levels/7"
-    155  14d8					      incbin	"../data/levels/binary_levels/8"
-    156  14fc					      incbin	"../data/levels/binary_levels/9"
-    157  1526
+    143  1392
+    144  1392				   compressed_screen_data_start
+    145  1392					      incbin	"../data/titleScreenData_compressed"	; got via 'bsave ""'
+    146  143a
+    147  143a				   level_data_start
+    148  143a					      incbin	"../data/levels/binary_levels/1"
+    149  1442					      incbin	"../data/levels/binary_levels/2"
+    150  145a					      incbin	"../data/levels/binary_levels/3"
+    151  146c					      incbin	"../data/levels/binary_levels/4"
+    152  1494					      incbin	"../data/levels/binary_levels/5"
+    153  14a8					      incbin	"../data/levels/binary_levels/6"
+    154  14c6					      incbin	"../data/levels/binary_levels/7"
+    155  14e2					      incbin	"../data/levels/binary_levels/8"
+    156  1506					      incbin	"../data/levels/binary_levels/9"
+    157  1530					      incbin	"../data/levels/binary_levels/10"
+    158  153e
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1526					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1526		       05 25	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1526		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 1317 bytes used
-      3  1526					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  5414
-      4  1526					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1526				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1526				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1526				  -	      err
-      8  1526					      endif
+      0  153e					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  153e		       05 3d	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  153e		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 1341 bytes used
+      3  153e					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  5438
+      4  153e					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  153e				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  153e				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  153e				  -	      err
+      8  153e					      endif
 ------- FILE src/main.s
-    159  1526
-    160  1526
-    161  1c00					      org	character_set_begin
-    162  1c00		       81 ff ff 81*	      BYTE.b	129,255,255,129,129,255,255,129	; ladder 0
-    163  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,165,153,129,255	; squarebot 1
-    164  1c10		       ff ff 00 00*	      BYTE.b	255,255,0,0,0,0,0,0	; platform 2
-    165  1c18		       ff ff ff ff*	      BYTE.b	255,255,255,255,255,255,255,255	; wall 3
-    166  1c20		       7e e7 81 81*	      BYTE.b	126,231,129,129,225,129,129,255	; exit (door) 4
-    167  1c28		       18 24 18 18*	      BYTE.b	24,36,24,24,30,24,30,24	; key powerup 5 
-    168  1c30		       ff ff ef ef*	      BYTE.b	255,255,239,239,239,227,255,255	;locked wall 6
-    169  1c38		       ff bd fd b7*	      BYTE.b	255,189,253,183,127,239,231,255	; breakable wall 7
-    170  1c40		       00 00 18 3c*	      BYTE.b	0,0,24,60,126,126,0,0	; spike 8
-    171  1c48		       00 70 48 78*	      BYTE.b	0,112,72,120,72,72,112,0	; booster powerup 9
+    160  153e
+    161  153e
+    162  1c00					      org	character_set_begin
+    163  1c00		       81 ff ff 81*	      BYTE.b	129,255,255,129,129,255,255,129	; ladder 0
+    164  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,165,153,129,255	; squarebot 1
+    165  1c10		       ff ff 00 00*	      BYTE.b	255,255,0,0,0,0,0,0	; platform 2
+    166  1c18		       ff ff ff ff*	      BYTE.b	255,255,255,255,255,255,255,255	; wall 3
+    167  1c20		       7e e7 81 81*	      BYTE.b	126,231,129,129,225,129,129,255	; exit (door) 4
+    168  1c28		       18 24 18 18*	      BYTE.b	24,36,24,24,30,24,30,24	; key powerup 5 
+    169  1c30		       ff ff ef ef*	      BYTE.b	255,255,239,239,239,227,255,255	;locked wall 6
+    170  1c38		       ff bd fd b7*	      BYTE.b	255,189,253,183,127,239,231,255	; breakable wall 7
+    171  1c40		       00 00 18 3c*	      BYTE.b	0,0,24,60,126,126,0,0	; spike 8
+    172  1c48		       00 70 48 78*	      BYTE.b	0,112,72,120,72,72,112,0	; booster powerup 9

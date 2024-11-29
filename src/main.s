@@ -154,6 +154,7 @@ level_data_start
   incbin "../data/levels/binary_levels/7"
   incbin "../data/levels/binary_levels/8"
   incbin "../data/levels/binary_levels/9"
+  incbin "../data/levels/binary_levels/10"
 
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
