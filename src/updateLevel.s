@@ -9,7 +9,7 @@ STARTING_POINT = 16 ; 00010000
 WALL = 32 ; 00100000
 BREAKABLE_WALL = 48 ; 00110000
 LOCKED_WALL = 64 ; 01000000
-LADDER = 80 ; 01010000
+GRAVITY_POWERUP = 80 ; 01010000
 EXIT = 96 ; 01100000
 PLATFORM = 112 ; 01110000
 KEY = 128 ; 10000000
@@ -20,7 +20,7 @@ BLANK_SPACE_COLOR = 0
 WALL_COLOR = 6
 BREAKABLE_WALL_COLOR = 0
 LOCKED_WALL_COLOR = 7
-LADDER_COLOR = 8
+GRAVITY_POWERUP_COLOR = 5
 EXIT_COLOR = 5
 PLATFORM_COLOR = 6
 KEY_COLOR = 7
@@ -32,7 +32,7 @@ BLANK_SPACE_CHAR = $20
 WALL_CHAR = $3
 BREAKABLE_WALL_CHAR = $7
 LOCKED_WALL_CHAR = $6
-LADDER_CHAR = $0  
+GRAVITY_POWERUP_CHAR = $0  
 EXIT_CHAR = $4
 PLATFORM_CHAR = $2
 KEY_CHAR =  $5
@@ -73,7 +73,13 @@ continue_update
   lda #COLOR_CURSOR_BEGINNING_LOW_BYTE
   sta color_cursor
   lda #COLOR_CURSOR_BEGINNING_HIGH_BYTE
-  sta color_cursor+1
+  sta color_cursor+1 
+
+  lda #0 
+  sta gravity_flipped
+  sta has_booster
+  sta has_key
+  sta jump_remaining
 
   ldx #0
   ldy #0
@@ -190,17 +196,17 @@ check_if_breakable_wall
 
 check_if_locked_wall
   cmp #LOCKED_WALL
-  bne check_if_ladder
+  bne check_if_gravity_powerup
   lda #LOCKED_WALL_CHAR
   ldx #LOCKED_WALL_COLOR
   jsr draw_char_in_accumulator
   rts
 
-check_if_ladder
-  cmp #LADDER
+check_if_gravity_powerup
+  cmp #GRAVITY_POWERUP
   bne check_if_exit
-  lda #LADDER_CHAR
-  ldx #LADDER_COLOR
+  lda #GRAVITY_POWERUP_CHAR
+  ldx #GRAVITY_POWERUP_COLOR
   jsr draw_char_in_accumulator
   rts
 

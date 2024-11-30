@@ -21,6 +21,7 @@ squarebot_color_position ds.w 1
 has_key ds.b 1
 has_booster ds.b 1
 jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
+gravity_flipped ds.b 1 ; 1 if gravity is flipped; 0 if not
   seg
 
 ; constants
@@ -74,6 +75,7 @@ start
   sta level_reset
   lda #0
   sta level_completed
+  sta gravity_flipped
 
   lda #<level_data_start
   sta current_level
@@ -130,10 +132,6 @@ check_for_reset_key
   bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
   lda #1
   sta level_reset
-  lda #0
-  sta has_booster
-  sta has_key
-  sta jump_remaining
   
 check_for_reset_key_return
   rts
@@ -155,12 +153,16 @@ level_data_start
   incbin "../data/levels/binary_levels/8"
   incbin "../data/levels/binary_levels/9"
   incbin "../data/levels/binary_levels/10"
+  incbin "../data/levels/binary_levels/11"
+  incbin "../data/levels/binary_levels/12"
+  incbin "../data/levels/binary_levels/13"
+  incbin "../data/levels/binary_levels/14"
 
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
 
   org character_set_begin
-  BYTE 129,255,255,129,129,255,255,129 ; ladder 0
+  BYTE 0,24,60,126,24,24,24,24 ; gravity powerup 0
   BYTE 255,129,165,129,165,153,129,255 ; squarebot 1
   BYTE 255,255,0,0,0,0,0,0 ; platform 2
   BYTE 255,255,255,255,255,255,255,255 ; wall 3

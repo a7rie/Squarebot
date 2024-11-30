@@ -2,7 +2,7 @@
       1  1c50 ????						; title screen program -- use hand-made compression method (esentially just RLE, see rleEncoding.py)
       2  1c50 ????				      processor	6502
       3  1c50 ????
-      4 U0018 ????				      seg.u	ZP
+      4 U0019 ????				      seg.u	ZP
       5 U0000					      org	$0
       6 U0000
       7 U0000
@@ -22,44 +22,45 @@
      21 U0015		       00	   has_key    ds.b	1
      22 U0016		       00	   has_booster ds.b	1
      23 U0017		       00	   jump_remaining ds.b	1	; number of times the character should continue to move upwards in the current jump
-     24  1c50 ????				      seg
-     25  1c50 ????
-     26  1c50 ????						; constants
-     27  1c50 ????	       00 20	   BLANK_CHAR =	$20
-     28  1c50 ????
-     29  1c50 ????	       00 00	   SCREEN_CURSOR_BEGINNING_LOW_BYTE =	$00
-     30  1c50 ????	       00 1e	   SCREEN_CURSOR_BEGINNING_HIGH_BYTE =	$1e
-     31  1c50 ????	       90 0f	   BACKGROUND_COLOR_BYTE =	$900f
-     32  1c50 ????
-     33  1c50 ????						; last screen location
-     34  1c50 ????	       00 fa	   END_OF_SCREEN_LOW_BYTE =	$fa
-     35  1c50 ????	       00 1f	   END_OF_SCREEN_HIGH_BYTE =	$1f
-     36  1c50 ????
-     37  1c50 ????						; beginning of color memory
-     38  1c50 ????	       00 00	   COLOR_CURSOR_BEGINNING_LOW_BYTE =	$00
-     39  1c50 ????	       00 96	   COLOR_CURSOR_BEGINNING_HIGH_BYTE =	$96
-     40  1c50 ????	       00 02	   RED_COLOR_CODE =	#2
-     41  1c50 ????
-     42  1c50 ????	       00 20	   SPACE_KEY  =	$20
-     43  1c50 ????	       00 0f	   ENTER_KEY  =	$0f
-     44  1c50 ????	       00 09	   W_KEY      =	$09
-     45  1c50 ????	       00 11	   A_KEY      =	$11
-     46  1c50 ????	       00 29	   S_KEY      =	$29
-     47  1c50 ????	       00 12	   D_KEY      =	$12
-     48  1c50 ????	       00 0d	   SECRET_KEY =	$0d	; press P to skip to next  level
-     49  1c50 ????	       00 34	   RESET_KEY  =	$34
-     50  1c50 ????	       00 04	   JUMP_SIZE  =	$4	; number of characters a jump causes
-     51  1c50 ????	       00 16	   ROW_SIZE   =	$16
-     52  1c50 ????
-     53  1c50 ????						; memory locations
-     54  1c50 ????	       10 01	   user_memory_start =	$1001
-     55  1c50 ????	       00 c5	   currently_pressed_key =	$c5
-     56  1c50 ????	       00 a0	   jiffy_clock =	$A0
-     57  1c50 ????	       90 05	   character_info_register =	$9005
-     58  1c50 ????	       1c 00	   character_set_begin =	$1c00
-     59  1c50 ????
-     60  1c50 ????						; begin location counter at 4096 (user memory)
-     61  1001					      org	user_memory_start
+     24 U0018		       00	   gravity_flipped ds.b	1	; 1 if gravity is flipped; 0 if not
+     25  1c50 ????				      seg
+     26  1c50 ????
+     27  1c50 ????						; constants
+     28  1c50 ????	       00 20	   BLANK_CHAR =	$20
+     29  1c50 ????
+     30  1c50 ????	       00 00	   SCREEN_CURSOR_BEGINNING_LOW_BYTE =	$00
+     31  1c50 ????	       00 1e	   SCREEN_CURSOR_BEGINNING_HIGH_BYTE =	$1e
+     32  1c50 ????	       90 0f	   BACKGROUND_COLOR_BYTE =	$900f
+     33  1c50 ????
+     34  1c50 ????						; last screen location
+     35  1c50 ????	       00 fa	   END_OF_SCREEN_LOW_BYTE =	$fa
+     36  1c50 ????	       00 1f	   END_OF_SCREEN_HIGH_BYTE =	$1f
+     37  1c50 ????
+     38  1c50 ????						; beginning of color memory
+     39  1c50 ????	       00 00	   COLOR_CURSOR_BEGINNING_LOW_BYTE =	$00
+     40  1c50 ????	       00 96	   COLOR_CURSOR_BEGINNING_HIGH_BYTE =	$96
+     41  1c50 ????	       00 02	   RED_COLOR_CODE =	#2
+     42  1c50 ????
+     43  1c50 ????	       00 20	   SPACE_KEY  =	$20
+     44  1c50 ????	       00 0f	   ENTER_KEY  =	$0f
+     45  1c50 ????	       00 09	   W_KEY      =	$09
+     46  1c50 ????	       00 11	   A_KEY      =	$11
+     47  1c50 ????	       00 29	   S_KEY      =	$29
+     48  1c50 ????	       00 12	   D_KEY      =	$12
+     49  1c50 ????	       00 0d	   SECRET_KEY =	$0d	; press P to skip to next  level
+     50  1c50 ????	       00 34	   RESET_KEY  =	$34
+     51  1c50 ????	       00 04	   JUMP_SIZE  =	$4	; number of characters a jump causes
+     52  1c50 ????	       00 16	   ROW_SIZE   =	$16
+     53  1c50 ????
+     54  1c50 ????						; memory locations
+     55  1c50 ????	       10 01	   user_memory_start =	$1001
+     56  1c50 ????	       00 c5	   currently_pressed_key =	$c5
+     57  1c50 ????	       00 a0	   jiffy_clock =	$A0
+     58  1c50 ????	       90 05	   character_info_register =	$9005
+     59  1c50 ????	       1c 00	   character_set_begin =	$1c00
+     60  1c50 ????
+     61  1c50 ????						; begin location counter at 4096 (user memory)
+     62  1001					      org	user_memory_start
 ------- FILE stub.s LEVEL 2 PASS 3
       0  1001					      include	"stub.s"	; stub contains BASIC sys cmd to run the machine language code
       1  1001		       00 9e	   SYS_CMD_TOKEN =	$9e
@@ -71,797 +72,832 @@
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
 ------- FILE src/main.s
-     63  100d
-     64  100d				   start
-     65  100d		       a9 0e		      LDA	#14	; black screen blue border
-     66  100f		       8d 0f 90 	      STA	BACKGROUND_COLOR_BYTE
-     67  1012
-     68  1012							; use combination of RAM (first 128 chars at 7168) & ROM character set
-     69  1012		       a9 ff		      lda	#255
-     70  1014		       8d 05 90 	      sta	character_info_register
-     71  1017
-     72  1017							; initialize some variables in the zero page
-     73  1017		       a9 01		      lda	#1
-     74  1019		       85 08		      sta	level_reset
-     75  101b		       a9 00		      lda	#0
-     76  101d		       85 09		      sta	level_completed
-     77  101f
-     78  101f		       a9 40		      lda	#<level_data_start
-     79  1021		       85 04		      sta	current_level
-     80  1023		       a9 14		      lda	#>level_data_start
-     81  1025		       85 05		      sta	current_level+1
-     82  1027
-     83  1027		       a9 00		      lda	#0
-     84  1029		       85 17		      sta	jump_remaining
-     85  102b		       85 16		      sta	has_booster
-     86  102d		       85 15		      sta	has_key
-     87  102f
+     64  100d
+     65  100d				   start
+     66  100d		       a9 0e		      LDA	#14	; black screen blue border
+     67  100f		       8d 0f 90 	      STA	BACKGROUND_COLOR_BYTE
+     68  1012
+     69  1012							; use combination of RAM (first 128 chars at 7168) & ROM character set
+     70  1012		       a9 ff		      lda	#255
+     71  1014		       8d 05 90 	      sta	character_info_register
+     72  1017
+     73  1017							; initialize some variables in the zero page
+     74  1017		       a9 01		      lda	#1
+     75  1019		       85 08		      sta	level_reset
+     76  101b		       a9 00		      lda	#0
+     77  101d		       85 09		      sta	level_completed
+     78  101f		       85 18		      sta	gravity_flipped
+     79  1021
+     80  1021		       a9 67		      lda	#<level_data_start
+     81  1023		       85 04		      sta	current_level
+     82  1025		       a9 14		      lda	#>level_data_start
+     83  1027		       85 05		      sta	current_level+1
+     84  1029
+     85  1029		       a9 00		      lda	#0
+     86  102b		       85 17		      sta	jump_remaining
+     87  102d		       85 16		      sta	has_booster
+     88  102f		       85 15		      sta	has_key
+     89  1031
 ------- FILE titleScreen.s LEVEL 2 PASS 3
-      0  102f					      include	"titleScreen.s"
-      1  102f		       00 01	   WHITE_COLOR_CODE =	1
-      2  102f
-      3  102f				   display_title_screen
-      4  102f		       a9 00		      lda	#SCREEN_CURSOR_BEGINNING_LOW_BYTE
-      5  1031		       85 00		      sta	screen_cursor
-      6  1033		       a9 1e		      lda	#SCREEN_CURSOR_BEGINNING_HIGH_BYTE	; store 1e in location 01
-      7  1035		       85 01		      sta	screen_cursor+1
-      8  1037
-      9  1037		       a9 00		      lda	#COLOR_CURSOR_BEGINNING_LOW_BYTE
-     10  1039		       85 02		      sta	color_cursor
-     11  103b		       a9 96		      lda	#COLOR_CURSOR_BEGINNING_HIGH_BYTE
-     12  103d		       85 03		      sta	color_cursor+1
-     13  103f
-     14  103f		       a0 00		      ldy	#$0	; to use for indirect indexed addressing
-     15  1041		       a2 00		      ldx	#$0
-     16  1043
-     17  1043		       20 53 10 	      jsr	draw_title_screen_chars_loop
-     18  1046		       a0 00		      ldy	#$0	; to use for indirect indexed addressing
-     19  1048		       a2 00		      ldx	#$0
-     20  104a
-     21  104a				   infinite_loop
-     22  104a		       a5 c5		      lda	currently_pressed_key
-     23  104c		       c9 0f		      cmp	#ENTER_KEY
-     24  104e		       f0 62		      beq	gameLoop
-     25  1050		       4c 4a 10 	      jmp	infinite_loop
-     26  1053
-     27  1053
-     28  1053				   draw_title_screen_chars_loop
-     29  1053		       bd 98 13 	      lda	compressed_screen_data_start,X	; accumulator stores num times to repeat the byte
-     30  1056		       20 61 10 	      jsr	draw_character	; draw the character that many times
-     31  1059		       e8		      inx
-     32  105a		       e8		      inx
-     33  105b		       20 a2 10 	      jsr	check_if_screen_cursor_at_end
-     34  105e		       90 f3		      bcc	draw_title_screen_chars_loop
-     35  1060		       60		      rts
-     36  1061
-     37  1061
-     38  1061							; draw the character in Y register for (value of accumulator) number of times
-     39  1061				   draw_character
-     40  1061							; if accumulator == 0, return; otherwise, subtract 1 from accumulator and continue drawing the letter at Y
-     41  1061		       f0 23		      beq	draw_character_end
-     42  1063		       38		      sec
-     43  1064		       e9 01		      sbc	#1
-     44  1066		       48		      pha		; push accumulator onto stack
-     45  1067
-     46  1067							; store current char at screen cursor location
-     47  1067		       a0 00		      ldy	#0
-     48  1069		       bd 99 13 	      lda	compressed_screen_data_start+1,X	; load cur char to draw
-     49  106c
-     50  106c		       c9 a0		      cmp	#$a0
-     51  106e		       d0 03		      bne	dont_convert_a0_to_3
-     52  1070		       a9 81		      lda	#129
-     53  1072		       18		      clc
-     54  1073
-     55  1073				   dont_convert_a0_to_3
-     56  1073		       69 80		      adc	#128
-     57  1075		       91 00		      sta	(screen_cursor),Y	; draw it on screen
-     58  1077
-     59  1077
-     60  1077							; add color to the screen location if it's not a space
-     61  1077							; because our title screen only has one color, and only displays it for characters that arent space, we can get away with this "optimization",
-     62  1077							; and avoid adding color data
-     63  1077		       c9 20		      cmp	#BLANK_CHAR
-     64  1079		       f0 04		      beq	dont_color
-     65  107b
-     66  107b		       a9 01		      lda	#WHITE_COLOR_CODE
-     67  107d		       91 02		      sta	(color_cursor),Y
-     68  107f
-     69  107f				   dont_color
-     70  107f		       20 87 10 	      jsr	add_one_to_screen_cursor
-     71  1082		       68		      pla		; put the current 'count' (remaining times to draw character) back on accumulator
-     72  1083		       4c 61 10 	      jmp	draw_character
-     73  1086
-     74  1086				   draw_character_end
-     75  1086		       60		      rts
-     76  1087
-     77  1087
-     78  1087				   add_one_to_screen_cursor
-     79  1087		       18		      clc
-     80  1088		       a5 00		      lda	screen_cursor	; load and add to low byte
-     81  108a		       69 01		      adc	#$1
-     82  108c		       85 00		      sta	screen_cursor
-     83  108e		       a5 01		      lda	screen_cursor+1
-     84  1090		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-     85  1092		       85 01		      sta	screen_cursor+1
-     86  1094
-     87  1094							; add to color cursor as well
-     88  1094		       18		      clc
-     89  1095		       a5 02		      lda	color_cursor	; load and add to low byte
-     90  1097		       69 01		      adc	#$1
-     91  1099		       85 02		      sta	color_cursor
-     92  109b		       a5 03		      lda	color_cursor+1
-     93  109d		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-     94  109f		       85 03		      sta	color_cursor+1
-     95  10a1		       60		      rts
-     96  10a2
-     97  10a2				   check_if_screen_cursor_at_end		; set carry flag if screen_cursor at position $1ff9 (8185
-     98  10a2		       a5 00		      lda	screen_cursor	; load value at screen_cursor low byte
-     99  10a4		       c9 fa		      cmp	#END_OF_SCREEN_LOW_BYTE
-    100  10a6		       d0 06		      bne	check_if_screen_cursor_at_end_return_false	; if low byte doesnt match, return with carry flag as neg
-    101  10a8
-    102  10a8		       a5 01		      lda	screen_cursor+1
-    103  10aa		       c9 1f		      cmp	#END_OF_SCREEN_HIGH_BYTE
-    104  10ac		       f0 02		      beq	check_if_screen_cursor_at_end_return_true	; if high byte matches, set carry flag
-    105  10ae
-    106  10ae				   check_if_screen_cursor_at_end_return_false
-    107  10ae		       18		      clc
-    108  10af		       60		      rts
-    109  10b0
-    110  10b0				   check_if_screen_cursor_at_end_return_true
-    111  10b0		       38		      sec
-    112  10b1		       60		      rts
-    113  10b2
+      0  1031					      include	"titleScreen.s"
+      1  1031		       00 01	   WHITE_COLOR_CODE =	1
+      2  1031
+      3  1031				   display_title_screen
+      4  1031		       a9 00		      lda	#SCREEN_CURSOR_BEGINNING_LOW_BYTE
+      5  1033		       85 00		      sta	screen_cursor
+      6  1035		       a9 1e		      lda	#SCREEN_CURSOR_BEGINNING_HIGH_BYTE	; store 1e in location 01
+      7  1037		       85 01		      sta	screen_cursor+1
+      8  1039
+      9  1039		       a9 00		      lda	#COLOR_CURSOR_BEGINNING_LOW_BYTE
+     10  103b		       85 02		      sta	color_cursor
+     11  103d		       a9 96		      lda	#COLOR_CURSOR_BEGINNING_HIGH_BYTE
+     12  103f		       85 03		      sta	color_cursor+1
+     13  1041
+     14  1041		       a0 00		      ldy	#$0	; to use for indirect indexed addressing
+     15  1043		       a2 00		      ldx	#$0
+     16  1045
+     17  1045		       20 55 10 	      jsr	draw_title_screen_chars_loop
+     18  1048		       a0 00		      ldy	#$0	; to use for indirect indexed addressing
+     19  104a		       a2 00		      ldx	#$0
+     20  104c
+     21  104c				   infinite_loop
+     22  104c		       a5 c5		      lda	currently_pressed_key
+     23  104e		       c9 0f		      cmp	#ENTER_KEY
+     24  1050		       f0 62		      beq	gameLoop
+     25  1052		       4c 4c 10 	      jmp	infinite_loop
+     26  1055
+     27  1055
+     28  1055				   draw_title_screen_chars_loop
+     29  1055		       bd bf 13 	      lda	compressed_screen_data_start,X	; accumulator stores num times to repeat the byte
+     30  1058		       20 63 10 	      jsr	draw_character	; draw the character that many times
+     31  105b		       e8		      inx
+     32  105c		       e8		      inx
+     33  105d		       20 a4 10 	      jsr	check_if_screen_cursor_at_end
+     34  1060		       90 f3		      bcc	draw_title_screen_chars_loop
+     35  1062		       60		      rts
+     36  1063
+     37  1063
+     38  1063							; draw the character in Y register for (value of accumulator) number of times
+     39  1063				   draw_character
+     40  1063							; if accumulator == 0, return; otherwise, subtract 1 from accumulator and continue drawing the letter at Y
+     41  1063		       f0 23		      beq	draw_character_end
+     42  1065		       38		      sec
+     43  1066		       e9 01		      sbc	#1
+     44  1068		       48		      pha		; push accumulator onto stack
+     45  1069
+     46  1069							; store current char at screen cursor location
+     47  1069		       a0 00		      ldy	#0
+     48  106b		       bd c0 13 	      lda	compressed_screen_data_start+1,X	; load cur char to draw
+     49  106e
+     50  106e		       c9 a0		      cmp	#$a0
+     51  1070		       d0 03		      bne	dont_convert_a0_to_3
+     52  1072		       a9 81		      lda	#129
+     53  1074		       18		      clc
+     54  1075
+     55  1075				   dont_convert_a0_to_3
+     56  1075		       69 80		      adc	#128
+     57  1077		       91 00		      sta	(screen_cursor),Y	; draw it on screen
+     58  1079
+     59  1079
+     60  1079							; add color to the screen location if it's not a space
+     61  1079							; because our title screen only has one color, and only displays it for characters that arent space, we can get away with this "optimization",
+     62  1079							; and avoid adding color data
+     63  1079		       c9 20		      cmp	#BLANK_CHAR
+     64  107b		       f0 04		      beq	dont_color
+     65  107d
+     66  107d		       a9 01		      lda	#WHITE_COLOR_CODE
+     67  107f		       91 02		      sta	(color_cursor),Y
+     68  1081
+     69  1081				   dont_color
+     70  1081		       20 89 10 	      jsr	add_one_to_screen_cursor
+     71  1084		       68		      pla		; put the current 'count' (remaining times to draw character) back on accumulator
+     72  1085		       4c 63 10 	      jmp	draw_character
+     73  1088
+     74  1088				   draw_character_end
+     75  1088		       60		      rts
+     76  1089
+     77  1089
+     78  1089				   add_one_to_screen_cursor
+     79  1089		       18		      clc
+     80  108a		       a5 00		      lda	screen_cursor	; load and add to low byte
+     81  108c		       69 01		      adc	#$1
+     82  108e		       85 00		      sta	screen_cursor
+     83  1090		       a5 01		      lda	screen_cursor+1
+     84  1092		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+     85  1094		       85 01		      sta	screen_cursor+1
+     86  1096
+     87  1096							; add to color cursor as well
+     88  1096		       18		      clc
+     89  1097		       a5 02		      lda	color_cursor	; load and add to low byte
+     90  1099		       69 01		      adc	#$1
+     91  109b		       85 02		      sta	color_cursor
+     92  109d		       a5 03		      lda	color_cursor+1
+     93  109f		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+     94  10a1		       85 03		      sta	color_cursor+1
+     95  10a3		       60		      rts
+     96  10a4
+     97  10a4				   check_if_screen_cursor_at_end		; set carry flag if screen_cursor at position $1ff9 (8185
+     98  10a4		       a5 00		      lda	screen_cursor	; load value at screen_cursor low byte
+     99  10a6		       c9 fa		      cmp	#END_OF_SCREEN_LOW_BYTE
+    100  10a8		       d0 06		      bne	check_if_screen_cursor_at_end_return_false	; if low byte doesnt match, return with carry flag as neg
+    101  10aa
+    102  10aa		       a5 01		      lda	screen_cursor+1
+    103  10ac		       c9 1f		      cmp	#END_OF_SCREEN_HIGH_BYTE
+    104  10ae		       f0 02		      beq	check_if_screen_cursor_at_end_return_true	; if high byte matches, set carry flag
+    105  10b0
+    106  10b0				   check_if_screen_cursor_at_end_return_false
+    107  10b0		       18		      clc
+    108  10b1		       60		      rts
+    109  10b2
+    110  10b2				   check_if_screen_cursor_at_end_return_true
+    111  10b2		       38		      sec
+    112  10b3		       60		      rts
+    113  10b4
 ------- FILE src/main.s
-     89  10b2
-     90  10b2
-     91  10b2							; title screen code jumps here once space pressed
-     92  10b2				   gameLoop
-     93  10b2		       20 fc 10 	      jsr	update_level
-     94  10b5		       a9 00		      lda	#0
-     95  10b7		       85 08		      sta	level_reset
-     96  10b9		       20 07 12 	      jsr	update_game_state
-     97  10bc		       20 da 10 	      jsr	check_for_secret_key
-     98  10bf		       20 e9 10 	      jsr	check_for_reset_key
-     99  10c2		       20 d1 10 	      jsr	wait_until_next_frame
-    100  10c5		       20 d1 10 	      jsr	wait_until_next_frame
-    101  10c8		       20 d1 10 	      jsr	wait_until_next_frame
-    102  10cb		       20 d1 10 	      jsr	wait_until_next_frame
-    103  10ce		       4c b2 10 	      JMP	gameLoop
-    104  10d1
-    105  10d1
-    106  10d1				   wait_until_next_frame		; wait one jiffy before completing game loop
-    107  10d1		       a5 a2		      lda	jiffy_clock+2
-    108  10d3		       c5 10		      cmp	current_time
-    109  10d5		       f0 fa		      beq	wait_until_next_frame
-    110  10d7		       85 10		      sta	current_time
-    111  10d9		       60		      rts
-    112  10da
-    113  10da							; update level_completed and level_reset if secret_key pressed
-    114  10da				   check_for_secret_key
-    115  10da		       a5 c5		      lda	currently_pressed_key
-    116  10dc		       c9 0d		      cmp	#SECRET_KEY
-    117  10de		       d0 08		      bne	check_for_secret_key_return
-    118  10e0		       a9 01		      lda	#1
-    119  10e2		       85 09		      sta	level_completed
-    120  10e4		       a9 01		      lda	#1
-    121  10e6		       85 08		      sta	level_reset
-    122  10e8
-    123  10e8				   check_for_secret_key_return
-    124  10e8		       60		      rts
-    125  10e9
-    126  10e9
-    127  10e9				   check_for_reset_key
-    128  10e9		       a5 c5		      lda	currently_pressed_key
-    129  10eb		       c9 34		      cmp	#RESET_KEY
-    130  10ed		       d0 f9		      bne	check_for_secret_key_return	; todo -- reset  a bunch of state (has_key, )
-    131  10ef		       a9 01		      lda	#1
-    132  10f1		       85 08		      sta	level_reset
-    133  10f3		       a9 00		      lda	#0
-    134  10f5		       85 16		      sta	has_booster
-    135  10f7		       85 15		      sta	has_key
-    136  10f9		       85 17		      sta	jump_remaining
-    137  10fb
-    138  10fb				   check_for_reset_key_return
-    139  10fb		       60		      rts
-    140  10fc
+     91  10b4
+     92  10b4
+     93  10b4							; title screen code jumps here once space pressed
+     94  10b4				   gameLoop
+     95  10b4		       20 f6 10 	      jsr	update_level
+     96  10b7		       a9 00		      lda	#0
+     97  10b9		       85 08		      sta	level_reset
+     98  10bb		       20 0b 12 	      jsr	update_game_state
+     99  10be		       20 dc 10 	      jsr	check_for_secret_key
+    100  10c1		       20 eb 10 	      jsr	check_for_reset_key
+    101  10c4		       20 d3 10 	      jsr	wait_until_next_frame
+    102  10c7		       20 d3 10 	      jsr	wait_until_next_frame
+    103  10ca		       20 d3 10 	      jsr	wait_until_next_frame
+    104  10cd		       20 d3 10 	      jsr	wait_until_next_frame
+    105  10d0		       4c b4 10 	      JMP	gameLoop
+    106  10d3
+    107  10d3
+    108  10d3				   wait_until_next_frame		; wait one jiffy before completing game loop
+    109  10d3		       a5 a2		      lda	jiffy_clock+2
+    110  10d5		       c5 10		      cmp	current_time
+    111  10d7		       f0 fa		      beq	wait_until_next_frame
+    112  10d9		       85 10		      sta	current_time
+    113  10db		       60		      rts
+    114  10dc
+    115  10dc							; update level_completed and level_reset if secret_key pressed
+    116  10dc				   check_for_secret_key
+    117  10dc		       a5 c5		      lda	currently_pressed_key
+    118  10de		       c9 0d		      cmp	#SECRET_KEY
+    119  10e0		       d0 08		      bne	check_for_secret_key_return
+    120  10e2		       a9 01		      lda	#1
+    121  10e4		       85 09		      sta	level_completed
+    122  10e6		       a9 01		      lda	#1
+    123  10e8		       85 08		      sta	level_reset
+    124  10ea
+    125  10ea				   check_for_secret_key_return
+    126  10ea		       60		      rts
+    127  10eb
+    128  10eb
+    129  10eb				   check_for_reset_key
+    130  10eb		       a5 c5		      lda	currently_pressed_key
+    131  10ed		       c9 34		      cmp	#RESET_KEY
+    132  10ef		       d0 f9		      bne	check_for_secret_key_return	; todo -- reset  a bunch of state (has_key, )
+    133  10f1		       a9 01		      lda	#1
+    134  10f3		       85 08		      sta	level_reset
+    135  10f5
+    136  10f5				   check_for_reset_key_return
+    137  10f5		       60		      rts
+    138  10f6
 ------- FILE updateLevel.s LEVEL 2 PASS 3
-      0  10fc					      include	"updateLevel.s"
-      1  10fc		       00 01	   LEVEL_IS_DONE =	1
-      2  10fc		       00 00	   LEVEL_NOT_DONE =	0
-      3  10fc		       00 01	   SHOULD_RESET =	1
-      4  10fc		       00 00	   SHOULD_NOT_RESET =	0
-      5  10fc
-      6  10fc							; only first 4 bits really matter here; refer to readme for guide on lvl format
-      7  10fc		       00 00	   BLANK_SPACE =	0	; 000000000
-      8  10fc		       00 10	   STARTING_POINT =	16	; 00010000
-      9  10fc		       00 20	   WALL       =	32	; 00100000
-     10  10fc		       00 30	   BREAKABLE_WALL =	48	; 00110000
-     11  10fc		       00 40	   LOCKED_WALL =	64	; 01000000
-     12  10fc		       00 50	   LADDER     =	80	; 01010000
-     13  10fc		       00 60	   EXIT       =	96	; 01100000
-     14  10fc		       00 70	   PLATFORM   =	112	; 01110000
-     15  10fc		       00 80	   KEY	      =	128	; 10000000
-     16  10fc		       00 90	   SPIKE      =	144	; 10010000
-     17  10fc		       00 a0	   BOOSTER    =	160	;  10100000
-     18  10fc
-     19  10fc		       00 00	   BLANK_SPACE_COLOR =	0
-     20  10fc		       00 06	   WALL_COLOR =	6
-     21  10fc		       00 00	   BREAKABLE_WALL_COLOR =	0
-     22  10fc		       00 07	   LOCKED_WALL_COLOR =	7
-     23  10fc		       00 08	   LADDER_COLOR =	8
-     24  10fc		       00 05	   EXIT_COLOR =	5
-     25  10fc		       00 06	   PLATFORM_COLOR =	6
-     26  10fc		       00 07	   KEY_COLOR  =	7
-     27  10fc		       00 02	   SPIKE_COLOR =	2
-     28  10fc		       00 03	   BOOSTER_COLOR =	3
-     29  10fc		       00 01	   SQUAREBOT_COLOR =	#1
-     30  10fc
-     31  10fc		       00 20	   BLANK_SPACE_CHAR =	$20
-     32  10fc		       00 03	   WALL_CHAR  =	$3
-     33  10fc		       00 07	   BREAKABLE_WALL_CHAR =	$7
-     34  10fc		       00 06	   LOCKED_WALL_CHAR =	$6
-     35  10fc		       00 00	   LADDER_CHAR =	$0
-     36  10fc		       00 04	   EXIT_CHAR  =	$4
-     37  10fc		       00 02	   PLATFORM_CHAR =	$2
-     38  10fc		       00 05	   KEY_CHAR   =	$5
-     39  10fc		       00 08	   SPIKE_CHAR =	$8
-     40  10fc		       00 09	   BOOSTER_CHAR =	$9
-     41  10fc		       00 01	   SQUAREBOT_CHAR =	$1
-     42  10fc
-     43  10fc				   update_level
-     44  10fc							; check if the level is completed; set current_level to next_level if so
-     45  10fc		       a5 09		      lda	level_completed
-     46  10fe		       c9 01		      cmp	#LEVEL_IS_DONE	; (try optimizing later)
-     47  1100		       d0 0c		      bne	dont_update
-     48  1102
-     49  1102							; level is done; reset level completed
-     50  1102		       a9 00		      lda	#LEVEL_NOT_DONE
-     51  1104		       85 09		      sta	level_completed
-     52  1106
-     53  1106							; now set current_level to next_level
-     54  1106		       a5 06		      lda	next_level
-     55  1108		       85 04		      sta	current_level
-     56  110a		       a5 07		      lda	next_level+1
-     57  110c		       85 05		      sta	current_level+1
-     58  110e
-     59  110e				   dont_update
-     60  110e							; now check if level reset was set
-     61  110e		       a5 08		      lda	level_reset
-     62  1110		       c9 00		      cmp	#0
-     63  1112		       d0 01		      bne	continue_update	; if not, go back to game loop
-     64  1114		       60		      rts
-     65  1115
-     66  1115				   continue_update
-     67  1115							; if it was, update the level
-     68  1115		       a9 00		      lda	#SCREEN_CURSOR_BEGINNING_LOW_BYTE
-     69  1117		       85 00		      sta	screen_cursor
-     70  1119		       a9 1e		      lda	#SCREEN_CURSOR_BEGINNING_HIGH_BYTE
-     71  111b		       85 01		      sta	screen_cursor+1
-     72  111d
-     73  111d		       a9 00		      lda	#COLOR_CURSOR_BEGINNING_LOW_BYTE
-     74  111f		       85 02		      sta	color_cursor
-     75  1121		       a9 96		      lda	#COLOR_CURSOR_BEGINNING_HIGH_BYTE
-     76  1123		       85 03		      sta	color_cursor+1
-     77  1125
-     78  1125		       a2 00		      ldx	#0
-     79  1127		       a0 00		      ldy	#0
-     80  1129		       84 0a		      sty	level_data_index
-     81  112b
-     82  112b							; draw (or redraw on reset) the current level
-     83  112b				   draw_level_loop
-     84  112b							; y stores our index in the current level data
-     85  112b		       a4 0a		      ldy	level_data_index
-     86  112d		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
+      0  10f6					      include	"updateLevel.s"
+      1  10f6		       00 01	   LEVEL_IS_DONE =	1
+      2  10f6		       00 00	   LEVEL_NOT_DONE =	0
+      3  10f6		       00 01	   SHOULD_RESET =	1
+      4  10f6		       00 00	   SHOULD_NOT_RESET =	0
+      5  10f6
+      6  10f6							; only first 4 bits really matter here; refer to readme for guide on lvl format
+      7  10f6		       00 00	   BLANK_SPACE =	0	; 000000000
+      8  10f6		       00 10	   STARTING_POINT =	16	; 00010000
+      9  10f6		       00 20	   WALL       =	32	; 00100000
+     10  10f6		       00 30	   BREAKABLE_WALL =	48	; 00110000
+     11  10f6		       00 40	   LOCKED_WALL =	64	; 01000000
+     12  10f6		       00 50	   GRAVITY_POWERUP =	80	; 01010000
+     13  10f6		       00 60	   EXIT       =	96	; 01100000
+     14  10f6		       00 70	   PLATFORM   =	112	; 01110000
+     15  10f6		       00 80	   KEY	      =	128	; 10000000
+     16  10f6		       00 90	   SPIKE      =	144	; 10010000
+     17  10f6		       00 a0	   BOOSTER    =	160	;  10100000
+     18  10f6
+     19  10f6		       00 00	   BLANK_SPACE_COLOR =	0
+     20  10f6		       00 06	   WALL_COLOR =	6
+     21  10f6		       00 00	   BREAKABLE_WALL_COLOR =	0
+     22  10f6		       00 07	   LOCKED_WALL_COLOR =	7
+     23  10f6		       00 05	   GRAVITY_POWERUP_COLOR =	5
+     24  10f6		       00 05	   EXIT_COLOR =	5
+     25  10f6		       00 06	   PLATFORM_COLOR =	6
+     26  10f6		       00 07	   KEY_COLOR  =	7
+     27  10f6		       00 02	   SPIKE_COLOR =	2
+     28  10f6		       00 03	   BOOSTER_COLOR =	3
+     29  10f6		       00 01	   SQUAREBOT_COLOR =	#1
+     30  10f6
+     31  10f6		       00 20	   BLANK_SPACE_CHAR =	$20
+     32  10f6		       00 03	   WALL_CHAR  =	$3
+     33  10f6		       00 07	   BREAKABLE_WALL_CHAR =	$7
+     34  10f6		       00 06	   LOCKED_WALL_CHAR =	$6
+     35  10f6		       00 00	   GRAVITY_POWERUP_CHAR =	$0
+     36  10f6		       00 04	   EXIT_CHAR  =	$4
+     37  10f6		       00 02	   PLATFORM_CHAR =	$2
+     38  10f6		       00 05	   KEY_CHAR   =	$5
+     39  10f6		       00 08	   SPIKE_CHAR =	$8
+     40  10f6		       00 09	   BOOSTER_CHAR =	$9
+     41  10f6		       00 01	   SQUAREBOT_CHAR =	$1
+     42  10f6
+     43  10f6				   update_level
+     44  10f6							; check if the level is completed; set current_level to next_level if so
+     45  10f6		       a5 09		      lda	level_completed
+     46  10f8		       c9 01		      cmp	#LEVEL_IS_DONE	; (try optimizing later)
+     47  10fa		       d0 0c		      bne	dont_update
+     48  10fc
+     49  10fc							; level is done; reset level completed
+     50  10fc		       a9 00		      lda	#LEVEL_NOT_DONE
+     51  10fe		       85 09		      sta	level_completed
+     52  1100
+     53  1100							; now set current_level to next_level
+     54  1100		       a5 06		      lda	next_level
+     55  1102		       85 04		      sta	current_level
+     56  1104		       a5 07		      lda	next_level+1
+     57  1106		       85 05		      sta	current_level+1
+     58  1108
+     59  1108				   dont_update
+     60  1108							; now check if level reset was set
+     61  1108		       a5 08		      lda	level_reset
+     62  110a		       c9 00		      cmp	#0
+     63  110c		       d0 01		      bne	continue_update	; if not, go back to game loop
+     64  110e		       60		      rts
+     65  110f
+     66  110f				   continue_update
+     67  110f							; if it was, update the level
+     68  110f		       a9 00		      lda	#SCREEN_CURSOR_BEGINNING_LOW_BYTE
+     69  1111		       85 00		      sta	screen_cursor
+     70  1113		       a9 1e		      lda	#SCREEN_CURSOR_BEGINNING_HIGH_BYTE
+     71  1115		       85 01		      sta	screen_cursor+1
+     72  1117
+     73  1117		       a9 00		      lda	#COLOR_CURSOR_BEGINNING_LOW_BYTE
+     74  1119		       85 02		      sta	color_cursor
+     75  111b		       a9 96		      lda	#COLOR_CURSOR_BEGINNING_HIGH_BYTE
+     76  111d		       85 03		      sta	color_cursor+1
+     77  111f
+     78  111f		       a9 00		      lda	#0
+     79  1121		       85 18		      sta	gravity_flipped
+     80  1123		       85 16		      sta	has_booster
+     81  1125		       85 15		      sta	has_key
+     82  1127		       85 17		      sta	jump_remaining
+     83  1129
+     84  1129		       a2 00		      ldx	#0
+     85  112b		       a0 00		      ldy	#0
+     86  112d		       84 0a		      sty	level_data_index
      87  112f
-     88  112f		       20 4b 11 	      jsr	draw_sequence
-     89  1132
-     90  1132		       a4 0a		      ldy	level_data_index
-     91  1134		       c8		      iny		; set y to point to next length byte (iterate 2 at a time)
-     92  1135		       c8		      iny
-     93  1136		       84 0a		      sty	level_data_index
-     94  1138
-     95  1138
-     96  1138		       20 a2 10 	      jsr	check_if_screen_cursor_at_end
-     97  113b		       90 ee		      bcc	draw_level_loop
-     98  113d
-     99  113d
-    100  113d							; update next level pointer to point to byte after current level
-    101  113d		       a5 04		      lda	current_level
-    102  113f		       18		      clc
-    103  1140		       65 0a		      adc	level_data_index
-    104  1142		       85 06		      sta	next_level
-    105  1144		       a5 05		      lda	current_level+1
-    106  1146		       69 00		      adc	#0
-    107  1148		       85 07		      sta	next_level+1
-    108  114a		       60		      rts
-    109  114b
-    110  114b
-    111  114b
-    112  114b				   draw_sequence
-    113  114b							; if acc == 0, return; otherwise subtract 1, draw the next 2 chars
-    114  114b		       f0 1c		      beq	draw_sequence_end
-    115  114d		       38		      sec
-    116  114e		       e9 01		      sbc	#1
-    117  1150		       48		      pha		; push accumulator onto stack
-    118  1151
-    119  1151		       a4 0a		      ldy	level_data_index
-    120  1153		       c8		      iny		; (so we can access the "element" byte after the length byte)
-    121  1154		       b1 04		      lda	(current_level),y	; get formatted byte (see squarebot doc)
-    122  1156		       0a		      asl
-    123  1157		       0a		      asl
-    124  1158		       0a		      asl
-    125  1159		       0a		      asl
-    126  115a		       20 6a 11 	      jsr	draw_high_bits	; draw char represented by the 4 high bits
-    127  115d
-    128  115d		       a4 0a		      ldy	level_data_index
-    129  115f		       c8		      iny
-    130  1160
-    131  1160		       b1 04		      lda	(current_level),y
-    132  1162		       20 6a 11 	      jsr	draw_high_bits
-    133  1165
-    134  1165		       68		      pla
-    135  1166		       4c 4b 11 	      jmp	draw_sequence
-    136  1169
-    137  1169				   draw_sequence_end
-    138  1169		       60		      rts
-    139  116a
-    140  116a
-    141  116a							; put the character in the high 4 bits of accumulator on screen (see readme), and move the color and screen cursors ahead
-    142  116a				   draw_high_bits
-    143  116a		       29 f0		      and	#240	; shave off last 4 bits
-    144  116c
-    145  116c		       c9 00		      cmp	#BLANK_SPACE
-    146  116e		       d0 08		      bne	check_if_starting_point
-    147  1170		       a9 20		      lda	#BLANK_SPACE_CHAR
-    148  1172		       a2 00		      ldx	#BLANK_SPACE_COLOR
-    149  1174		       20 fc 11 	      jsr	draw_char_in_accumulator
-    150  1177		       60		      rts
-    151  1178
-    152  1178				   check_if_starting_point
-    153  1178		       c9 10		      cmp	#STARTING_POINT
-    154  117a		       d0 18		      bne	check_if_wall
-    155  117c
-    156  117c							; set squarebot to starting point
-    157  117c		       a5 00		      lda	screen_cursor
-    158  117e		       85 11		      sta	squarebot_position
-    159  1180		       a5 01		      lda	screen_cursor+1
-    160  1182		       85 12		      sta	squarebot_position+1
-    161  1184
-    162  1184		       a5 02		      lda	color_cursor
-    163  1186		       85 13		      sta	squarebot_color_position
-    164  1188		       a5 03		      lda	color_cursor+1
-    165  118a		       85 14		      sta	squarebot_color_position+1
-    166  118c
-    167  118c		       a9 01		      lda	#$1
-    168  118e		       a2 01		      ldx	#SQUAREBOT_COLOR
-    169  1190		       20 fc 11 	      jsr	draw_char_in_accumulator
-    170  1193
-    171  1193
-    172  1193
-    173  1193		       60		      rts
-    174  1194
-    175  1194				   check_if_wall
-    176  1194		       c9 20		      cmp	#WALL
-    177  1196		       d0 08		      bne	check_if_breakable_wall
-    178  1198		       a9 03		      lda	#WALL_CHAR
-    179  119a		       a2 06		      ldx	#WALL_COLOR
-    180  119c		       20 fc 11 	      jsr	draw_char_in_accumulator
-    181  119f		       60		      rts
-    182  11a0
-    183  11a0				   check_if_breakable_wall
-    184  11a0		       c9 30		      cmp	#BREAKABLE_WALL
-    185  11a2		       d0 08		      bne	check_if_locked_wall
-    186  11a4		       a9 07		      lda	#BREAKABLE_WALL_CHAR
-    187  11a6		       a2 00		      ldx	#BREAKABLE_WALL_COLOR
-    188  11a8		       20 fc 11 	      jsr	draw_char_in_accumulator
-    189  11ab		       60		      rts
-    190  11ac
-    191  11ac				   check_if_locked_wall
-    192  11ac		       c9 40		      cmp	#LOCKED_WALL
-    193  11ae		       d0 08		      bne	check_if_ladder
-    194  11b0		       a9 06		      lda	#LOCKED_WALL_CHAR
-    195  11b2		       a2 07		      ldx	#LOCKED_WALL_COLOR
-    196  11b4		       20 fc 11 	      jsr	draw_char_in_accumulator
-    197  11b7		       60		      rts
-    198  11b8
-    199  11b8				   check_if_ladder
-    200  11b8		       c9 50		      cmp	#LADDER
-    201  11ba		       d0 08		      bne	check_if_exit
-    202  11bc		       a9 00		      lda	#LADDER_CHAR
-    203  11be		       a2 08		      ldx	#LADDER_COLOR
-    204  11c0		       20 fc 11 	      jsr	draw_char_in_accumulator
-    205  11c3		       60		      rts
-    206  11c4
-    207  11c4				   check_if_exit
-    208  11c4		       c9 60		      cmp	#EXIT
-    209  11c6		       d0 08		      bne	check_if_platform
-    210  11c8		       a9 04		      lda	#EXIT_CHAR
-    211  11ca		       a2 05		      ldx	#EXIT_COLOR
-    212  11cc		       20 fc 11 	      jsr	draw_char_in_accumulator
-    213  11cf		       60		      rts
-    214  11d0
-    215  11d0				   check_if_platform
-    216  11d0		       c9 70		      cmp	#PLATFORM
-    217  11d2		       d0 08		      bne	check_if_key
-    218  11d4		       a9 02		      lda	#PLATFORM_CHAR
-    219  11d6		       a2 06		      ldx	#PLATFORM_COLOR
-    220  11d8		       20 fc 11 	      jsr	draw_char_in_accumulator
-    221  11db		       60		      rts
-    222  11dc
-    223  11dc
-    224  11dc				   check_if_key
-    225  11dc		       c9 80		      cmp	#KEY
-    226  11de		       d0 08		      bne	check_if_spike
-    227  11e0		       a9 05		      lda	#KEY_CHAR
-    228  11e2		       a2 07		      ldx	#KEY_COLOR
-    229  11e4		       20 fc 11 	      jsr	draw_char_in_accumulator
-    230  11e7		       60		      rts
-    231  11e8
-    232  11e8				   check_if_spike
-    233  11e8		       c9 90		      cmp	#SPIKE
-    234  11ea		       d0 08		      bne	check_if_booster
-    235  11ec		       a9 08		      lda	#SPIKE_CHAR
-    236  11ee		       a2 02		      ldx	#SPIKE_COLOR
-    237  11f0		       20 fc 11 	      jsr	draw_char_in_accumulator
-    238  11f3		       60		      rts
-    239  11f4
-    240  11f4				   check_if_booster
-    241  11f4		       a9 09		      lda	#BOOSTER_CHAR
-    242  11f6		       a2 03		      ldx	#BOOSTER_COLOR
-    243  11f8		       20 fc 11 	      jsr	draw_char_in_accumulator
-    244  11fb		       60		      rts
-    245  11fc
-    246  11fc
-    247  11fc							; char in accumulator goes in screen cursor, color in x register goes in color cursor, then update cursors
-    248  11fc
-    249  11fc				   draw_char_in_accumulator
-    250  11fc		       a0 00		      ldy	#0
-    251  11fe		       91 00		      sta	(screen_cursor),y
+     88  112f							; draw (or redraw on reset) the current level
+     89  112f				   draw_level_loop
+     90  112f							; y stores our index in the current level data
+     91  112f		       a4 0a		      ldy	level_data_index
+     92  1131		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
+     93  1133
+     94  1133		       20 4f 11 	      jsr	draw_sequence
+     95  1136
+     96  1136		       a4 0a		      ldy	level_data_index
+     97  1138		       c8		      iny		; set y to point to next length byte (iterate 2 at a time)
+     98  1139		       c8		      iny
+     99  113a		       84 0a		      sty	level_data_index
+    100  113c
+    101  113c
+    102  113c		       20 a4 10 	      jsr	check_if_screen_cursor_at_end
+    103  113f		       90 ee		      bcc	draw_level_loop
+    104  1141
+    105  1141
+    106  1141							; update next level pointer to point to byte after current level
+    107  1141		       a5 04		      lda	current_level
+    108  1143		       18		      clc
+    109  1144		       65 0a		      adc	level_data_index
+    110  1146		       85 06		      sta	next_level
+    111  1148		       a5 05		      lda	current_level+1
+    112  114a		       69 00		      adc	#0
+    113  114c		       85 07		      sta	next_level+1
+    114  114e		       60		      rts
+    115  114f
+    116  114f
+    117  114f
+    118  114f				   draw_sequence
+    119  114f							; if acc == 0, return; otherwise subtract 1, draw the next 2 chars
+    120  114f		       f0 1c		      beq	draw_sequence_end
+    121  1151		       38		      sec
+    122  1152		       e9 01		      sbc	#1
+    123  1154		       48		      pha		; push accumulator onto stack
+    124  1155
+    125  1155		       a4 0a		      ldy	level_data_index
+    126  1157		       c8		      iny		; (so we can access the "element" byte after the length byte)
+    127  1158		       b1 04		      lda	(current_level),y	; get formatted byte (see squarebot doc)
+    128  115a		       0a		      asl
+    129  115b		       0a		      asl
+    130  115c		       0a		      asl
+    131  115d		       0a		      asl
+    132  115e		       20 6e 11 	      jsr	draw_high_bits	; draw char represented by the 4 high bits
+    133  1161
+    134  1161		       a4 0a		      ldy	level_data_index
+    135  1163		       c8		      iny
+    136  1164
+    137  1164		       b1 04		      lda	(current_level),y
+    138  1166		       20 6e 11 	      jsr	draw_high_bits
+    139  1169
+    140  1169		       68		      pla
+    141  116a		       4c 4f 11 	      jmp	draw_sequence
+    142  116d
+    143  116d				   draw_sequence_end
+    144  116d		       60		      rts
+    145  116e
+    146  116e
+    147  116e							; put the character in the high 4 bits of accumulator on screen (see readme), and move the color and screen cursors ahead
+    148  116e				   draw_high_bits
+    149  116e		       29 f0		      and	#240	; shave off last 4 bits
+    150  1170
+    151  1170		       c9 00		      cmp	#BLANK_SPACE
+    152  1172		       d0 08		      bne	check_if_starting_point
+    153  1174		       a9 20		      lda	#BLANK_SPACE_CHAR
+    154  1176		       a2 00		      ldx	#BLANK_SPACE_COLOR
+    155  1178		       20 00 12 	      jsr	draw_char_in_accumulator
+    156  117b		       60		      rts
+    157  117c
+    158  117c				   check_if_starting_point
+    159  117c		       c9 10		      cmp	#STARTING_POINT
+    160  117e		       d0 18		      bne	check_if_wall
+    161  1180
+    162  1180							; set squarebot to starting point
+    163  1180		       a5 00		      lda	screen_cursor
+    164  1182		       85 11		      sta	squarebot_position
+    165  1184		       a5 01		      lda	screen_cursor+1
+    166  1186		       85 12		      sta	squarebot_position+1
+    167  1188
+    168  1188		       a5 02		      lda	color_cursor
+    169  118a		       85 13		      sta	squarebot_color_position
+    170  118c		       a5 03		      lda	color_cursor+1
+    171  118e		       85 14		      sta	squarebot_color_position+1
+    172  1190
+    173  1190		       a9 01		      lda	#$1
+    174  1192		       a2 01		      ldx	#SQUAREBOT_COLOR
+    175  1194		       20 00 12 	      jsr	draw_char_in_accumulator
+    176  1197
+    177  1197
+    178  1197
+    179  1197		       60		      rts
+    180  1198
+    181  1198				   check_if_wall
+    182  1198		       c9 20		      cmp	#WALL
+    183  119a		       d0 08		      bne	check_if_breakable_wall
+    184  119c		       a9 03		      lda	#WALL_CHAR
+    185  119e		       a2 06		      ldx	#WALL_COLOR
+    186  11a0		       20 00 12 	      jsr	draw_char_in_accumulator
+    187  11a3		       60		      rts
+    188  11a4
+    189  11a4				   check_if_breakable_wall
+    190  11a4		       c9 30		      cmp	#BREAKABLE_WALL
+    191  11a6		       d0 08		      bne	check_if_locked_wall
+    192  11a8		       a9 07		      lda	#BREAKABLE_WALL_CHAR
+    193  11aa		       a2 00		      ldx	#BREAKABLE_WALL_COLOR
+    194  11ac		       20 00 12 	      jsr	draw_char_in_accumulator
+    195  11af		       60		      rts
+    196  11b0
+    197  11b0				   check_if_locked_wall
+    198  11b0		       c9 40		      cmp	#LOCKED_WALL
+    199  11b2		       d0 08		      bne	check_if_gravity_powerup
+    200  11b4		       a9 06		      lda	#LOCKED_WALL_CHAR
+    201  11b6		       a2 07		      ldx	#LOCKED_WALL_COLOR
+    202  11b8		       20 00 12 	      jsr	draw_char_in_accumulator
+    203  11bb		       60		      rts
+    204  11bc
+    205  11bc				   check_if_gravity_powerup
+    206  11bc		       c9 50		      cmp	#GRAVITY_POWERUP
+    207  11be		       d0 08		      bne	check_if_exit
+    208  11c0		       a9 00		      lda	#GRAVITY_POWERUP_CHAR
+    209  11c2		       a2 05		      ldx	#GRAVITY_POWERUP_COLOR
+    210  11c4		       20 00 12 	      jsr	draw_char_in_accumulator
+    211  11c7		       60		      rts
+    212  11c8
+    213  11c8				   check_if_exit
+    214  11c8		       c9 60		      cmp	#EXIT
+    215  11ca		       d0 08		      bne	check_if_platform
+    216  11cc		       a9 04		      lda	#EXIT_CHAR
+    217  11ce		       a2 05		      ldx	#EXIT_COLOR
+    218  11d0		       20 00 12 	      jsr	draw_char_in_accumulator
+    219  11d3		       60		      rts
+    220  11d4
+    221  11d4				   check_if_platform
+    222  11d4		       c9 70		      cmp	#PLATFORM
+    223  11d6		       d0 08		      bne	check_if_key
+    224  11d8		       a9 02		      lda	#PLATFORM_CHAR
+    225  11da		       a2 06		      ldx	#PLATFORM_COLOR
+    226  11dc		       20 00 12 	      jsr	draw_char_in_accumulator
+    227  11df		       60		      rts
+    228  11e0
+    229  11e0
+    230  11e0				   check_if_key
+    231  11e0		       c9 80		      cmp	#KEY
+    232  11e2		       d0 08		      bne	check_if_spike
+    233  11e4		       a9 05		      lda	#KEY_CHAR
+    234  11e6		       a2 07		      ldx	#KEY_COLOR
+    235  11e8		       20 00 12 	      jsr	draw_char_in_accumulator
+    236  11eb		       60		      rts
+    237  11ec
+    238  11ec				   check_if_spike
+    239  11ec		       c9 90		      cmp	#SPIKE
+    240  11ee		       d0 08		      bne	check_if_booster
+    241  11f0		       a9 08		      lda	#SPIKE_CHAR
+    242  11f2		       a2 02		      ldx	#SPIKE_COLOR
+    243  11f4		       20 00 12 	      jsr	draw_char_in_accumulator
+    244  11f7		       60		      rts
+    245  11f8
+    246  11f8				   check_if_booster
+    247  11f8		       a9 09		      lda	#BOOSTER_CHAR
+    248  11fa		       a2 03		      ldx	#BOOSTER_COLOR
+    249  11fc		       20 00 12 	      jsr	draw_char_in_accumulator
+    250  11ff		       60		      rts
+    251  1200
     252  1200
-    253  1200		       8a		      txa
-    254  1201		       91 02		      sta	(color_cursor),y
-    255  1203
-    256  1203		       20 87 10 	      jsr	add_one_to_screen_cursor	; add to both screen and color cursor
-    257  1206		       60		      rts
+    253  1200							; char in accumulator goes in screen cursor, color in x register goes in color cursor, then update cursors
+    254  1200
+    255  1200				   draw_char_in_accumulator
+    256  1200		       a0 00		      ldy	#0
+    257  1202		       91 00		      sta	(screen_cursor),y
+    258  1204
+    259  1204		       8a		      txa
+    260  1205		       91 02		      sta	(color_cursor),y
+    261  1207
+    262  1207		       20 89 10 	      jsr	add_one_to_screen_cursor	; add to both screen and color cursor
+    263  120a		       60		      rts
 ------- FILE src/main.s
 ------- FILE updateGameState.s LEVEL 2 PASS 3
-      0  1207					      include	"updateGameState.s"
-      1  1207
-      2  1207		       00 01	   MOVE_LEFT  =	1
-      3  1207		       00 02	   MOVE_RIGHT =	2
-      4  1207		       00 e4	   START_OF_FIRST_ROW_LOW_BYTE =	$e4
-      5  1207		       00 1f	   START_OF_FIRST_ROW_HIGH_BYTE =	$1f
-      6  1207
-      7  1207				   update_game_state
-      8  1207		       20 87 13 	      jsr	reset_new_position
-      9  120a
-     10  120a		       a5 c5		      lda	currently_pressed_key
-     11  120c		       c9 11		      cmp	#A_KEY
-     12  120e		       d0 06		      bne	check_if_d_pressed
-     13  1210		       20 e0 12 	      jsr	move_new_position_to_left
-     14  1213		       4c 1d 12 	      jmp	check_if_new_position_valid
-     15  1216
-     16  1216				   check_if_d_pressed
-     17  1216		       c9 12		      cmp	#D_KEY
-     18  1218		       d0 03		      bne	check_if_new_position_valid
-     19  121a		       20 c5 12 	      jsr	move_new_position_to_right
-     20  121d
-     21  121d				   check_if_new_position_valid
-     22  121d		       a0 00		      ldy	#0
-     23  121f		       b1 0c		      lda	(new_position),y
-     24  1221		       c9 04		      cmp	#EXIT_CHAR
-     25  1223		       d0 04		      bne	continue_level
-     26  1225		       20 be 12 	      jsr	level_has_finished
-     27  1228		       60		      rts
-     28  1229
-     29  1229				   continue_level
-     30  1229		       20 3c 13 	      jsr	collision_handler
-     31  122c		       90 03		      bcc	handle_jump_logic
-     32  122e
-     33  122e		       20 a0 12 	      jsr	update_squarebot_position
-     34  1231
-     35  1231				   handle_jump_logic
-     36  1231		       a5 17		      lda	jump_remaining	; how many more upward motions for current jump
-     37  1233		       c9 00		      cmp	#0
-     38  1235		       d0 2d		      bne	handle_jumps_remaining
-     39  1237
-     40  1237
-     41  1237				   handle_no_jumps_remaining		; if no jumps left, then start jump if space is pressed, otherwise just skip and handle gravity
-     42  1237		       a5 c5		      lda	currently_pressed_key
-     43  1239		       c9 20		      cmp	#SPACE_KEY
-     44  123b		       d0 47		      bne	handle_gravity
-     45  123d
-     46  123d
-     47  123d
-     48  123d		       20 77 13 	      jsr	squarebot_on_first_row	; if on first row, we dont care about what character lies below
-     49  1240		       b0 0d		      bcs	skip_validity_check
-     50  1242
-     51  1242							; check if character below is blank; if so dont allow us to set jump_remaining
-     52  1242		       a0 16		      ldy	#ROW_SIZE
-     53  1244		       b1 11		      lda	(squarebot_position),y
-     54  1246
-     55  1246		       c9 04		      cmp	#EXIT_CHAR
-     56  1248		       f0 74		      beq	level_has_finished
-     57  124a
-     58  124a		       20 3c 13 	      jsr	collision_handler
-     59  124d		       b0 35		      bcs	handle_gravity
-     60  124f
-     61  124f				   skip_validity_check
-     62  124f		       a5 16		      lda	has_booster	; if we have the booster, set jump_remaining to twice as high, then get rid of the booster
-     63  1251		       c9 01		      cmp	#1
-     64  1253		       d0 0b		      bne	regular_jump
-     65  1255		       a9 08		      lda	#JUMP_SIZE*2
-     66  1257		       85 17		      sta	jump_remaining
-     67  1259		       a9 00		      lda	#0
-     68  125b		       85 16		      sta	has_booster
-     69  125d		       4c 64 12 	      jmp	handle_jumps_remaining
-     70  1260
-     71  1260
-     72  1260				   regular_jump
-     73  1260		       a9 04		      lda	#JUMP_SIZE
-     74  1262		       85 17		      sta	jump_remaining
-     75  1264
-     76  1264				   handle_jumps_remaining
-     77  1264		       20 fb 12 	      jsr	move_new_position_up
-     78  1267		       a0 00		      ldy	#0
-     79  1269		       b1 0c		      lda	(new_position),y
-     80  126b		       c9 04		      cmp	#EXIT_CHAR
-     81  126d		       f0 4f		      beq	level_has_finished
-     82  126f
-     83  126f		       20 3c 13 	      jsr	collision_handler
-     84  1272		       90 0b		      bcc	jump_is_invalid
-     85  1274
-     86  1274		       20 a0 12 	      jsr	update_squarebot_position
-     87  1277
-     88  1277		       a5 17		      lda	jump_remaining
-     89  1279		       38		      sec
-     90  127a		       e9 01		      sbc	#1
-     91  127c		       85 17		      sta	jump_remaining
-     92  127e		       60		      rts		; no gravity effect after moving upwards from jump
-     93  127f
-     94  127f
-     95  127f				   jump_is_invalid
-     96  127f		       a9 00		      lda	#0
-     97  1281		       85 17		      sta	jump_remaining
-     98  1283		       60		      rts
-     99  1284
-    100  1284				   handle_gravity		; on first row - do nothing
-    101  1284		       20 87 13 	      jsr	reset_new_position
-    102  1287		       20 16 13 	      jsr	move_new_position_down
-    103  128a
-    104  128a		       20 77 13 	      jsr	squarebot_on_first_row
-    105  128d		       b0 10		      bcs	do_nothing
-    106  128f
-    107  128f		       a0 00		      ldy	#0
-    108  1291		       b1 0c		      lda	(new_position),y
-    109  1293
-    110  1293		       c9 04		      cmp	#EXIT_CHAR
-    111  1295		       f0 27		      beq	level_has_finished
-    112  1297
-    113  1297		       20 3c 13 	      jsr	collision_handler
-    114  129a		       90 03		      bcc	do_nothing
-    115  129c
-    116  129c
-    117  129c		       20 a0 12 	      jsr	update_squarebot_position
-    118  129f
-    119  129f				   do_nothing
-    120  129f		       60		      rts
-    121  12a0
-    122  12a0				   update_squarebot_position
-    123  12a0		       20 31 13 	      jsr	remove_char
-    124  12a3							; new positions are valid; set them to current positions
-    125  12a3
-    126  12a3		       a5 0c		      lda	new_position
-    127  12a5		       85 11		      sta	squarebot_position
-    128  12a7		       a5 0d		      lda	new_position+1
-    129  12a9		       85 12		      sta	squarebot_position+1
-    130  12ab
-    131  12ab		       a5 0e		      lda	new_color_position
-    132  12ad		       85 13		      sta	squarebot_color_position
-    133  12af		       a5 0f		      lda	new_color_position+1
-    134  12b1		       85 14		      sta	squarebot_color_position+1
+      0  120b					      include	"updateGameState.s"
+      1  120b
+      2  120b		       00 01	   MOVE_LEFT  =	1
+      3  120b		       00 02	   MOVE_RIGHT =	2
+      4  120b		       00 e4	   START_OF_FIRST_ROW_LOW_BYTE =	$e4
+      5  120b		       00 1f	   START_OF_FIRST_ROW_HIGH_BYTE =	$1f
+      6  120b
+      7  120b				   update_game_state
+      8  120b		       20 ae 13 	      jsr	reset_new_position
+      9  120e
+     10  120e		       a5 c5		      lda	currently_pressed_key
+     11  1210		       c9 11		      cmp	#A_KEY
+     12  1212		       d0 06		      bne	check_if_d_pressed
+     13  1214		       20 f7 12 	      jsr	move_new_position_to_left
+     14  1217		       4c 21 12 	      jmp	check_if_new_position_valid
+     15  121a
+     16  121a				   check_if_d_pressed
+     17  121a		       c9 12		      cmp	#D_KEY
+     18  121c		       d0 03		      bne	check_if_new_position_valid
+     19  121e		       20 dc 12 	      jsr	move_new_position_to_right
+     20  1221
+     21  1221				   check_if_new_position_valid
+     22  1221		       a0 00		      ldy	#0
+     23  1223		       b1 0c		      lda	(new_position),y
+     24  1225		       c9 04		      cmp	#EXIT_CHAR
+     25  1227		       d0 04		      bne	continue_level
+     26  1229		       20 d5 12 	      jsr	level_has_finished
+     27  122c		       60		      rts
+     28  122d
+     29  122d				   continue_level
+     30  122d		       20 53 13 	      jsr	collision_handler
+     31  1230		       90 03		      bcc	handle_jump_logic
+     32  1232
+     33  1232		       20 b7 12 	      jsr	update_squarebot_position
+     34  1235
+     35  1235				   handle_jump_logic
+     36  1235		       a5 17		      lda	jump_remaining	; how many more upward motions for current jump
+     37  1237		       c9 00		      cmp	#0
+     38  1239		       d0 33		      bne	handle_jumps_remaining
+     39  123b
+     40  123b
+     41  123b				   handle_no_jumps_remaining		; if no jumps left, then start jump if space is pressed, otherwise just skip and handle gravity
+     42  123b		       a5 c5		      lda	currently_pressed_key
+     43  123d		       c9 20		      cmp	#SPACE_KEY
+     44  123f		       d0 4d		      bne	handle_gravity
+     45  1241
+     46  1241
+     47  1241
+     48  1241		       20 9b 13 	      jsr	squarebot_on_first_row	; if on first row, we dont care about what character lies below
+     49  1244		       b0 13		      bcs	skip_validity_check
+     50  1246
+     51  1246
+     52  1246
+     53  1246							; check if character below is blank; if so dont allow us to set jump_remaining
+     54  1246		       a0 16		      ldy	#ROW_SIZE
+     55  1248		       b1 11		      lda	(squarebot_position),y
+     56  124a
+     57  124a		       c9 04		      cmp	#EXIT_CHAR
+     58  124c		       d0 06		      bne	level_is_not_completed
+     59  124e		       a9 01		      lda	#1
+     60  1250		       85 09		      sta	level_completed
+     61  1252		       85 08		      sta	level_reset
+     62  1254
+     63  1254
+     64  1254				   level_is_not_completed
+     65  1254		       20 53 13 	      jsr	collision_handler
+     66  1257		       b0 35		      bcs	handle_gravity
+     67  1259
+     68  1259				   skip_validity_check
+     69  1259		       a5 16		      lda	has_booster	; if we have the booster, set jump_remaining to twice as high, then get rid of the booster
+     70  125b		       c9 01		      cmp	#1
+     71  125d		       d0 0b		      bne	regular_jump
+     72  125f		       a9 08		      lda	#JUMP_SIZE*2
+     73  1261		       85 17		      sta	jump_remaining
+     74  1263		       a9 00		      lda	#0
+     75  1265		       85 16		      sta	has_booster
+     76  1267		       4c 6e 12 	      jmp	handle_jumps_remaining
+     77  126a
+     78  126a
+     79  126a				   regular_jump
+     80  126a		       a9 04		      lda	#JUMP_SIZE
+     81  126c		       85 17		      sta	jump_remaining
+     82  126e
+     83  126e				   handle_jumps_remaining
+     84  126e		       20 12 13 	      jsr	move_new_position_up
+     85  1271		       a0 00		      ldy	#0
+     86  1273		       b1 0c		      lda	(new_position),y
+     87  1275		       c9 04		      cmp	#EXIT_CHAR
+     88  1277		       f0 5c		      beq	level_has_finished
+     89  1279
+     90  1279		       20 53 13 	      jsr	collision_handler
+     91  127c		       90 0b		      bcc	jump_is_invalid
+     92  127e
+     93  127e		       20 b7 12 	      jsr	update_squarebot_position
+     94  1281
+     95  1281		       a5 17		      lda	jump_remaining
+     96  1283		       38		      sec
+     97  1284		       e9 01		      sbc	#1
+     98  1286		       85 17		      sta	jump_remaining
+     99  1288		       60		      rts		; no gravity effect after moving upwards from jump
+    100  1289
+    101  1289
+    102  1289				   jump_is_invalid
+    103  1289		       a9 00		      lda	#0
+    104  128b		       85 17		      sta	jump_remaining
+    105  128d		       60		      rts
+    106  128e
+    107  128e				   handle_gravity
+    108  128e		       20 ae 13 	      jsr	reset_new_position
+    109  1291
+    110  1291		       a5 18		      lda	gravity_flipped
+    111  1293		       d0 06		      bne	gravity_is_flipped
+    112  1295
+    113  1295		       20 2d 13 	      jsr	move_new_position_down
+    114  1298		       4c a1 12 	      jmp	check_if_position_valid
+    115  129b
+    116  129b				   gravity_is_flipped
+    117  129b		       20 12 13 	      jsr	move_new_position_up
+    118  129e		       4c a6 12 	      jmp	not_on_first_row
+    119  12a1
+    120  12a1				   check_if_position_valid
+    121  12a1
+    122  12a1		       20 9b 13 	      jsr	squarebot_on_first_row
+    123  12a4		       b0 10		      bcs	do_nothing
+    124  12a6
+    125  12a6
+    126  12a6				   not_on_first_row
+    127  12a6		       a0 00		      ldy	#0
+    128  12a8		       b1 0c		      lda	(new_position),y
+    129  12aa
+    130  12aa		       c9 04		      cmp	#EXIT_CHAR
+    131  12ac		       f0 27		      beq	level_has_finished
+    132  12ae
+    133  12ae		       20 53 13 	      jsr	collision_handler
+    134  12b1		       90 03		      bcc	do_nothing
     135  12b3
-    136  12b3		       a0 00		      ldy	#0
-    137  12b5		       a9 01		      lda	#SQUAREBOT_CHAR
-    138  12b7		       91 11		      sta	(squarebot_position),y
-    139  12b9		       a9 01		      lda	#SQUAREBOT_COLOR
-    140  12bb		       91 13		      sta	(squarebot_color_position),y
-    141  12bd
-    142  12bd		       60		      rts
-    143  12be
-    144  12be				   level_has_finished
-    145  12be		       a9 01		      lda	#1
-    146  12c0		       85 09		      sta	level_completed
-    147  12c2		       85 08		      sta	level_reset
-    148  12c4		       60		      rts
-    149  12c5
-    150  12c5				   move_new_position_to_right
-    151  12c5		       18		      clc
-    152  12c6		       a5 0c		      lda	new_position	; load and add to low byte
-    153  12c8		       69 01		      adc	#$1
-    154  12ca		       85 0c		      sta	new_position
-    155  12cc		       a5 0d		      lda	new_position+1
-    156  12ce		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    157  12d0		       85 0d		      sta	new_position+1
-    158  12d2		       18		      clc
-    159  12d3		       a5 0e		      lda	new_color_position	; load and add to low byte
-    160  12d5		       69 01		      adc	#$1
-    161  12d7		       85 0e		      sta	new_color_position
-    162  12d9		       a5 0f		      lda	new_color_position+1
-    163  12db		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    164  12dd		       85 0f		      sta	new_color_position+1
-    165  12df		       60		      rts
-    166  12e0
-    167  12e0				   move_new_position_to_left
-    168  12e0		       38		      sec
-    169  12e1		       a5 0c		      lda	new_position
-    170  12e3		       e9 01		      sbc	#$1
-    171  12e5		       85 0c		      sta	new_position
-    172  12e7		       a5 0d		      lda	new_position+1
-    173  12e9		       e9 00		      sbc	#$0
-    174  12eb		       85 0d		      sta	new_position+1
-    175  12ed		       38		      sec
-    176  12ee		       a5 0e		      lda	new_color_position
-    177  12f0		       e9 01		      sbc	#$1
-    178  12f2		       85 0e		      sta	new_color_position
-    179  12f4		       a5 0f		      lda	new_color_position+1
-    180  12f6		       e9 00		      sbc	#$0
-    181  12f8		       85 0f		      sta	new_color_position+1
-    182  12fa		       60		      rts
-    183  12fb
-    184  12fb
-    185  12fb				   move_new_position_up
-    186  12fb		       38		      sec
-    187  12fc		       a5 0c		      lda	new_position
-    188  12fe		       e9 16		      sbc	#ROW_SIZE
-    189  1300		       85 0c		      sta	new_position
-    190  1302		       a5 0d		      lda	new_position+1
-    191  1304		       e9 00		      sbc	#$0
-    192  1306		       85 0d		      sta	new_position+1
-    193  1308		       38		      sec
-    194  1309		       a5 0e		      lda	new_color_position
-    195  130b		       e9 16		      sbc	#ROW_SIZE
-    196  130d		       85 0e		      sta	new_color_position
-    197  130f		       a5 0f		      lda	new_color_position+1
-    198  1311		       e9 00		      sbc	#$0
-    199  1313		       85 0f		      sta	new_color_position+1
-    200  1315		       60		      rts
-    201  1316
-    202  1316				   move_new_position_down
-    203  1316		       18		      clc
-    204  1317		       a5 0c		      lda	new_position	; load and add to low byte
-    205  1319		       69 16		      adc	#ROW_SIZE
-    206  131b		       85 0c		      sta	new_position
-    207  131d		       a5 0d		      lda	new_position+1
-    208  131f		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    209  1321		       85 0d		      sta	new_position+1
-    210  1323		       18		      clc
-    211  1324		       a5 0e		      lda	new_color_position	; load and add to low byte
-    212  1326		       69 16		      adc	#ROW_SIZE
-    213  1328		       85 0e		      sta	new_color_position
-    214  132a		       a5 0f		      lda	new_color_position+1
-    215  132c		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
-    216  132e		       85 0f		      sta	new_color_position+1
-    217  1330		       60		      rts
-    218  1331
-    219  1331
-    220  1331				   remove_char		; remove squarebot from current screen location
-    221  1331		       a0 00		      ldy	#0
-    222  1333		       a9 20		      lda	#BLANK_CHAR
-    223  1335		       91 11		      sta	(squarebot_position),Y
-    224  1337		       a9 00		      lda	#BLANK_SPACE_COLOR
-    225  1339		       91 13		      sta	(squarebot_color_position),Y
-    226  133b		       60		      rts
-    227  133c
-    228  133c				   collision_handler		; accumulator is the character (the actual character code) in the position that squarbeot wants to move to
-    229  133c							; set carry flag if we can move to this char, otherwise clear it
-    230  133c		       c9 20		      cmp	#BLANK_CHAR
-    231  133e		       f0 43		      beq	return_true
-    232  1340
-    233  1340		       c9 09		      CMP	#BOOSTER_CHAR
-    234  1342		       d0 07		      bne	key_check
-    235  1344		       a9 01		      lda	#1
-    236  1346		       85 16		      sta	has_booster
-    237  1348		       4c 83 13 	      jmp	return_true
-    238  134b
-    239  134b				   key_check
-    240  134b		       c9 05		      cmp	#KEY_CHAR
-    241  134d		       d0 07		      bne	locked_wall_check
-    242  134f		       a9 01		      lda	#1
-    243  1351		       85 15		      sta	has_key
-    244  1353		       4c 83 13 	      jmp	return_true
-    245  1356
-    246  1356				   locked_wall_check
-    247  1356		       c9 06		      cmp	#LOCKED_WALL_CHAR
-    248  1358		       d0 0d		      bne	spike_check
-    249  135a
-    250  135a		       a5 15		      lda	has_key	; if locked wall, but player doesnt have key, cant do anything
-    251  135c		       c9 00		      cmp	#0
-    252  135e		       f0 25		      beq	return_false
-    253  1360
-    254  1360		       a9 00		      lda	#0	; but if locked wall and has key, get rid of the locked wall and the key
-    255  1362		       85 15		      sta	has_key
-    256  1364		       4c 83 13 	      jmp	return_true
-    257  1367
-    258  1367				   spike_check
-    259  1367		       c9 08		      cmp	#SPIKE_CHAR
-    260  1369		       d0 1a		      bne	return_false
-    261  136b
-    262  136b		       a9 02		      lda	#RED_COLOR_CODE
-    263  136d		       a0 00		      ldy	#0
-    264  136f		       91 13		      sta	(squarebot_color_position),y
-    265  1371
-    266  1371		       a9 01		      lda	#1
-    267  1373		       85 08		      sta	level_reset
-    268  1375		       d0 0e		      bne	return_false
-    269  1377
-    270  1377
-    271  1377				   squarebot_on_first_row		; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
-    272  1377		       a5 12		      lda	squarebot_position+1
-    273  1379		       c9 1f		      cmp	#START_OF_FIRST_ROW_HIGH_BYTE
-    274  137b		       90 08		      bcc	return_false	; compare high bits; return false if current position high bit is smaller than high bit of leftmost position on first row
-    275  137d		       a5 11		      lda	squarebot_position
-    276  137f		       c9 e4		      cmp	#START_OF_FIRST_ROW_LOW_BYTE
-    277  1381		       90 02		      bcc	return_false
-    278  1383
-    279  1383				   return_true
-    280  1383		       38		      sec
-    281  1384		       60		      rts
-    282  1385
-    283  1385				   return_false
-    284  1385		       18		      clc
-    285  1386		       60		      rts
-    286  1387
-    287  1387				   reset_new_position
-    288  1387		       a5 11		      lda	squarebot_position
-    289  1389		       85 0c		      sta	new_position
-    290  138b		       a5 12		      lda	squarebot_position+1
-    291  138d		       85 0d		      sta	new_position+1
-    292  138f		       a5 13		      lda	squarebot_color_position
-    293  1391		       85 0e		      sta	new_color_position
-    294  1393		       a5 14		      lda	squarebot_color_position+1
-    295  1395		       85 0f		      sta	new_color_position+1
-    296  1397		       60		      rts
+    136  12b3
+    137  12b3		       20 b7 12 	      jsr	update_squarebot_position
+    138  12b6
+    139  12b6				   do_nothing
+    140  12b6		       60		      rts
+    141  12b7
+    142  12b7				   update_squarebot_position
+    143  12b7		       20 48 13 	      jsr	remove_char
+    144  12ba							; new positions are valid; set them to current positions
+    145  12ba
+    146  12ba		       a5 0c		      lda	new_position
+    147  12bc		       85 11		      sta	squarebot_position
+    148  12be		       a5 0d		      lda	new_position+1
+    149  12c0		       85 12		      sta	squarebot_position+1
+    150  12c2
+    151  12c2		       a5 0e		      lda	new_color_position
+    152  12c4		       85 13		      sta	squarebot_color_position
+    153  12c6		       a5 0f		      lda	new_color_position+1
+    154  12c8		       85 14		      sta	squarebot_color_position+1
+    155  12ca
+    156  12ca		       a0 00		      ldy	#0
+    157  12cc		       a9 01		      lda	#SQUAREBOT_CHAR
+    158  12ce		       91 11		      sta	(squarebot_position),y
+    159  12d0		       a9 01		      lda	#SQUAREBOT_COLOR
+    160  12d2		       91 13		      sta	(squarebot_color_position),y
+    161  12d4
+    162  12d4		       60		      rts
+    163  12d5
+    164  12d5				   level_has_finished
+    165  12d5		       a9 01		      lda	#1
+    166  12d7		       85 09		      sta	level_completed
+    167  12d9		       85 08		      sta	level_reset
+    168  12db		       60		      rts
+    169  12dc
+    170  12dc				   move_new_position_to_right
+    171  12dc		       18		      clc
+    172  12dd		       a5 0c		      lda	new_position	; load and add to low byte
+    173  12df		       69 01		      adc	#$1
+    174  12e1		       85 0c		      sta	new_position
+    175  12e3		       a5 0d		      lda	new_position+1
+    176  12e5		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    177  12e7		       85 0d		      sta	new_position+1
+    178  12e9		       18		      clc
+    179  12ea		       a5 0e		      lda	new_color_position	; load and add to low byte
+    180  12ec		       69 01		      adc	#$1
+    181  12ee		       85 0e		      sta	new_color_position
+    182  12f0		       a5 0f		      lda	new_color_position+1
+    183  12f2		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    184  12f4		       85 0f		      sta	new_color_position+1
+    185  12f6		       60		      rts
+    186  12f7
+    187  12f7				   move_new_position_to_left
+    188  12f7		       38		      sec
+    189  12f8		       a5 0c		      lda	new_position
+    190  12fa		       e9 01		      sbc	#$1
+    191  12fc		       85 0c		      sta	new_position
+    192  12fe		       a5 0d		      lda	new_position+1
+    193  1300		       e9 00		      sbc	#$0
+    194  1302		       85 0d		      sta	new_position+1
+    195  1304		       38		      sec
+    196  1305		       a5 0e		      lda	new_color_position
+    197  1307		       e9 01		      sbc	#$1
+    198  1309		       85 0e		      sta	new_color_position
+    199  130b		       a5 0f		      lda	new_color_position+1
+    200  130d		       e9 00		      sbc	#$0
+    201  130f		       85 0f		      sta	new_color_position+1
+    202  1311		       60		      rts
+    203  1312
+    204  1312
+    205  1312				   move_new_position_up
+    206  1312		       38		      sec
+    207  1313		       a5 0c		      lda	new_position
+    208  1315		       e9 16		      sbc	#ROW_SIZE
+    209  1317		       85 0c		      sta	new_position
+    210  1319		       a5 0d		      lda	new_position+1
+    211  131b		       e9 00		      sbc	#$0
+    212  131d		       85 0d		      sta	new_position+1
+    213  131f		       38		      sec
+    214  1320		       a5 0e		      lda	new_color_position
+    215  1322		       e9 16		      sbc	#ROW_SIZE
+    216  1324		       85 0e		      sta	new_color_position
+    217  1326		       a5 0f		      lda	new_color_position+1
+    218  1328		       e9 00		      sbc	#$0
+    219  132a		       85 0f		      sta	new_color_position+1
+    220  132c		       60		      rts
+    221  132d
+    222  132d				   move_new_position_down
+    223  132d		       18		      clc
+    224  132e		       a5 0c		      lda	new_position	; load and add to low byte
+    225  1330		       69 16		      adc	#ROW_SIZE
+    226  1332		       85 0c		      sta	new_position
+    227  1334		       a5 0d		      lda	new_position+1
+    228  1336		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    229  1338		       85 0d		      sta	new_position+1
+    230  133a		       18		      clc
+    231  133b		       a5 0e		      lda	new_color_position	; load and add to low byte
+    232  133d		       69 16		      adc	#ROW_SIZE
+    233  133f		       85 0e		      sta	new_color_position
+    234  1341		       a5 0f		      lda	new_color_position+1
+    235  1343		       69 00		      adc	#$0	; add if carry flag is set (low byte overflowed)
+    236  1345		       85 0f		      sta	new_color_position+1
+    237  1347		       60		      rts
+    238  1348
+    239  1348
+    240  1348				   remove_char		; remove squarebot from current screen location
+    241  1348		       a0 00		      ldy	#0
+    242  134a		       a9 20		      lda	#BLANK_CHAR
+    243  134c		       91 11		      sta	(squarebot_position),Y
+    244  134e		       a9 00		      lda	#BLANK_SPACE_COLOR
+    245  1350		       91 13		      sta	(squarebot_color_position),Y
+    246  1352		       60		      rts
+    247  1353
+    248  1353				   collision_handler		; accumulator is the character (the actual character code) in the position that squarbeot wants to move to
+    249  1353							; set carry flag if we can move to this char, otherwise clear it
+    250  1353		       c9 20		      cmp	#BLANK_CHAR
+    251  1355		       f0 53		      beq	return_true
+    252  1357
+    253  1357		       c9 09		      CMP	#BOOSTER_CHAR
+    254  1359		       d0 07		      bne	key_check
+    255  135b		       a9 01		      lda	#1
+    256  135d		       85 16		      sta	has_booster
+    257  135f		       4c aa 13 	      jmp	return_true
+    258  1362
+    259  1362				   key_check
+    260  1362		       c9 05		      cmp	#KEY_CHAR
+    261  1364		       d0 07		      bne	locked_wall_check
+    262  1366		       a9 01		      lda	#1
+    263  1368		       85 15		      sta	has_key
+    264  136a		       4c aa 13 	      jmp	return_true
+    265  136d
+    266  136d				   locked_wall_check
+    267  136d		       c9 06		      cmp	#LOCKED_WALL_CHAR
+    268  136f		       d0 0d		      bne	spike_check
+    269  1371
+    270  1371		       a5 15		      lda	has_key	; if locked wall, but player doesnt have key, cant do anything
+    271  1373		       c9 00		      cmp	#0
+    272  1375		       f0 35		      beq	return_false
+    273  1377
+    274  1377		       a9 00		      lda	#0	; but if locked wall and has key, get rid of the locked wall and the key
+    275  1379		       85 15		      sta	has_key
+    276  137b		       4c aa 13 	      jmp	return_true
+    277  137e
+    278  137e				   spike_check
+    279  137e		       c9 08		      cmp	#SPIKE_CHAR
+    280  1380		       d0 0c		      bne	gravity_powerup_check
+    281  1382
+    282  1382		       a9 02		      lda	#RED_COLOR_CODE
+    283  1384		       a0 00		      ldy	#0
+    284  1386		       91 13		      sta	(squarebot_color_position),y
+    285  1388
+    286  1388		       a9 01		      lda	#1
+    287  138a		       85 08		      sta	level_reset
+    288  138c		       d0 1e		      bne	return_false
+    289  138e
+    290  138e				   gravity_powerup_check
+    291  138e		       c9 00		      cmp	#GRAVITY_POWERUP_CHAR
+    292  1390		       d0 1a		      bne	return_false
+    293  1392		       a5 18		      lda	gravity_flipped
+    294  1394		       49 01		      eor	#1
+    295  1396		       85 18		      sta	gravity_flipped
+    296  1398		       4c aa 13 	      jmp	return_true
+    297  139b
+    298  139b				   squarebot_on_first_row		; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
+    299  139b		       a5 12		      lda	squarebot_position+1
+    300  139d		       c9 1f		      cmp	#START_OF_FIRST_ROW_HIGH_BYTE
+    301  139f		       90 0b		      bcc	return_false	; compare high byte; return false if current position high bit is smaller than high bit of leftmost position on first row
+    302  13a1		       a5 11		      lda	squarebot_position
+    303  13a3		       c9 e4		      cmp	#START_OF_FIRST_ROW_LOW_BYTE
+    304  13a5		       90 05		      bcc	return_false
+    305  13a7		       4c aa 13 	      jmp	return_true
+    306  13aa
+    307  13aa				   return_true
+    308  13aa		       38		      sec
+    309  13ab		       60		      rts
+    310  13ac
+    311  13ac				   return_false
+    312  13ac		       18		      clc
+    313  13ad		       60		      rts
+    314  13ae
+    315  13ae				   reset_new_position
+    316  13ae		       a5 11		      lda	squarebot_position
+    317  13b0		       85 0c		      sta	new_position
+    318  13b2		       a5 12		      lda	squarebot_position+1
+    319  13b4		       85 0d		      sta	new_position+1
+    320  13b6		       a5 13		      lda	squarebot_color_position
+    321  13b8		       85 0e		      sta	new_color_position
+    322  13ba		       a5 14		      lda	squarebot_color_position+1
+    323  13bc		       85 0f		      sta	new_color_position+1
+    324  13be		       60		      rts
 ------- FILE src/main.s
-    143  1398
-    144  1398				   compressed_screen_data_start
-    145  1398					      incbin	"../data/titleScreenData_compressed"	; got via 'bsave ""'
-    146  1440
-    147  1440				   level_data_start
-    148  1440					      incbin	"../data/levels/binary_levels/1"
-    149  1448					      incbin	"../data/levels/binary_levels/2"
-    150  1460					      incbin	"../data/levels/binary_levels/3"
-    151  1472					      incbin	"../data/levels/binary_levels/4"
-    152  149a					      incbin	"../data/levels/binary_levels/5"
-    153  14ae					      incbin	"../data/levels/binary_levels/6"
-    154  14cc					      incbin	"../data/levels/binary_levels/7"
-    155  14e8					      incbin	"../data/levels/binary_levels/8"
-    156  150c					      incbin	"../data/levels/binary_levels/9"
-    157  1536					      incbin	"../data/levels/binary_levels/10"
-    158  1544
+    141  13bf
+    142  13bf				   compressed_screen_data_start
+    143  13bf					      incbin	"../data/titleScreenData_compressed"	; got via 'bsave ""'
+    144  1467
+    145  1467				   level_data_start
+    146  1467					      incbin	"../data/levels/binary_levels/1"
+    147  146f					      incbin	"../data/levels/binary_levels/2"
+    148  1487					      incbin	"../data/levels/binary_levels/3"
+    149  14b1					      incbin	"../data/levels/binary_levels/4"
+    150  14c3					      incbin	"../data/levels/binary_levels/5"
+    151  14eb					      incbin	"../data/levels/binary_levels/6"
+    152  14ff					      incbin	"../data/levels/binary_levels/7"
+    153  151d					      incbin	"../data/levels/binary_levels/8"
+    154  1539					      incbin	"../data/levels/binary_levels/9"
+    155  155d					      incbin	"../data/levels/binary_levels/10"
+    156  156b					      incbin	"../data/levels/binary_levels/11"
+    157  157b					      incbin	"../data/levels/binary_levels/12"
+    158  1597					      incbin	"../data/levels/binary_levels/13"
+    159  15bb					      incbin	"../data/levels/binary_levels/14"
+    160  15e3
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1544					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1544		       05 43	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1544		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 1347 bytes used
-      3  1544					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  5444
-      4  1544					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1544				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1544				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1544				  -	      err
-      8  1544					      endif
+      0  15e3					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  15e3		       05 e2	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  15e3		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 1506 bytes used
+      3  15e3					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  5603
+      4  15e3					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  15e3				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  15e3				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  15e3				  -	      err
+      8  15e3					      endif
 ------- FILE src/main.s
-    160  1544
-    161  1544
-    162  1c00					      org	character_set_begin
-    163  1c00		       81 ff ff 81*	      BYTE.b	129,255,255,129,129,255,255,129	; ladder 0
-    164  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,165,153,129,255	; squarebot 1
-    165  1c10		       ff ff 00 00*	      BYTE.b	255,255,0,0,0,0,0,0	; platform 2
-    166  1c18		       ff ff ff ff*	      BYTE.b	255,255,255,255,255,255,255,255	; wall 3
-    167  1c20		       7e e7 81 81*	      BYTE.b	126,231,129,129,225,129,129,255	; exit (door) 4
-    168  1c28		       18 24 18 18*	      BYTE.b	24,36,24,24,30,24,30,24	; key powerup 5 
-    169  1c30		       ff ff ef ef*	      BYTE.b	255,255,239,239,239,227,255,255	;locked wall 6
-    170  1c38		       ff bd fd b7*	      BYTE.b	255,189,253,183,127,239,231,255	; breakable wall 7
-    171  1c40		       00 00 18 3c*	      BYTE.b	0,0,24,60,126,126,0,0	; spike 8
-    172  1c48		       00 70 48 78*	      BYTE.b	0,112,72,120,72,72,112,0	; booster powerup 9
+    162  15e3
+    163  15e3
+    164  1c00					      org	character_set_begin
+    165  1c00		       00 18 3c 7e*	      BYTE.b	0,24,60,126,24,24,24,24	; gravity powerup 0
+    166  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,165,153,129,255	; squarebot 1
+    167  1c10		       ff ff 00 00*	      BYTE.b	255,255,0,0,0,0,0,0	; platform 2
+    168  1c18		       ff ff ff ff*	      BYTE.b	255,255,255,255,255,255,255,255	; wall 3
+    169  1c20		       7e e7 81 81*	      BYTE.b	126,231,129,129,225,129,129,255	; exit (door) 4
+    170  1c28		       18 24 18 18*	      BYTE.b	24,36,24,24,30,24,30,24	; key powerup 5 
+    171  1c30		       ff ff ef ef*	      BYTE.b	255,255,239,239,239,227,255,255	;locked wall 6
+    172  1c38		       ff bd fd b7*	      BYTE.b	255,189,253,183,127,239,231,255	; breakable wall 7
+    173  1c40		       00 00 18 3c*	      BYTE.b	0,0,24,60,126,126,0,0	; spike 8
+    174  1c48		       00 70 48 78*	      BYTE.b	0,112,72,120,72,72,112,0	; booster powerup 9

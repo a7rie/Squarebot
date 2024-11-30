@@ -14,7 +14,7 @@ ascii_to_byte = {
     'W': 0b00000010, # wall
     'T': 0b00000011, # breakable wall
     'L': 0b00000100, # locked wall
-    '#': 0b00000101, # ladder
+    'G': 0b00000101, # gravity powerup
     'E': 0b00000110, # exit (go to next level)
     '_': 0b00000111, # jump-through platform
     'S': 0b00001001, # spike
@@ -44,6 +44,8 @@ def main():
       if line == "":
         break
       split_line = list(line)
+      
+      if line[0] == ";": continue # to allow for comments in the level files
       
       if split_line[-1] == "\n": # for stylistic reasons, we want the nl in ascii data, but not in the binary output
         split_line.pop()
