@@ -49,10 +49,10 @@ post_powerup_r
   jsr set_down
   ;powerup logic
 
-  ;draw chars
-
+  
   jsr delete_squarebot
   jsr update_squarebot
+  jsr update_chars
   jsr draw_squarebot ;TODO: DRAW HIM
 
 
@@ -93,6 +93,14 @@ key_check
   sta has_key
   jmp return_true
 
+return_true ;beq and bne HATE going to a different file because why would anything be easy
+  sec
+  rts
+
+return_false
+  clc
+  rts
+
 delete_squarebot
   jsr get_squarebot_draw_position
 
@@ -129,6 +137,7 @@ delete_squarebot
 
   rts
 
+
 update_squarebot
   lda new_position
   sta squarebot_position
@@ -142,7 +151,143 @@ update_squarebot
 
   rts
 
+
+update_chars
+  jsr get_up
+  asl
+  asl
+  asl ; multiply by 8
+  sta charandr
+
+  lda attached_powerups
+  lsr
+  lsr
+  lsr
+  lsr
+  cmp #0
+  beq update_blank_u
+  adc #9
+  asl
+  asl
+  asl ; we could simplify this but at this rate a few more asls isn't going to be the main thing slowing down the code
+update_blank_u
+  sta charandr+1
+  
+  lda #[CHAR_U << 3]
+  sta charandr+2
+
+  jsr update_char
+  ;keep in mind we haven't rotated it yet
+
+  jsr get_down
+  asl
+  asl
+  asl
+  sta charandr
+
+  lda attached_powerups
+  and $0F
+  cmp #0
+  beq update_blank_d
+  adc #9
+  asl
+  asl
+  asl
+update_blank_d
+  sta charandr+1
+
+  lda #[CHAR_D << 3]
+  sta charandr+2
+
+  jsr update_char
+
+
+  jsr get_left
+  asl
+  asl
+  asl
+  sta charandr
+
+  lda attached_powerups+1
+  lsr
+  lsr
+  lsr
+  lsr
+  cmp #0
+  beq update_blank_l
+  adc #9
+  asl
+  asl
+  asl
+update_blank_l
+  sta charandr+1
+
+  lda #[CHAR_L << 3]
+  sta charandr+2
+
+  jsr update_char
+
+
+  jsr get_right
+  asl
+  asl
+  asl
+  sta charandr
+
+  lda attached_powerups+1
+  and $0F
+  cmp #0
+  beq update_blank_r
+  adc #9
+  asl
+  asl
+  asl
+update_blank_r
+  sta charandr+1
+
+  lda #[CHAR_R << 3]
+  sta charandr+2
+
+  jsr update_char
+
+  rts ;casual 98 line function
+
+
+update_char
+  ldx #0
+update_char_loop
+  txa
+  adc charandr
+  tay
+  lda (#character_set_begin),y
+  sta temp
+
+  txa
+  adc charandr+1
+  tay
+  lda (#character_set_begin),y
+  eor temp
+  sta temp
+
+  txa
+  adc charandr+2
+  tay
+  lda temp
+  sta (#character_set_begin),y
+
+  inx
+  cpx #8
+  bne update_char_loop
+  rts
+
+; if there is a powerup:
+; for each of 8 bytes:
+; load tile byte
+; eor with powerup tile byte
+; store in char byte
+
 draw_squarebot
+  rts
 
 ;start of level need to set the tiles and chars and everything, and when you reset too
 
@@ -175,11 +320,12 @@ draw_squarebot
 ;get new position
 ;refresh tiles
 ;apply powerup logic
-;redraw chars
 ;delete old position
 ;update position
+;redraw chars
 ;draw new position
 ;wait a jiffy maybe
 ;check booster
 ;
 ;j/f movement
+;do similar thing

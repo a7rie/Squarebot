@@ -141,16 +141,6 @@ move_new_position_down
   sta new_color_position+1
   rts
 
-
-
-return_true
-  sec
-  rts
-
-return_false
-  clc
-  rts
-
 get_squarebot_draw_position
   lda squarebot_position
   sbc #[ROW_SIZE+1]

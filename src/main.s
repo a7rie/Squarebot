@@ -22,8 +22,9 @@ has_booster ds.b 1
 jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
 tileStore ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
 ;colorStore ds.b 3 ; 0UUU0DDD 0LLL0RRR 00000MMM   not the most efficient storage but it needs to also be efficient to decompress
-attached_powerups ds.w 1; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=key 3=spike 4=shield 5=activeBoost
+attached_powerups ds.w 1; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=activeBoost 3=key 4=spike 5=shield
 temp ds.w 1 ; for temporary storage of things. mainly used in updateGameState
+charandr ds.b 3 ; for the incredibly complex operation of anding chars
   seg
 
 ; constants
@@ -141,7 +142,7 @@ check_for_reset_key_return
 
   include "updateLevel.s"
   include "updateGameState_new.s"
-  include "gameStateHelper.s"
+  include "updateGameStateHelper.s"
 
 compressed_screen_data_start
   incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
