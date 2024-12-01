@@ -1,3 +1,5 @@
+;DEPRECATED
+
 
 MOVE_LEFT = 1
 MOVE_RIGHT = 2
@@ -52,8 +54,6 @@ handle_no_jumps_remaining ; if no jumps left, then start jump if space is presse
   lda currently_pressed_key
   cmp #SPACE_KEY
   bne handle_gravity
-
-
 
   jsr squarebot_on_first_row ; if on first row, we dont care about what character lies below
   bcs skip_validity_check

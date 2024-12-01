@@ -12,7 +12,6 @@ next_level ds.w 1
 level_reset ds.b 1
 level_completed ds.b 1
 level_data_index ds.b 1 ; for temporarily saving index registers
-temp ds.b 1 ; for temporarily saving index registers
 new_position ds.w 1 ; use to store position of (proposed) new location for squarebot
 new_color_position ds.w 1 ; use to store position of (proposed) new location for squarebot
 current_time ds.b 1 ; store only the last byte of the jiffy clock
@@ -21,8 +20,10 @@ squarebot_color_position ds.w 1
 has_key ds.b 1
 has_booster ds.b 1
 jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
-tileStore ds.b 3 ; 5 bits for the 4 powerup tiles, 4 bits for squarebot tile since many tiles can't go there. ordered U,D,L,R,M
-attached_powerups ds.w 1; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=key 3=spike 4=shield
+tileStore ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
+;colorStore ds.b 3 ; 0UUU0DDD 0LLL0RRR 00000MMM   not the most efficient storage but it needs to also be efficient to decompress
+attached_powerups ds.w 1; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=key 3=spike 4=shield 5=activeBoost
+temp ds.w 1 ; for temporary storage of things. mainly used in updateGameState
   seg
 
 ; constants
@@ -47,7 +48,7 @@ S_KEY = $29
 D_KEY = $12
 SECRET_KEY = $0d ; press P to skip to next  level
 RESET_KEY = $0a ; press R to restart level i assume
-JUMP_SIZE = $4 ; number of characters a jump causes
+JUMP_SIZE = $3 ; number of characters a jump causes
 ROW_SIZE = $16
 ; memory locations
 user_memory_start = $1001
@@ -98,7 +99,7 @@ gameLoop
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
-  JMP gameLoop
+  jmp gameLoop
 
 
 wait_until_next_frame ; wait one jiffy before completing game loop
@@ -119,7 +120,7 @@ check_for_secret_key
   sta level_reset
 
 check_for_secret_key_return
-  rts
+  rts ; what is this for?
 
 
 check_for_reset_key
@@ -133,12 +134,14 @@ check_for_reset_key
   sta has_key
   sta jump_remaining
   sta attached_powerups
+  sta attached_powerups+1
   
 check_for_reset_key_return
-  rts
+  rts ; what is this for?
 
   include "updateLevel.s"
-  include "updateGameState.s"
+  include "updateGameState_new.s"
+  include "gameStateHelper.s"
 
 compressed_screen_data_start
   incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
@@ -157,23 +160,22 @@ level_data_start
 
 
   org character_set_begin
-  BYTE $7E, $42, $7E, $42, $7E, $42, $7E, $42 ; ladder 0
-  BYTE $FF, $81, $A5, $81, $BD, $81, $81, $FF ; squarebot 1
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; blank 0
+  BYTE $7E, $42, $7E, $42, $7E, $42, $7E, $42 ; ladder 1
   BYTE $FF, $5A, $00, $00, $00, $00, $00, $00 ; platform 2
   BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; wall 3
   BYTE $FF, $9D, $A3, $AC, $A5, $99, $C3, $FF ; exit (door) 4
-  BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 5 
-  BYTE $FF, $FF, $C3, $C3, $E7, $E7, $E7, $FF ; locked wall 6
-  BYTE $FF, $EE, $F1, $EF, $57, $8F, $F3, $FF ; breakable wall 7
-  BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike 8
-  BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 9
-  BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R)
-  BYTE $08, $38, $F0, $FD, $FA, $F0, $38, $08 ; booster attachment (R)
-  BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R)
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charD
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charL
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charR
-
-; there appears to be no simple way to turn the characters
-; but its still worth since storing 24 more bytes for each powerup probably takes more space than brute force flip/rotate array.
+  BYTE $FF, $FF, $C3, $C3, $E7, $E7, $E7, $FF ; locked wall 5
+  BYTE $FF, $EE, $F1, $EF, $57, $8F, $F3, $FF ; breakable wall 6
+  BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 7
+  BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 8
+  BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike powerup 9
+  BYTE $08, $38, $F0, $F0, $F0, $F0, $38, $08 ; booster attachment (R) 10
+  BYTE $08, $38, $F1, $FF, $FE, $F1, $38, $08 ; activated booster attachment (R) 11
+  BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R) 12
+  BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R) 13
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU 14
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charD 15
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charL 16
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charR 17
+  BYTE $FF, $81, $A5, $81, $BD, $81, $81, $FF ; squarebot 18

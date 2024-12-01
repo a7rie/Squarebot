@@ -14,7 +14,12 @@ EXIT = 96 ; 01100000
 PLATFORM = 112 ; 01110000
 KEY = 128 ; 10000000
 SPIKE = 144 ; 10010000
-BOOSTER = 160 ;  10100000
+BOOSTER = 160 ; 10100000
+X = 176 ; 10110000        unused tile
+TILE_U = 192 ; 11000000
+TILE_D = 208 ; 11010000
+TILE_L = 224 ; 11100000
+TILE_R = 240 ; 11110000
 
 WALL_COLOR = 0
 BREAKABLE_WALL_COLOR = 0
@@ -26,22 +31,28 @@ SPIKE_COLOR = 2
 KEY_P_COLOR = 7
 SPIKE_P_COLOR = 6
 BOOSTER_P_COLOR = 6
+SQUAREBOT_COLOR = 2
 
 BLANK_SPACE_CHAR = $20
-LADDER_CHAR = $0
-; no $1?
-PLATFORM_CHAR = $2
-WALL_CHAR = $3
-EXIT_CHAR = $4
-KEY_P_CHAR =  $5
-LOCKED_WALL_CHAR = $6
-BREAKABLE_WALL_CHAR = $7
-SPIKE_P_CHAR = $8
-BOOSTER_P_CHAR = $9
-CHAR_U = $11 ; 17-20 in hex
-CHAR_D = $12
-CHAR_L = $13
-CHAR_R = $14
+BLANK_TILE_CHAR = $00 ; for ease of use with tileStore
+LADDER_CHAR = $01
+PLATFORM_CHAR = $02
+WALL_CHAR = $03
+EXIT_CHAR = $04
+LOCKED_WALL_CHAR = $05
+BREAKABLE_WALL_CHAR = $06
+BOOSTER_P_CHAR = $07
+KEY_P_CHAR =  $08
+SPIKE_P_CHAR = $09
+BOOSTER_A_CHAR = $0A
+BOOSTER_AA_CHAR = $0B
+KEY_A_CHAR = $0C
+SPIKE_A_CHAR = $0D
+CHAR_U = $0E
+CHAR_D = $0F
+CHAR_L = $10
+CHAR_R = $11
+SQUAREBOT_CHAR = $12
 
 
 update_level
@@ -78,6 +89,12 @@ continue_update
   sta color_cursor
   lda #COLOR_CURSOR_BEGINNING_HIGH_BYTE
   sta color_cursor+1
+
+  ; reset tileStore, assume squarebot is surrounded by blank tiles
+  lda #$0
+  sta tileStore
+  sta tileStore+1
+  sta tileStore+2
 
   ldx #0
   ldy #0
@@ -168,7 +185,7 @@ check_if_starting_point
   lda color_cursor+1
   sta squarebot_color_position+1
 
-  lda #$1 
+  lda #SQUAREBOT_CHAR
   ldx #SQUAREBOT_COLOR
   jsr draw_char_in_accumulator
 
@@ -223,7 +240,6 @@ check_if_platform
   jsr draw_char_in_accumulator
   rts
 
-
 check_if_key
   cmp #KEY
   bne check_if_spike
@@ -241,10 +257,43 @@ check_if_spike
   rts
   
 check_if_booster
+  cmp #BOOSTER
+  bne check_if_tile_u
   lda #BOOSTER_P_CHAR
   ldx #BOOSTER_P_COLOR
   jsr draw_char_in_accumulator
   rts
+
+check_if_tile_u
+  cmp #TILE_U
+  bne check_if_tile_d
+  lda #CHAR_U
+  ldx #$1
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_tile_d
+  cmp #TILE_D
+  bne check_if_tile_l
+  lda #CHAR_D
+  ldx #$1
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_tile_l
+  cmp #TILE_L
+  bne check_if_tile_r
+  lda #CHAR_L
+  ldx #$1
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_tile_r
+  lda #CHAR_R
+  ldx #$1
+  jsr draw_char_in_accumulator
+  rts
+
 
 
 ; char in accumulator goes in screen cursor, color in x register goes in color cursor, then update cursors
