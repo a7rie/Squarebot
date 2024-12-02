@@ -15,22 +15,17 @@ PLATFORM = 112 ; 01110000
 KEY = 128 ; 10000000
 SPIKE = 144 ; 10010000
 BOOSTER = 160 ; 10100000
-X = 176 ; 10110000        unused tile
-TILE_U = 192 ; 11000000
-TILE_D = 208 ; 11010000
-TILE_L = 224 ; 11100000
-TILE_R = 240 ; 11110000
 
 WALL_COLOR = 0
 BREAKABLE_WALL_COLOR = 0
 LOCKED_WALL_COLOR = 0
-LADDER_COLOR = 6
-EXIT_COLOR = 6
-PLATFORM_COLOR = 4
-SPIKE_COLOR = 2
-KEY_P_COLOR = 7
-SPIKE_P_COLOR = 6
-BOOSTER_P_COLOR = 6
+LADDER_COLOR = 0 ;6
+EXIT_COLOR = 0 ;6
+PLATFORM_COLOR = 0 ;4
+SPIKE_COLOR = 0 ;2
+KEY_P_COLOR = 0 ;7
+SPIKE_P_COLOR = 0 ;6
+BOOSTER_P_COLOR = 0 ;6
 SQUAREBOT_COLOR = 2
 
 BLANK_SPACE_CHAR = $20
@@ -257,40 +252,8 @@ check_if_spike
   rts
   
 check_if_booster
-  cmp #BOOSTER
-  bne check_if_tile_u
   lda #BOOSTER_P_CHAR
   ldx #BOOSTER_P_COLOR
-  jsr draw_char_in_accumulator
-  rts
-
-check_if_tile_u
-  cmp #TILE_U
-  bne check_if_tile_d
-  lda #CHAR_U
-  ldx #$1
-  jsr draw_char_in_accumulator
-  rts
-
-check_if_tile_d
-  cmp #TILE_D
-  bne check_if_tile_l
-  lda #CHAR_D
-  ldx #$1
-  jsr draw_char_in_accumulator
-  rts
-
-check_if_tile_l
-  cmp #TILE_L
-  bne check_if_tile_r
-  lda #CHAR_L
-  ldx #$1
-  jsr draw_char_in_accumulator
-  rts
-
-check_if_tile_r
-  lda #CHAR_R
-  ldx #$1
   jsr draw_char_in_accumulator
   rts
 

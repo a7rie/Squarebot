@@ -22,7 +22,7 @@ has_booster ds.b 1
 jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
 tileStore ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
 ;colorStore ds.b 3 ; 0UUU0DDD 0LLL0RRR 00000MMM   not the most efficient storage but it needs to also be efficient to decompress
-attached_powerups ds.w 1; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=activeBoost 3=key 4=spike 5=shield
+attached_powerups ds.b 2; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=activeBoost 3=key 4=spike 5=shield
 temp ds.w 1 ; for temporary storage of things. mainly used in updateGameState
 charandr ds.b 3 ; for the incredibly complex operation of anding chars
   seg
@@ -83,8 +83,7 @@ start
   sta has_booster
   sta has_key
 
-  include "titleScreen.s"  
-
+  include "titleScreen.s"
 
 ; title screen code jumps here once space pressed
 gameLoop

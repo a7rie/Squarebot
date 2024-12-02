@@ -8,7 +8,6 @@ SQUAREBOT_COLOR = $2
 START_OF_FIRST_ROW_LOW_BYTE = $e4
 START_OF_FIRST_ROW_HIGH_BYTE = $1f
 
-update_game_state
   lda squarebot_position
   sta new_position
   lda squarebot_position+1

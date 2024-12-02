@@ -12,6 +12,7 @@ update_game_state
   sta new_color_position+1
 
 check_if_d_pressed
+  lda currently_pressed_key
   cmp #D_KEY
   bne check_if_a_pressed
 d_pressed
@@ -47,17 +48,28 @@ post_powerup_r
   ldy #[[ROW_SIZE*2]+2]
   lda (squarebot_position),y
   jsr set_down
-  ;powerup logic
-
-  
+  jsr apply_powerup_logic
+  lda attached_powerups+1
+  and #$F0
+  cmp #$10
+  bne no_booster_r
+  lda attached_powerups+1
+  and #$0F
+  adc #$20
+  sta attached_powerups+1 ;boosted booster
+no_booster_r
   jsr delete_squarebot
   jsr update_squarebot
   jsr update_chars
-  jsr draw_squarebot ;TODO: DRAW HIM
+  jsr draw_squarebot
 
+  lda attached_powerups+1 ;booster time!
+  and #$F0
+  cmp #$20
+  beq d_pressed
+  jmp handle_jump_logic
 
 check_if_a_pressed
-  lda currently_pressed_key
   cmp #A_KEY
   bne handle_jump_logic
 a_pressed
@@ -100,6 +112,124 @@ return_true ;beq and bne HATE going to a different file because why would anythi
 return_false
   clc
   rts
+
+apply_powerup_logic
+  lda attached_powerups
+  sta temp
+  jsr get_up
+  asl
+  asl
+  asl
+  asl
+  sta temp+1
+  jsr get_down
+  adc temp+1
+  sta temp+1
+  jsr power_pair_logic
+  lda temp
+  sta attached_powerups
+  lda temp+1
+  lsr
+  lsr
+  lsr
+  lsr
+  jsr set_up
+  lda temp+1
+  and #$0F
+  jsr set_down
+  
+  lda attached_powerups+1
+  sta temp
+  jsr get_left
+  asl
+  asl
+  asl
+  asl
+  sta temp+1
+  jsr get_right
+  adc temp+1
+  sta temp+1
+  jsr power_pair_logic
+  lda temp
+  sta attached_powerups+1
+  lda temp+1
+  lsr
+  lsr
+  lsr
+  lsr
+  jsr set_left
+  lda temp+1
+  and #$0F
+  jsr set_right
+  rts
+  
+power_pair_logic
+  lda temp
+  and #$F0
+  cmp #$20 ;booster
+  bne ppl1k
+  lda temp+1
+  and #$0F
+  cmp #BREAKABLE_WALL_CHAR
+  bne ppl1b
+  lda temp+1
+  and #$F0
+  sta temp+1 ; delete that wall  
+ppl1b
+  lda temp
+  and #$0F
+  adc #$10
+  sta temp
+  jmp ppl2
+ppl1k
+  cmp #$30 ;key
+  bne ppl2
+  lda temp+1
+  and #$F0
+  cmp #[LOCKED_WALL_CHAR << 4]
+  bne ppl2
+  lda temp
+  and #$0F
+  sta temp
+  lda temp+1
+  and #$0F
+  sta temp+1
+
+ppl2
+  lda temp
+  and #$0F
+  cmp #$02 ;booster
+  bne ppl2k
+  lda temp+1
+  and #$F0
+  cmp #[BREAKABLE_WALL_CHAR << 4]
+  bne ppl2b
+  lda temp+1
+  and #$0F
+  sta temp+1
+ppl2b
+  lda temp
+  and #$F0
+  adc #$01
+  sta temp
+  jmp ppl3
+ppl2k
+  cmp #$03 ;key
+  bne ppl3
+  lda temp+1
+  and #$0F
+  cmp #LOCKED_WALL_CHAR
+  bne ppl3
+  lda temp
+  and #$F0
+  sta temp
+  lda temp+1
+  and #$F0
+  sta temp+1
+
+ppl3
+  rts
+
 
 delete_squarebot
   jsr get_squarebot_draw_position
@@ -201,7 +331,6 @@ update_blank_d
 
   jsr update_char
 
-
   jsr get_left
   asl
   asl
@@ -226,7 +355,6 @@ update_blank_l
   sta charandr+2
 
   jsr update_char
-
 
   jsr get_right
   asl
@@ -287,7 +415,41 @@ update_char_loop
 ; store in char byte
 
 draw_squarebot
+  jsr get_squarebot_draw_position
+
+  lda #CHAR_U
+  ldy #1
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  lda #CHAR_D
+  ldy #[[ROW_SIZE*2]+1]
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  lda #CHAR_L
+  ldy #ROW_SIZE
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  lda #CHAR_R
+  ldy #[ROW_SIZE+2]
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  lda #SQUAREBOT_CHAR
+  ldy #[ROW_SIZE+1]
+  sta (squarebot_position),y
+  lda #SQUAREBOT_COLOR
+  sta (squarebot_color_position),y
+
+  jsr get_squarebot_game_position
   rts
+
 
 ;start of level need to set the tiles and chars and everything, and when you reset too
 
