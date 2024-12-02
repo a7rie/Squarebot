@@ -12,7 +12,7 @@ BINARY_LEVELS := $(patsubst $(ASCII_LEVELS_DIR)/%, $(BINARY_LEVELS_DIR)/%, $(ASC
 all: out/main.prg 
 
 out/main.prg: src/* ${BINARY_LEVELS}
-	${DASM} $< -o'out/main.prg' -l'out/main.lst' -I'src'
+	${DASM} main.s -o'out/main.prg' -l'out/main.lst' -I'src'
 
 
 ${BINARY_LEVELS_DIR}/%: ${ASCII_LEVELS_DIR}/%
