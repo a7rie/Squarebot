@@ -28,8 +28,7 @@ SPIKE_P_COLOR = 0 ;6
 BOOSTER_P_COLOR = 0 ;6
 SQUAREBOT_COLOR = 2
 
-BLANK_SPACE_CHAR = $20
-BLANK_TILE_CHAR = $00 ; for ease of use with tileStore
+BLANK_TILE_CHAR = $00 ; use this instead of BLANK_CHAR, allows me to save space with tileStore
 LADDER_CHAR = $01
 PLATFORM_CHAR = $02
 WALL_CHAR = $03
@@ -85,15 +84,17 @@ continue_update
   lda #COLOR_CURSOR_BEGINNING_HIGH_BYTE
   sta color_cursor+1
 
-  ; reset tileStore, assume squarebot is surrounded by blank tiles
-  lda #$0
-  sta tileStore
-  sta tileStore+1
-  sta tileStore+2
-
   ldx #0
   ldy #0
   sty level_data_index
+
+  lda #0
+  sta jump_remaining
+  sta attached_powerups
+  sta attached_powerups+1
+  sta tileStore
+  sta tileStore+1
+  sta tileStore+2
 
   ; draw (or redraw on reset) the current level
 draw_level_loop
@@ -160,7 +161,7 @@ draw_high_bits
 
   cmp #BLANK_SPACE
   bne check_if_starting_point
-  lda #BLANK_SPACE_CHAR ; todo; replace with actual chars
+  lda #BLANK_TILE_CHAR ; todo; replace with actual chars
   ldx #1
   jsr draw_char_in_accumulator
   rts

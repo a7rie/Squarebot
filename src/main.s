@@ -17,12 +17,11 @@ new_color_position ds.w 1 ; use to store position of (proposed) new location for
 current_time ds.b 1 ; store only the last byte of the jiffy clock
 squarebot_position ds.w 1
 squarebot_color_position ds.w 1
-has_key ds.b 1
-has_booster ds.b 1
 jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
 tileStore ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
 ;colorStore ds.b 3 ; 0UUU0DDD 0LLL0RRR 00000MMM   not the most efficient storage but it needs to also be efficient to decompress
-attached_powerups ds.b 2; 4 bits for each side, ordered U,D,L,R. 0=none 1=boost 2=activeBoost 3=key 4=spike 5=shield
+attached_powerups ds.b 2; 4 bits for each side, ordered U,D,L,R.
+; 0=none  1=readyBooster  2=activeBooster  3=key 4=spike(not implemented)  add more powerups here   8=ignitedBooster
 temp ds.w 1 ; for temporary storage of things. mainly used in updateGameState
 charandr ds.b 3 ; for the incredibly complex operation of anding chars
   seg
@@ -80,8 +79,11 @@ start
 
   lda #0
   sta jump_remaining
-  sta has_booster
-  sta has_key
+  sta attached_powerups
+  sta attached_powerups+1
+  sta tileStore
+  sta tileStore+1
+  sta tileStore+2
 
   include "titleScreen.s"
 
@@ -118,10 +120,8 @@ check_for_secret_key
   sta level_completed
   lda #1
   sta level_reset
-
 check_for_secret_key_return
-  rts ; what is this for?
-
+  rts
 
 check_for_reset_key
   lda currently_pressed_key
@@ -129,15 +129,8 @@ check_for_reset_key
   bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
   lda #1
   sta level_reset
-  lda #0
-  sta has_booster
-  sta has_key
-  sta jump_remaining
-  sta attached_powerups
-  sta attached_powerups+1
-  
 check_for_reset_key_return
-  rts ; what is this for?
+  rts
 
   include "updateLevel.s"
   include "updateGameState_new.s"
@@ -147,7 +140,7 @@ compressed_screen_data_start
   incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
 
 level_data_start
-  incbin "../data/levels/binary_levels/1"
+  incbin "../data/levels/binary_levels/jesse_1"
   incbin "../data/levels/binary_levels/booster_test"
   incbin "../data/levels/binary_levels/key_test"
   incbin "../data/levels/binary_levels/2"
@@ -170,8 +163,8 @@ level_data_start
   BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 7
   BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 8
   BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike powerup 9
-  BYTE $08, $38, $F0, $F0, $F0, $F0, $38, $08 ; booster attachment (R) 10
-  BYTE $08, $38, $F1, $FF, $FE, $F1, $38, $08 ; activated booster attachment (R) 11
+  BYTE $08, $38, $F0, $F0, $F0, $F0, $38, $08 ; ready booster attachment (R) 10
+  BYTE $08, $38, $F1, $FF, $FE, $F1, $38, $08 ; active booster attachment (R) 11
   BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R) 12
   BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R) 13
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU 14
