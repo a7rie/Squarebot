@@ -1,20 +1,11 @@
 
 MOVE_LEFT = 1
 MOVE_RIGHT = 2
-SQUAREBOT_CHAR = $1
-SQUAREBOT_COLOR = $0
 START_OF_FIRST_ROW_LOW_BYTE = $e4
 START_OF_FIRST_ROW_HIGH_BYTE = $1f
 
 update_game_state
-  lda squarebot_position
-  sta new_position
-  lda squarebot_position+1
-  sta new_position+1
-  lda squarebot_color_position
-  sta new_color_position
-  lda squarebot_color_position+1
-  sta new_color_position+1
+  jsr reset_new_position
 
   lda currently_pressed_key
   cmp #A_KEY
@@ -57,13 +48,20 @@ handle_no_jumps_remaining ; if no jumps left, then start jump if space is presse
   jsr squarebot_on_first_row ; if on first row, we dont care about what character lies below
   bcs skip_validity_check
 
+
+
 ; check if character below is blank; if so dont allow us to set jump_remaining
   ldy #ROW_SIZE
   lda (squarebot_position),y
   
   cmp #EXIT_CHAR
-  beq level_has_finished
+  bne level_is_not_completed
+  lda #1
+  sta level_completed
+  sta level_reset
   
+
+level_is_not_completed
   jsr collision_handler
   bcs handle_gravity
 
@@ -106,12 +104,26 @@ jump_is_invalid
   sta jump_remaining
   rts
 
-handle_gravity ; on first row - do nothing
+handle_gravity 
+  jsr reset_new_position
+  
+  lda gravity_flipped
+  bne gravity_is_flipped
+
   jsr move_new_position_down
+  jmp check_if_position_valid
+
+gravity_is_flipped
+  jsr move_new_position_up
+  jmp not_on_first_row
+  
+check_if_position_valid
 
   jsr squarebot_on_first_row
   bcs do_nothing
 
+
+not_on_first_row
   ldy #0
   lda (new_position),y
 
@@ -229,7 +241,7 @@ remove_char ; remove squarebot from current screen location
   ldy #0
   lda #BLANK_CHAR
   sta (squarebot_position),Y
-  lda #1
+  lda #BLANK_SPACE_COLOR
   sta (squarebot_color_position),Y
   rts
 
@@ -253,7 +265,7 @@ key_check
 
 locked_wall_check
   cmp #LOCKED_WALL_CHAR
-  bne return_false
+  bne spike_check
 
   lda has_key ; if locked wall, but player doesnt have key, cant do anything
   cmp #0
@@ -263,14 +275,34 @@ locked_wall_check
   sta has_key
   jmp return_true
 
+spike_check
+  cmp #SPIKE_CHAR
+  bne gravity_powerup_check
+
+  lda #RED_COLOR_CODE
+  ldy #0
+  sta (squarebot_color_position),y
+
+  lda #1
+  sta level_reset
+  bne return_false
+
+gravity_powerup_check
+  cmp #GRAVITY_POWERUP_CHAR
+  bne return_false
+  lda gravity_flipped
+  eor #1
+  sta gravity_flipped
+  jmp return_true
 
 squarebot_on_first_row ; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
   lda squarebot_position+1
   cmp #START_OF_FIRST_ROW_HIGH_BYTE
-  bcc return_false ; compare high bits; return false if current position high bit is smaller than high bit of leftmost position on first row
+  bcc return_false ; compare high byte; return false if current position high bit is smaller than high bit of leftmost position on first row
   lda squarebot_position
   cmp #START_OF_FIRST_ROW_LOW_BYTE
   bcc return_false
+  jmp return_true
 
 return_true
   sec
@@ -278,4 +310,15 @@ return_true
 
 return_false
   clc
+  rts
+
+reset_new_position
+  lda squarebot_position
+  sta new_position
+  lda squarebot_position+1
+  sta new_position+1
+  lda squarebot_color_position
+  sta new_color_position
+  lda squarebot_color_position+1
+  sta new_color_position+1
   rts

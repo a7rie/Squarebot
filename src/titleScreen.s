@@ -1,3 +1,5 @@
+WHITE_COLOR_CODE = 1
+
 display_title_screen
   lda #SCREEN_CURSOR_BEGINNING_LOW_BYTE
   sta screen_cursor
@@ -61,7 +63,7 @@ dont_convert_a0_to_3
   cmp #BLANK_CHAR
   beq dont_color
 
-  lda #RED_COLOR_CODE
+  lda #WHITE_COLOR_CODE
   sta (color_cursor),Y
 
 dont_color

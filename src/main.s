@@ -21,6 +21,7 @@ squarebot_color_position ds.w 1
 has_key ds.b 1
 has_booster ds.b 1
 jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
+gravity_flipped ds.b 1 ; 1 if gravity is flipped; 0 if not
   seg
 
 ; constants
@@ -37,7 +38,7 @@ END_OF_SCREEN_HIGH_BYTE = $1f
 ; beginning of color memory
 COLOR_CURSOR_BEGINNING_LOW_BYTE = $00
 COLOR_CURSOR_BEGINNING_HIGH_BYTE = $96
-RED_COLOR_CODE = 0
+RED_COLOR_CODE = #2
 
 SPACE_KEY = $20
 ENTER_KEY = $0f
@@ -49,6 +50,7 @@ SECRET_KEY = $0d ; press P to skip to next  level
 RESET_KEY = $34
 JUMP_SIZE = $4 ; number of characters a jump causes
 ROW_SIZE = $16
+
 ; memory locations
 user_memory_start = $1001
 currently_pressed_key =  $c5 ;proposed fix: mem editor 028 abc space bar loops
@@ -61,7 +63,7 @@ character_set_begin = $1c00
   include "stub.s" ; stub contains BASIC sys cmd to run the machine language code
 
 start  
-  LDA #24
+  LDA #14 ; black screen blue border
   STA BACKGROUND_COLOR_BYTE
 
   ; use combination of RAM (first 128 chars at 7168) & ROM character set
@@ -73,6 +75,7 @@ start
   sta level_reset
   lda #0
   sta level_completed
+  sta gravity_flipped
 
   lda #<level_data_start
   sta current_level
@@ -129,10 +132,6 @@ check_for_reset_key
   bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
   lda #1
   sta level_reset
-  lda #0
-  sta has_booster
-  sta has_key
-  sta jump_remaining
   
 check_for_reset_key_return
   rts
@@ -145,8 +144,6 @@ compressed_screen_data_start
 
 level_data_start
   incbin "../data/levels/binary_levels/1"
-  incbin "../data/levels/binary_levels/booster_test"
-  incbin "../data/levels/binary_levels/key_test"
   incbin "../data/levels/binary_levels/2"
   incbin "../data/levels/binary_levels/3"
   incbin "../data/levels/binary_levels/4"
@@ -154,12 +151,18 @@ level_data_start
   incbin "../data/levels/binary_levels/6"
   incbin "../data/levels/binary_levels/7"
   incbin "../data/levels/binary_levels/8"
+  incbin "../data/levels/binary_levels/9"
+  incbin "../data/levels/binary_levels/10"
+  incbin "../data/levels/binary_levels/11"
+  incbin "../data/levels/binary_levels/12"
+  incbin "../data/levels/binary_levels/13"
+  incbin "../data/levels/binary_levels/14"
 
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
 
   org character_set_begin
-  BYTE 129,255,255,129,129,255,255,129 ; ladder 0
+  BYTE 0,24,60,126,24,24,24,24 ; gravity powerup 0
   BYTE 255,129,165,129,165,153,129,255 ; squarebot 1
   BYTE 255,255,0,0,0,0,0,0 ; platform 2
   BYTE 255,255,255,255,255,255,255,255 ; wall 3

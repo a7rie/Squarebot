@@ -9,34 +9,36 @@ STARTING_POINT = 16 ; 00010000
 WALL = 32 ; 00100000
 BREAKABLE_WALL = 48 ; 00110000
 LOCKED_WALL = 64 ; 01000000
-LADDER = 80 ; 01010000
+GRAVITY_POWERUP = 80 ; 01010000
 EXIT = 96 ; 01100000
 PLATFORM = 112 ; 01110000
 KEY = 128 ; 10000000
 SPIKE = 144 ; 10010000
 BOOSTER = 160 ;  10100000
 
-WALL_COLOR = 0
+BLANK_SPACE_COLOR = 0
+WALL_COLOR = 6
 BREAKABLE_WALL_COLOR = 0
 LOCKED_WALL_COLOR = 7
-LADDER_COLOR = 8
+GRAVITY_POWERUP_COLOR = 5
 EXIT_COLOR = 5
-PLATFORM_COLOR = 0
+PLATFORM_COLOR = 6
 KEY_COLOR = 7
 SPIKE_COLOR = 2
 BOOSTER_COLOR = 3
+SQUAREBOT_COLOR = #1
 
 BLANK_SPACE_CHAR = $20 
 WALL_CHAR = $3
 BREAKABLE_WALL_CHAR = $7
 LOCKED_WALL_CHAR = $6
-LADDER_CHAR = $0  
+GRAVITY_POWERUP_CHAR = $0  
 EXIT_CHAR = $4
 PLATFORM_CHAR = $2
 KEY_CHAR =  $5
 SPIKE_CHAR = $8
 BOOSTER_CHAR = $9
-
+SQUAREBOT_CHAR = $1
 
 update_level
   ; check if the level is completed; set current_level to next_level if so
@@ -71,7 +73,13 @@ continue_update
   lda #COLOR_CURSOR_BEGINNING_LOW_BYTE
   sta color_cursor
   lda #COLOR_CURSOR_BEGINNING_HIGH_BYTE
-  sta color_cursor+1
+  sta color_cursor+1 
+
+  lda #0 
+  sta gravity_flipped
+  sta has_booster
+  sta has_key
+  sta jump_remaining
 
   ldx #0
   ldy #0
@@ -117,7 +125,7 @@ draw_sequence
   ldy level_data_index
   iny ; (so we can access the "element" byte after the length byte)
   lda (current_level),y ; get formatted byte (see squarebot doc)
-  asl ; lol
+  asl 
   asl
   asl
   asl 
@@ -142,8 +150,8 @@ draw_high_bits
 
   cmp #BLANK_SPACE
   bne check_if_starting_point
-  lda #BLANK_SPACE_CHAR ; todo; replace with actual chars
-  ldx #1
+  lda #BLANK_SPACE_CHAR
+  ldx #BLANK_SPACE_COLOR
   jsr draw_char_in_accumulator
   rts
 
@@ -188,17 +196,17 @@ check_if_breakable_wall
 
 check_if_locked_wall
   cmp #LOCKED_WALL
-  bne check_if_ladder
+  bne check_if_gravity_powerup
   lda #LOCKED_WALL_CHAR
   ldx #LOCKED_WALL_COLOR
   jsr draw_char_in_accumulator
   rts
 
-check_if_ladder
-  cmp #LADDER
+check_if_gravity_powerup
+  cmp #GRAVITY_POWERUP
   bne check_if_exit
-  lda #LADDER_CHAR
-  ldx #LADDER_COLOR
+  lda #GRAVITY_POWERUP_CHAR
+  ldx #GRAVITY_POWERUP_COLOR
   jsr draw_char_in_accumulator
   rts
 
