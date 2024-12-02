@@ -11,66 +11,224 @@ update_game_state
   lda squarebot_color_position+1
   sta new_color_position+1
 
-check_if_d_pressed
-  lda currently_pressed_key
-  cmp #D_KEY
-  bne check_if_a_pressed
-d_pressed
-  lda #$0
-  sta temp ; preset temp to 0 here so collision_handler logic is simpler
-  jsr get_right
-  cmp #EXIT_CHAR ; check here if we finish the level so we can rts to game loop
-  bne cont_r
-  lda #1 ; finish level
-  sta level_completed
-  sta level_reset
-  rts 
-cont_r
-  jsr collision_handler ; check rest of collision
-  bcc hop_to_handle_jump_logic ; collided
-  lda temp ; check for powerup (from collision_handler)
-  cmp #$0 ; collision handler will put a 0 here unless we hit a powerup
-  beq post_powerup_r
-  and #$0F ; save right
-  sta temp
-  lda #$F0 ; its a powerup, add the powerup to attached_powerup
-  and attached_powerups+1
-  adc temp
-  sta attached_powerups+1
-  lda #$F0  ; clear right of powerup
-  and tileStore+1
-  sta tileStore+1
-post_powerup_r
-  jsr delete_squarebot ; delete character
-  jsr move_new_position_right ; new position is where we want to move
-  jsr get_tiles_r
-  lda attached_powerups+1 ; if left powerup is readyBooster, change it to ignitedBooster, since apply_powerup_logic doesn't have directional context
-  and #$F0
+;maybe we handle jumps first actually
+;continue jumping if already jumping
+;else check if we are on ground
+;if not, fall
+;if yes, check if we want to jump
+;
+jump_logic
+  jsr get_jump_num
+  cmp #0
+  beq fall_logic
+  sec
+  sbc #1
+  jsr set_jump_num
+  jsr move_up
+  jsr get_jump_dir
+j_left
   cmp #$10
-  bne no_booster_r
-  lda attached_powerups+1
-  and #$0F
-  adc #$80 ; turn on the ignition
-  sta attached_powerups+1
-  jsr apply_powerup_logic
-no_booster_r
-  jsr update_squarebot ; update squarebot_position and its color pos
-  jsr update_chars ; redraw adjacent characters
-  jsr draw_squarebot ; put squarebot on screen
-  ;perhaps we wait a jiffy
-  lda attached_powerups+1 ; booster time, if we activated booster we move again in the same frame before handling jump logic
-  and #$F0
+  bne j_right
+  jsr wait_until_next_frame
+  jsr move_left
+  jmp update_return
+j_right
   cmp #$20
-  beq d_pressed
-  jmp handle_jump_logic ; now we handle going up and down
+  bne update_return
+  jsr wait_until_next_frame
+  jsr move_right
+  jmp update_return
 
-hop_to_handle_jump_logic
-  bcc handle_jump_logic ;dang code is long, hoping to use this trick as few times as possible
+fall_logic
+  jsr get_down
+  jsr fall_check
+  bcc check_if_space_pressed
+  jsr move_down
+  jsr get_down
+  jsr fall_check
+  bcc update_return ; don't move if we land
+  jsr get_jump_dir
+f_left
+  cmp #$10
+  bne f_right
+  jsr wait_until_next_frame
+  jsr move_left
+  jmp update_return
+f_right
+  cmp #$20
+  bne update_return
+  jsr wait_until_next_frame
+  jsr move_right
+  jmp update_return
+
+update_return
+  rts
+
+check_if_space_pressed
+  lda currently_pressed_key
+  cmp #SPACE_KEY
+  bne check_if_q_pressed
+  lda #JUMP_SIZE
+  jsr set_jump_num
+  lda #00
+  jsr set_jump_dir
+  jsr move_up
+  jmp update_return
+
+check_if_q_pressed
+  lda currently_pressed_key
+  cmp #Q_KEY
+  bne check_if_e_pressed
+  lda #JUMP_SIZE
+  jsr set_jump_num
+  lda #$10
+  jsr set_jump_dir
+  jsr move_up
+  jsr wait_until_next_frame
+  jsr move_left
+  jmp update_return
+
+check_if_e_pressed
+  cmp #E_KEY
+  bne check_if_a_pressed
+  lda #JUMP_SIZE
+  jsr set_jump_num
+  lda #$20
+  jsr set_jump_dir
+  jsr move_up
+  jsr wait_until_next_frame
+  jsr move_right
+  jmp update_return
 
 check_if_a_pressed
   cmp #A_KEY
-  bne handle_jump_logic
-a_pressed
+  bne check_if_d_pressed
+  jsr move_left
+  jmp update_return
+
+check_if_d_pressed
+  cmp #D_KEY
+  bne update_return
+  jsr move_right
+  jmp update_return
+
+move_up
+  lda #$0
+  sta temp
+  jsr get_up
+  cmp #EXIT_CHAR
+  bne cont_u
+  lda #1
+  sta level_completed
+  sta level_reset
+  jmp return_u
+cont_u
+  jsr collision_handler
+  bcc remove_jumps
+  lda temp
+  cmp #$0
+  beq post_powerup_u
+  and #$F0
+  sta temp
+  lda #$0F
+  and attached_powerups
+  clc
+  adc temp
+  sta attached_powerups
+  lda #$0F
+  and tileStore
+  sta tileStore
+post_powerup_u
+  jsr delete_squarebot
+  jsr move_new_position_up
+  jsr get_tiles_u
+  lda attached_powerups
+  and #$0F
+  cmp #$01
+  bne no_booster_u
+  lda attached_powerups
+  and #$F0
+  clc
+  adc #$08
+  sta attached_powerups
+  jsr apply_powerup_logic
+no_booster_u
+  jsr update_squarebot
+  jsr update_chars
+  jsr draw_squarebot
+  jsr wait_until_next_frame
+  lda attached_powerups
+  and #$0F
+  cmp #$02
+  beq move_up
+return_u
+  rts
+remove_jumps
+  lda jump_info
+  and #$F0 ;remove jumps_remaining since we hit a wall
+  sta jump_info
+  jmp return_u
+
+move_down
+  lda #$0
+  sta temp
+  jsr get_down
+  cmp #EXIT_CHAR
+  bne cont_d
+  lda #1
+  sta level_completed
+  sta level_reset
+  jmp return_d 
+cont_d
+  cmp #PLATFORM_CHAR ; collision_handler assumes we go through these otherwise
+  beq remove_fall
+  jsr collision_handler
+  bcc remove_fall
+  lda temp
+  cmp #$0
+  beq post_powerup_d
+  and #$0F
+  sta temp
+  lda #$F0
+  and attached_powerups
+  clc
+  adc temp
+  sta attached_powerups
+  lda #$F0
+  and tileStore
+  sta tileStore
+post_powerup_d
+  jsr delete_squarebot
+  jsr move_new_position_down
+  jsr get_tiles_d
+  lda attached_powerups
+  and #$F0
+  cmp #$10
+  bne no_booster_d
+  lda attached_powerups
+  and #$0F
+  clc
+  adc #$80
+  sta attached_powerups
+  jsr apply_powerup_logic
+no_booster_d
+  jsr update_squarebot
+  jsr update_chars
+  jsr draw_squarebot
+  jsr wait_until_next_frame
+  lda attached_powerups
+  and #$F0
+  cmp #$20
+  beq move_down
+return_d
+  rts
+remove_fall
+  lda jump_info
+  and #$00 ;landed on ground so we aren't jumping or falling
+  sta jump_info
+  jmp return_d
+
+move_left
   lda #$0
   sta temp ; preset temp to 0 here so collision_handler logic is simpler
   jsr get_left
@@ -79,10 +237,10 @@ a_pressed
   lda #1 ; finish level
   sta level_completed
   sta level_reset
-  rts 
+  jmp return_l
 cont_l
   jsr collision_handler ; check collision
-  bcc handle_jump_logic
+  bcc return_l
   lda temp
   cmp #$0
   beq post_powerup_l
@@ -90,6 +248,7 @@ cont_l
   sta temp
   lda #$0F ; assume we hit a powerup
   and attached_powerups+1
+  clc
   adc temp
   sta attached_powerups+1
   lda #$0F ; clear left of powerup
@@ -105,6 +264,7 @@ post_powerup_l
   bne no_booster_l
   lda attached_powerups+1
   and #$F0
+  clc
   adc #$08 ; turn on the ignition
   sta attached_powerups+1
   jsr apply_powerup_logic
@@ -112,14 +272,64 @@ no_booster_l
   jsr update_squarebot ; update squarebot_position and its color pos
   jsr update_chars ; redraw adjacent characters
   jsr draw_squarebot ; put squarebot on screen
-  ;perhaps we wait a jiffy
+  jsr wait_until_next_frame
   lda attached_powerups+1 ; booster time, if we activated booster we move again in the same frame before handling jump logic
   and #$0F
   cmp #$02
-  beq a_pressed
-  jmp handle_jump_logic ; now we handle going up and down  
+  beq move_left
+return_l
+  rts 
 
-handle_jump_logic
+move_right
+  lda #$0
+  sta temp ; preset temp to 0 here so collision_handler logic is simpler
+  jsr get_right
+  cmp #EXIT_CHAR ; check here if we finish the level so we can rts to game loop
+  bne cont_r
+  lda #1 ; finish level
+  sta level_completed
+  sta level_reset
+  jmp return_r 
+cont_r
+  jsr collision_handler ; check rest of collision
+  bcc return_r ; collided
+  lda temp ; check for powerup (from collision_handler)
+  cmp #$0 ; collision handler will put a 0 here unless we hit a powerup
+  beq post_powerup_r
+  and #$0F ; save right
+  sta temp
+  lda #$F0 ; its a powerup, add the powerup to attached_powerup
+  and attached_powerups+1
+  clc
+  adc temp
+  sta attached_powerups+1
+  lda #$F0  ; clear right of powerup
+  and tileStore+1
+  sta tileStore+1
+post_powerup_r
+  jsr delete_squarebot ; delete character
+  jsr move_new_position_right ; new position is where we want to move
+  jsr get_tiles_r
+  lda attached_powerups+1 ; if left powerup is readyBooster, change it to ignitedBooster, since apply_powerup_logic doesn't have directional context
+  and #$F0
+  cmp #$10
+  bne no_booster_r
+  lda attached_powerups+1
+  and #$0F
+  clc
+  adc #$80 ; turn on the ignition
+  sta attached_powerups+1
+  jsr apply_powerup_logic
+no_booster_r
+  jsr update_squarebot ; update squarebot_position and its color pos
+  jsr update_chars ; redraw adjacent characters
+  jsr draw_squarebot ; put squarebot on screen
+  jsr wait_until_next_frame
+  lda attached_powerups+1 ; booster time, if we activated booster we move again in the same frame before handling jump logic
+  and #$F0
+  cmp #$20
+  beq move_right
+return_r
   rts
 
 collision_handler ; accumulator is the character in the position that squarebot wants to move to
@@ -163,6 +373,19 @@ return_false
   clc
   rts
 
+fall_check
+  cmp #PLATFORM_CHAR
+  beq return_false
+  cmp #WALL_CHAR
+  beq return_false
+  cmp #LOCKED_WALL_CHAR
+  beq return_false
+  cmp #BREAKABLE_WALL_CHAR
+  beq return_false
+  cmp #LADDER_CHAR
+  beq return_false
+  jmp return_true;
+
 apply_powerup_logic
 ; ready bosoter: does nothing
 ; ignited booster: breaks breakable walls and changes to active booster 
@@ -177,6 +400,7 @@ apply_powerup_logic
   asl
   sta temp+1
   jsr get_down
+  clc
   adc temp+1
   sta temp+1
   jsr power_pair_logic
@@ -201,6 +425,7 @@ apply_powerup_logic
   asl
   sta temp+1
   jsr get_right
+  clc
   adc temp+1
   sta temp+1
   jsr power_pair_logic
@@ -232,6 +457,7 @@ power_pair_logic
 ppl1ab
   lda temp
   and #$0F
+  clc
   adc #$20 ; set active booster
   sta temp
   jmp ppl2
@@ -248,6 +474,7 @@ ppl1b
 ppl1rb
   lda temp
   and #$0F
+  clc
   adc #$10 ; set ready booster
   sta temp
   jmp ppl2
@@ -281,6 +508,7 @@ ppl2
 ppl2ab
   lda temp
   and #$F0
+  clc
   adc #$02 ; set active booster
   sta temp
   jmp pplend
@@ -297,6 +525,7 @@ ppl2b
 ppl2rb
   lda temp
   and #$F0
+  clc
   adc #$01 ; set ready booster
   sta temp
   jmp pplend
@@ -383,6 +612,7 @@ update_chars
   lsr
   cmp #0
   beq update_blank_u
+  clc
   adc #9
   asl
   asl
@@ -406,6 +636,7 @@ update_blank_u
   and $0F
   cmp #0
   beq update_blank_d
+  clc
   adc #9
   asl
   asl
@@ -431,6 +662,7 @@ update_blank_d
   lsr
   cmp #0
   beq update_blank_l
+  clc
   adc #9
   asl
   asl
@@ -472,12 +704,14 @@ update_char
   ldx #0
 update_char_loop
   txa
+  clc
   adc charandr
   tay
   lda (#character_set_begin),y
   sta temp
 
   txa
+  clc
   adc charandr+1
   tay
   lda (#character_set_begin),y
@@ -485,6 +719,7 @@ update_char_loop
   sta temp
 
   txa
+  clc
   adc charandr+2
   tay
   lda temp

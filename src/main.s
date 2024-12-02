@@ -17,7 +17,7 @@ new_color_position ds.w 1 ; use to store position of (proposed) new location for
 current_time ds.b 1 ; store only the last byte of the jiffy clock
 squarebot_position ds.w 1
 squarebot_color_position ds.w 1
-jump_remaining ds.b 1 ; number of times the character should continue to move upwards in the current jump
+jump_info ds.b 1 ; split in half, first hex=jump direction 0=up 1=left 2=right, second half=jumps remaining
 tileStore ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
 ;colorStore ds.b 3 ; 0UUU0DDD 0LLL0RRR 00000MMM   not the most efficient storage but it needs to also be efficient to decompress
 attached_powerups ds.b 2; 4 bits for each side, ordered U,D,L,R.
@@ -42,13 +42,15 @@ COLOR_CURSOR_BEGINNING_HIGH_BYTE = $96
 RED_COLOR_CODE = 0
 
 SPACE_KEY = $20
+Q_KEY = $30
 W_KEY = $09
+E_KEY = $31
 A_KEY = $11
 S_KEY = $29
 D_KEY = $12
 SECRET_KEY = $0d ; press P to skip to next  level
 RESET_KEY = $0a ; press R to restart level i assume
-JUMP_SIZE = $3 ; number of characters a jump causes
+JUMP_SIZE = $2 ; number of characters a jump causes
 ROW_SIZE = $16
 ; memory locations
 user_memory_start = $1001
@@ -78,7 +80,7 @@ start
   sta current_level+1
 
   lda #0
-  sta jump_remaining
+  sta jump_info
   sta attached_powerups
   sta attached_powerups+1
   sta tileStore
@@ -95,7 +97,6 @@ gameLoop
   jsr update_game_state
   jsr check_for_secret_key
   jsr check_for_reset_key
-  jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame

@@ -89,7 +89,7 @@ continue_update
   sty level_data_index
 
   lda #0
-  sta jump_remaining
+  sta jump_info
   sta attached_powerups
   sta attached_powerups+1
   sta tileStore

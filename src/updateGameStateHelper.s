@@ -1,5 +1,31 @@
 ; Helper functions for updateGameState
 
+get_jump_dir
+  lda jump_info
+  and #$F0
+  rts
+
+get_jump_num
+  lda jump_info
+  and #$0F
+  rts
+
+set_jump_dir
+  sta temp
+  jsr get_jump_num
+  clc
+  adc temp
+  sta jump_info
+  rts
+
+set_jump_num
+  sta temp
+  jsr get_jump_dir
+  clc
+  adc temp
+  sta jump_info
+  rts
+
 get_right
   lda tileStore+1
   and #$0F
@@ -218,22 +244,40 @@ get_new_game_position
   sta new_color_position+1
   rts
 
-get_tiles_r
-  jsr get_new_draw_position ; moves new_position and its color pos up and left one tile
+get_tiles_u
+  jsr get_new_draw_position
   jsr get_mid
-  jsr set_left
-  jsr get_right
-  jsr set_mid
-  ldy #1
-  lda (new_position),y
-  jsr set_up
-  ldy #[[ROW_SIZE*2]+1]
-  lda (new_position),y
   jsr set_down
+  jsr get_up
+  jsr set_mid
+  ldy #ROW_SIZE
+  lda (new_position),y
+  jsr set_left
   ldy #[ROW_SIZE+2]
   lda (new_position),y
   jsr set_right
-  jsr get_new_game_position ; move new_position and its color pos back
+  ldy #1
+  lda (new_position),y
+  jsr set_up
+  jsr get_new_game_position
+  rts
+
+get_tiles_d
+  jsr get_new_draw_position
+  jsr get_mid
+  jsr set_up
+  jsr get_down
+  jsr set_mid
+  ldy #ROW_SIZE
+  lda (new_position),y
+  jsr set_left
+  ldy #[ROW_SIZE+2]
+  lda (new_position),y
+  jsr set_right
+  ldy #[[ROW_SIZE*2]+1]
+  lda (new_position),y
+  jsr set_down
+  jsr get_new_game_position
   rts
 
 get_tiles_l
@@ -252,4 +296,22 @@ get_tiles_l
   lda (new_position),y
   jsr set_left
   jsr get_new_game_position
+  rts
+
+get_tiles_r
+  jsr get_new_draw_position ; moves new_position and its color pos up and left one tile
+  jsr get_mid
+  jsr set_left
+  jsr get_right
+  jsr set_mid
+  ldy #1
+  lda (new_position),y
+  jsr set_up
+  ldy #[[ROW_SIZE*2]+1]
+  lda (new_position),y
+  jsr set_down
+  ldy #[ROW_SIZE+2]
+  lda (new_position),y
+  jsr set_right
+  jsr get_new_game_position ; move new_position and its color pos back
   rts
