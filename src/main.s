@@ -102,6 +102,7 @@ gameLoop
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
+  jsr wait_until_next_frame
   JMP gameLoop
 
 
@@ -157,6 +158,12 @@ level_data_start
   incbin "../data/levels/binary_levels/12"
   incbin "../data/levels/binary_levels/13"
   incbin "../data/levels/binary_levels/14"
+  incbin "../data/levels/binary_levels/15"
+  incbin "../data/levels/binary_levels/16"
+  incbin "../data/levels/binary_levels/17"
+  incbin "../data/levels/binary_levels/18"
+  incbin "../data/levels/binary_levels/19"
+  incbin "../data/levels/binary_levels/20"
 
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
