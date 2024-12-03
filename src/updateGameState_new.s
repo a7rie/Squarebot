@@ -151,8 +151,8 @@ post_powerup_u
   clc
   adc #$08
   sta attached_powerups
-  jsr apply_powerup_logic
 no_booster_u
+  jsr apply_powerup_logic
   jsr update_squarebot
   jsr update_chars
   jsr draw_squarebot
@@ -210,8 +210,8 @@ post_powerup_d
   clc
   adc #$80
   sta attached_powerups
-  jsr apply_powerup_logic
 no_booster_d
+  jsr apply_powerup_logic
   jsr update_squarebot
   jsr update_chars
   jsr draw_squarebot
@@ -267,8 +267,8 @@ post_powerup_l
   clc
   adc #$08 ; turn on the ignition
   sta attached_powerups+1
-  jsr apply_powerup_logic
 no_booster_l
+  jsr apply_powerup_logic
   jsr update_squarebot ; update squarebot_position and its color pos
   jsr update_chars ; redraw adjacent characters
   jsr draw_squarebot ; put squarebot on screen
@@ -319,8 +319,8 @@ post_powerup_r
   clc
   adc #$80 ; turn on the ignition
   sta attached_powerups+1
-  jsr apply_powerup_logic
 no_booster_r
+  jsr apply_powerup_logic
   jsr update_squarebot ; update squarebot_position and its color pos
   jsr update_chars ; redraw adjacent characters
   jsr draw_squarebot ; put squarebot on screen
@@ -387,7 +387,7 @@ fall_check
   jmp return_true;
 
 apply_powerup_logic
-; ready bosoter: does nothing
+; ready booster: does nothing
 ; ignited booster: breaks breakable walls and changes to active booster 
 ; active booster: breaks breakable walls and changes to ready booster
 ; key: spends itself to break locked walls
@@ -415,7 +415,7 @@ apply_powerup_logic
   lda temp+1
   and #$0F
   jsr set_down
-  
+
   lda attached_powerups+1
   sta temp
   jsr get_left
@@ -604,25 +604,22 @@ update_chars
   asl
   asl ; multiply by 8
   sta charandr
-
   lda attached_powerups
   lsr
   lsr
   lsr
   lsr
   cmp #0
-  beq update_blank_u
+  beq update_char_u
   clc
-  adc #9
+  adc #$8
   asl
   asl
   asl ; we could simplify this but at this rate a few more asls isn't going to be the main thing slowing down the code
-update_blank_u
+update_char_u
   sta charandr+1
-  
   lda #[CHAR_U << 3]
   sta charandr+2
-
   jsr update_char
   ;keep in mind we haven't rotated it yet
 
@@ -631,22 +628,19 @@ update_blank_u
   asl
   asl
   sta charandr
-
   lda attached_powerups
   and $0F
   cmp #0
-  beq update_blank_d
+  beq update_char_d
   clc
-  adc #9
+  adc #$8
   asl
   asl
   asl
-update_blank_d
+update_char_d
   sta charandr+1
-
   lda #[CHAR_D << 3]
   sta charandr+2
-
   jsr update_char
 
   jsr get_left
@@ -654,25 +648,22 @@ update_blank_d
   asl
   asl
   sta charandr
-
   lda attached_powerups+1
   lsr
   lsr
   lsr
   lsr
   cmp #0
-  beq update_blank_l
+  beq update_char_l
   clc
-  adc #9
+  adc #$8
   asl
   asl
   asl
-update_blank_l
+update_char_l
   sta charandr+1
-
   lda #[CHAR_L << 3]
   sta charandr+2
-
   jsr update_char
 
   jsr get_right
@@ -680,16 +671,15 @@ update_blank_l
   asl
   asl
   sta charandr
-
   lda attached_powerups+1
   and $0F
   cmp #0
-  beq update_blank_r
-  adc #9
+  beq update_char_r
+  adc #$8
   asl
   asl
   asl
-update_blank_r
+update_char_r
   sta charandr+1
 
   lda #[CHAR_R << 3]

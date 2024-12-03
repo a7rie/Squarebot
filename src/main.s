@@ -50,7 +50,7 @@ S_KEY = $29
 D_KEY = $12
 SECRET_KEY = $0d ; press P to skip to next  level
 RESET_KEY = $0a ; press R to restart level i assume
-JUMP_SIZE = $2 ; number of characters a jump causes
+JUMP_SIZE = $01 ; number of characters a jump causes
 ROW_SIZE = $16
 ; memory locations
 user_memory_start = $1001
@@ -142,13 +142,9 @@ compressed_screen_data_start
 
 level_data_start
   incbin "../data/levels/binary_levels/jesse_1"
-  incbin "../data/levels/binary_levels/booster_test"
-  incbin "../data/levels/binary_levels/key_test"
-  incbin "../data/levels/binary_levels/2"
-  incbin "../data/levels/binary_levels/3"
-  incbin "../data/levels/binary_levels/4"
-  incbin "../data/levels/binary_levels/5"
-  incbin "../data/levels/binary_levels/6"
+  incbin "../data/levels/binary_levels/jesse_2"
+  incbin "../data/levels/binary_levels/jesse_3"
+
 
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
@@ -164,8 +160,8 @@ level_data_start
   BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 7
   BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 8
   BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike powerup 9
-  BYTE $08, $38, $F0, $F0, $F0, $F0, $38, $08 ; ready booster attachment (R) 10
-  BYTE $08, $38, $F1, $FF, $FE, $F1, $38, $08 ; active booster attachment (R) 11
+  BYTE $10, $30, $F0, $F0, $F0, $F0, $30, $10 ; ready booster attachment (R) 10
+  BYTE $10, $30, $F1, $FF, $FE, $F1, $30, $10 ; active booster attachment (R) 11
   BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R) 12
   BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R) 13
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU 14

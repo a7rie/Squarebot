@@ -51,7 +51,7 @@
      50  1c98 ????	       00 12	   D_KEY      =	$12
      51  1c98 ????	       00 0d	   SECRET_KEY =	$0d	; press P to skip to next  level
      52  1c98 ????	       00 0a	   RESET_KEY  =	$0a	; press R to restart level i assume
-     53  1c98 ????	       00 02	   JUMP_SIZE  =	$2	; number of characters a jump causes
+     53  1c98 ????	       00 01	   JUMP_SIZE  =	$01	; number of characters a jump causes
      54  1c98 ????	       00 16	   ROW_SIZE   =	$16
      55  1c98 ????						; memory locations
      56  1c98 ????	       10 01	   user_memory_start =	$1001
@@ -595,7 +595,7 @@
      68  1275		       a5 c5		      lda	currently_pressed_key
      69  1277		       c9 20		      cmp	#SPACE_KEY
      70  1279		       d0 10		      bne	check_if_q_pressed
-     71  127b		       a9 02		      lda	#JUMP_SIZE
+     71  127b		       a9 01		      lda	#JUMP_SIZE
      72  127d		       20 1e 17 	      jsr	set_jump_num
      73  1280		       a9 00		      lda	#00
      74  1282		       20 13 17 	      jsr	set_jump_dir
@@ -606,7 +606,7 @@
      79  128b		       a5 c5		      lda	currently_pressed_key
      80  128d		       c9 30		      cmp	#Q_KEY
      81  128f		       d0 16		      bne	check_if_e_pressed
-     82  1291		       a9 02		      lda	#JUMP_SIZE
+     82  1291		       a9 01		      lda	#JUMP_SIZE
      83  1293		       20 1e 17 	      jsr	set_jump_num
      84  1296		       a9 10		      lda	#$10
      85  1298		       20 13 17 	      jsr	set_jump_dir
@@ -618,7 +618,7 @@
      91  12a7				   check_if_e_pressed
      92  12a7		       c9 31		      cmp	#E_KEY
      93  12a9		       d0 16		      bne	check_if_a_pressed
-     94  12ab		       a9 02		      lda	#JUMP_SIZE
+     94  12ab		       a9 01		      lda	#JUMP_SIZE
      95  12ad		       20 1e 17 	      jsr	set_jump_num
      96  12b0		       a9 20		      lda	#$20
      97  12b2		       20 13 17 	      jsr	set_jump_dir
@@ -672,14 +672,14 @@
     145  1310		       a5 18		      lda	attached_powerups
     146  1312		       29 0f		      and	#$0F
     147  1314		       c9 01		      cmp	#$01
-    148  1316		       d0 0c		      bne	no_booster_u
+    148  1316		       d0 09		      bne	no_booster_u
     149  1318		       a5 18		      lda	attached_powerups
     150  131a		       29 f0		      and	#$F0
     151  131c		       18		      clc
     152  131d		       69 08		      adc	#$08
     153  131f		       85 18		      sta	attached_powerups
-    154  1321		       20 cb 14 	      jsr	apply_powerup_logic
-    155  1324				   no_booster_u
+    154  1321				   no_booster_u
+    155  1321		       20 cb 14 	      jsr	apply_powerup_logic
     156  1324		       20 17 16 	      jsr	update_squarebot
     157  1327		       20 28 16 	      jsr	update_chars
     158  132a		       20 d0 16 	      jsr	draw_squarebot
@@ -731,14 +731,14 @@
     204  1381		       a5 18		      lda	attached_powerups
     205  1383		       29 f0		      and	#$F0
     206  1385		       c9 10		      cmp	#$10
-    207  1387		       d0 0c		      bne	no_booster_d
+    207  1387		       d0 09		      bne	no_booster_d
     208  1389		       a5 18		      lda	attached_powerups
     209  138b		       29 0f		      and	#$0F
     210  138d		       18		      clc
     211  138e		       69 80		      adc	#$80
     212  1390		       85 18		      sta	attached_powerups
-    213  1392		       20 cb 14 	      jsr	apply_powerup_logic
-    214  1395				   no_booster_d
+    213  1392				   no_booster_d
+    214  1392		       20 cb 14 	      jsr	apply_powerup_logic
     215  1395		       20 17 16 	      jsr	update_squarebot
     216  1398		       20 28 16 	      jsr	update_chars
     217  139b		       20 d0 16 	      jsr	draw_squarebot
@@ -788,14 +788,14 @@
     261  13ee		       a5 19		      lda	attached_powerups+1
     262  13f0		       29 0f		      and	#$0F
     263  13f2		       c9 01		      cmp	#$01
-    264  13f4		       d0 0c		      bne	no_booster_l
+    264  13f4		       d0 09		      bne	no_booster_l
     265  13f6		       a5 19		      lda	attached_powerups+1
     266  13f8		       29 f0		      and	#$F0
     267  13fa		       18		      clc
     268  13fb		       69 08		      adc	#$08	; turn on the ignition
     269  13fd		       85 19		      sta	attached_powerups+1
-    270  13ff		       20 cb 14 	      jsr	apply_powerup_logic
-    271  1402				   no_booster_l
+    270  13ff				   no_booster_l
+    271  13ff		       20 cb 14 	      jsr	apply_powerup_logic
     272  1402		       20 17 16 	      jsr	update_squarebot	; update squarebot_position and its color pos
     273  1405		       20 28 16 	      jsr	update_chars	; redraw adjacent characters
     274  1408		       20 d0 16 	      jsr	draw_squarebot	; put squarebot on screen
@@ -840,14 +840,14 @@
     313  1452		       a5 19		      lda	attached_powerups+1	; if left powerup is readyBooster, change it to ignitedBooster, since apply_powerup_logic doesn't have directional context
     314  1454		       29 f0		      and	#$F0
     315  1456		       c9 10		      cmp	#$10
-    316  1458		       d0 0c		      bne	no_booster_r
+    316  1458		       d0 09		      bne	no_booster_r
     317  145a		       a5 19		      lda	attached_powerups+1
     318  145c		       29 0f		      and	#$0F
     319  145e		       18		      clc
     320  145f		       69 80		      adc	#$80	; turn on the ignition
     321  1461		       85 19		      sta	attached_powerups+1
-    322  1463		       20 cb 14 	      jsr	apply_powerup_logic
-    323  1466				   no_booster_r
+    322  1463				   no_booster_r
+    323  1463		       20 cb 14 	      jsr	apply_powerup_logic
     324  1466		       20 17 16 	      jsr	update_squarebot	; update squarebot_position and its color pos
     325  1469		       20 28 16 	      jsr	update_chars	; redraw adjacent characters
     326  146c		       20 d0 16 	      jsr	draw_squarebot	; put squarebot on screen
@@ -914,7 +914,7 @@
     387  14c8		       4c b0 14 	      jmp	return_true	;
     388  14cb
     389  14cb				   apply_powerup_logic
-    390  14cb							; ready bosoter: does nothing
+    390  14cb							; ready booster: does nothing
     391  14cb							; ignited booster: breaks breakable walls and changes to active booster 
     392  14cb							; active booster: breaks breakable walls and changes to ready booster
     393  14cb							; key: spends itself to break locked walls
@@ -1131,196 +1131,186 @@
     604  162c		       0a		      asl
     605  162d		       0a		      asl		; multiply by 8
     606  162e		       85 1c		      sta	charandr
-    607  1630
-    608  1630		       a5 18		      lda	attached_powerups
-    609  1632		       4a		      lsr
-    610  1633		       4a		      lsr
-    611  1634		       4a		      lsr
-    612  1635		       4a		      lsr
-    613  1636		       c9 00		      cmp	#0
-    614  1638		       f0 06		      beq	update_blank_u
-    615  163a		       18		      clc
-    616  163b		       69 09		      adc	#9
-    617  163d		       0a		      asl
-    618  163e		       0a		      asl
-    619  163f		       0a		      asl		; we could simplify this but at this rate a few more asls isn't going to be the main thing slowing down the code
-    620  1640				   update_blank_u
-    621  1640		       85 1d		      sta	charandr+1
-    622  1642
-    623  1642		       a9 70		      lda	#[CHAR_U << 3]
-    624  1644		       85 1e		      sta	charandr+2
-    625  1646
-    626  1646		       20 a8 16 	      jsr	update_char
-    627  1649							;keep in mind we haven't rotated it yet
-    628  1649
-    629  1649		       20 35 17 	      jsr	get_down
-    630  164c		       0a		      asl
-    631  164d		       0a		      asl
-    632  164e		       0a		      asl
-    633  164f		       85 1c		      sta	charandr
-    634  1651
-    635  1651		       a5 18		      lda	attached_powerups
-    636  1653		       25 0f		      and	$0F
-    637  1655		       c9 00		      cmp	#0
-    638  1657		       f0 06		      beq	update_blank_d
-    639  1659		       18		      clc
-    640  165a		       69 09		      adc	#9
-    641  165c		       0a		      asl
-    642  165d		       0a		      asl
-    643  165e		       0a		      asl
-    644  165f				   update_blank_d
-    645  165f		       85 1d		      sta	charandr+1
-    646  1661
-    647  1661		       a9 78		      lda	#[CHAR_D << 3]
-    648  1663		       85 1e		      sta	charandr+2
-    649  1665
-    650  1665		       20 a8 16 	      jsr	update_char
-    651  1668
-    652  1668		       20 2e 17 	      jsr	get_left
-    653  166b		       0a		      asl
-    654  166c		       0a		      asl
-    655  166d		       0a		      asl
-    656  166e		       85 1c		      sta	charandr
-    657  1670
-    658  1670		       a5 19		      lda	attached_powerups+1
-    659  1672		       4a		      lsr
-    660  1673		       4a		      lsr
-    661  1674		       4a		      lsr
-    662  1675		       4a		      lsr
-    663  1676		       c9 00		      cmp	#0
-    664  1678		       f0 06		      beq	update_blank_l
-    665  167a		       18		      clc
-    666  167b		       69 09		      adc	#9
-    667  167d		       0a		      asl
-    668  167e		       0a		      asl
-    669  167f		       0a		      asl
-    670  1680				   update_blank_l
-    671  1680		       85 1d		      sta	charandr+1
-    672  1682
-    673  1682		       a9 80		      lda	#[CHAR_L << 3]
-    674  1684		       85 1e		      sta	charandr+2
-    675  1686
-    676  1686		       20 a8 16 	      jsr	update_char
-    677  1689
-    678  1689		       20 29 17 	      jsr	get_right
-    679  168c		       0a		      asl
-    680  168d		       0a		      asl
-    681  168e		       0a		      asl
-    682  168f		       85 1c		      sta	charandr
-    683  1691
-    684  1691		       a5 19		      lda	attached_powerups+1
-    685  1693		       25 0f		      and	$0F
-    686  1695		       c9 00		      cmp	#0
-    687  1697		       f0 05		      beq	update_blank_r
-    688  1699		       69 09		      adc	#9
-    689  169b		       0a		      asl
-    690  169c		       0a		      asl
-    691  169d		       0a		      asl
-    692  169e				   update_blank_r
-    693  169e		       85 1d		      sta	charandr+1
-    694  16a0
-    695  16a0		       a9 88		      lda	#[CHAR_R << 3]
-    696  16a2		       85 1e		      sta	charandr+2
-    697  16a4
-    698  16a4		       20 a8 16 	      jsr	update_char
-    699  16a7
-    700  16a7		       60		      rts		;casual 98 line function
-    701  16a8
-    702  16a8
-    703  16a8				   update_char
-    704  16a8		       a2 00		      ldx	#0
-    705  16aa				   update_char_loop
-    706  16aa		       8a		      txa
-    707  16ab		       18		      clc
-    708  16ac		       65 1c		      adc	charandr
-    709  16ae		       a8		      tay
-    710  16af		       b9 00 1c 	      lda	(#character_set_begin),y
-    711  16b2		       85 1a		      sta	temp
-    712  16b4
-    713  16b4		       8a		      txa
-    714  16b5		       18		      clc
-    715  16b6		       65 1d		      adc	charandr+1
-    716  16b8		       a8		      tay
-    717  16b9		       b9 00 1c 	      lda	(#character_set_begin),y
-    718  16bc		       45 1a		      eor	temp
-    719  16be		       85 1a		      sta	temp
-    720  16c0
-    721  16c0		       8a		      txa
-    722  16c1		       18		      clc
-    723  16c2		       65 1e		      adc	charandr+2
-    724  16c4		       a8		      tay
-    725  16c5		       a5 1a		      lda	temp
-    726  16c7		       99 00 1c 	      sta	(#character_set_begin),y
-    727  16ca
-    728  16ca		       e8		      inx
-    729  16cb		       e0 08		      cpx	#8
-    730  16cd		       d0 db		      bne	update_char_loop
-    731  16cf		       60		      rts
-    732  16d0
-    733  16d0							; if there is a powerup:
-    734  16d0							; for each of 8 bytes:
-    735  16d0							; load tile byte
-    736  16d0							; eor with powerup tile byte
-    737  16d0							; store in char byte
-    738  16d0
-    739  16d0				   draw_squarebot
-    740  16d0		       20 ef 17 	      jsr	get_squarebot_draw_position
-    741  16d3
-    742  16d3		       a9 0e		      lda	#CHAR_U
-    743  16d5		       a0 01		      ldy	#1
-    744  16d7		       91 10		      sta	(squarebot_position),y
-    745  16d9		       a9 00		      lda	#0
-    746  16db		       91 12		      sta	(squarebot_color_position),y
-    747  16dd
-    748  16dd		       a9 0f		      lda	#CHAR_D
-    749  16df		       a0 2d		      ldy	#[[ROW_SIZE*2]+1]
-    750  16e1		       91 10		      sta	(squarebot_position),y
-    751  16e3		       a9 00		      lda	#0
-    752  16e5		       91 12		      sta	(squarebot_color_position),y
-    753  16e7
-    754  16e7		       a9 10		      lda	#CHAR_L
-    755  16e9		       a0 16		      ldy	#ROW_SIZE
-    756  16eb		       91 10		      sta	(squarebot_position),y
-    757  16ed		       a9 00		      lda	#0
-    758  16ef		       91 12		      sta	(squarebot_color_position),y
-    759  16f1
-    760  16f1		       a9 11		      lda	#CHAR_R
-    761  16f3		       a0 18		      ldy	#[ROW_SIZE+2]
-    762  16f5		       91 10		      sta	(squarebot_position),y
-    763  16f7		       a9 00		      lda	#0
-    764  16f9		       91 12		      sta	(squarebot_color_position),y
-    765  16fb
-    766  16fb		       a9 12		      lda	#SQUAREBOT_CHAR
-    767  16fd		       a0 17		      ldy	#[ROW_SIZE+1]
-    768  16ff		       91 10		      sta	(squarebot_position),y
-    769  1701		       a9 02		      lda	#SQUAREBOT_COLOR
-    770  1703		       91 12		      sta	(squarebot_color_position),y
-    771  1705
-    772  1705		       20 0a 18 	      jsr	get_squarebot_game_position
-    773  1708		       60		      rts
-    774  1709
-    775  1709							;real how it works:
-    776  1709
-    777  1709							;l/r movement:
-    778  1709							;store l/r tile you want to move to
-    779  1709							;if you win, win
-    780  1709							;check collision:
-    781  1709							;  store powerup in temp
-    782  1709							;  return whether you can move or not
-    783  1709							;if you can't move, goto j/f movement
-    784  1709							;apply powerup
-    785  1709							;get new position
-    786  1709							;refresh tiles
-    787  1709							;apply powerup logic
-    788  1709							;delete old position
-    789  1709							;update position
-    790  1709							;redraw chars
-    791  1709							;draw new position
-    792  1709							;wait a jiffy maybe
-    793  1709							;check booster
-    794  1709							;
-    795  1709							;j/f movement
-    796  1709							;do similar thing
+    607  1630		       a5 18		      lda	attached_powerups
+    608  1632		       4a		      lsr
+    609  1633		       4a		      lsr
+    610  1634		       4a		      lsr
+    611  1635		       4a		      lsr
+    612  1636		       c9 00		      cmp	#0
+    613  1638		       f0 06		      beq	update_char_u
+    614  163a		       18		      clc
+    615  163b		       69 08		      adc	#$8
+    616  163d		       0a		      asl
+    617  163e		       0a		      asl
+    618  163f		       0a		      asl		; we could simplify this but at this rate a few more asls isn't going to be the main thing slowing down the code
+    619  1640				   update_char_u
+    620  1640		       85 1d		      sta	charandr+1
+    621  1642		       a9 70		      lda	#[CHAR_U << 3]
+    622  1644		       85 1e		      sta	charandr+2
+    623  1646		       20 a8 16 	      jsr	update_char
+    624  1649							;keep in mind we haven't rotated it yet
+    625  1649
+    626  1649		       20 35 17 	      jsr	get_down
+    627  164c		       0a		      asl
+    628  164d		       0a		      asl
+    629  164e		       0a		      asl
+    630  164f		       85 1c		      sta	charandr
+    631  1651		       a5 18		      lda	attached_powerups
+    632  1653		       25 0f		      and	$0F
+    633  1655		       c9 00		      cmp	#0
+    634  1657		       f0 06		      beq	update_char_d
+    635  1659		       18		      clc
+    636  165a		       69 08		      adc	#$8
+    637  165c		       0a		      asl
+    638  165d		       0a		      asl
+    639  165e		       0a		      asl
+    640  165f				   update_char_d
+    641  165f		       85 1d		      sta	charandr+1
+    642  1661		       a9 78		      lda	#[CHAR_D << 3]
+    643  1663		       85 1e		      sta	charandr+2
+    644  1665		       20 a8 16 	      jsr	update_char
+    645  1668
+    646  1668		       20 2e 17 	      jsr	get_left
+    647  166b		       0a		      asl
+    648  166c		       0a		      asl
+    649  166d		       0a		      asl
+    650  166e		       85 1c		      sta	charandr
+    651  1670		       a5 19		      lda	attached_powerups+1
+    652  1672		       4a		      lsr
+    653  1673		       4a		      lsr
+    654  1674		       4a		      lsr
+    655  1675		       4a		      lsr
+    656  1676		       c9 00		      cmp	#0
+    657  1678		       f0 06		      beq	update_char_l
+    658  167a		       18		      clc
+    659  167b		       69 08		      adc	#$8
+    660  167d		       0a		      asl
+    661  167e		       0a		      asl
+    662  167f		       0a		      asl
+    663  1680				   update_char_l
+    664  1680		       85 1d		      sta	charandr+1
+    665  1682		       a9 80		      lda	#[CHAR_L << 3]
+    666  1684		       85 1e		      sta	charandr+2
+    667  1686		       20 a8 16 	      jsr	update_char
+    668  1689
+    669  1689		       20 29 17 	      jsr	get_right
+    670  168c		       0a		      asl
+    671  168d		       0a		      asl
+    672  168e		       0a		      asl
+    673  168f		       85 1c		      sta	charandr
+    674  1691		       a5 19		      lda	attached_powerups+1
+    675  1693		       25 0f		      and	$0F
+    676  1695		       c9 00		      cmp	#0
+    677  1697		       f0 05		      beq	update_char_r
+    678  1699		       69 08		      adc	#$8
+    679  169b		       0a		      asl
+    680  169c		       0a		      asl
+    681  169d		       0a		      asl
+    682  169e				   update_char_r
+    683  169e		       85 1d		      sta	charandr+1
+    684  16a0
+    685  16a0		       a9 88		      lda	#[CHAR_R << 3]
+    686  16a2		       85 1e		      sta	charandr+2
+    687  16a4
+    688  16a4		       20 a8 16 	      jsr	update_char
+    689  16a7
+    690  16a7		       60		      rts		;casual 98 line function
+    691  16a8
+    692  16a8
+    693  16a8				   update_char
+    694  16a8		       a2 00		      ldx	#0
+    695  16aa				   update_char_loop
+    696  16aa		       8a		      txa
+    697  16ab		       18		      clc
+    698  16ac		       65 1c		      adc	charandr
+    699  16ae		       a8		      tay
+    700  16af		       b9 00 1c 	      lda	(#character_set_begin),y
+    701  16b2		       85 1a		      sta	temp
+    702  16b4
+    703  16b4		       8a		      txa
+    704  16b5		       18		      clc
+    705  16b6		       65 1d		      adc	charandr+1
+    706  16b8		       a8		      tay
+    707  16b9		       b9 00 1c 	      lda	(#character_set_begin),y
+    708  16bc		       45 1a		      eor	temp
+    709  16be		       85 1a		      sta	temp
+    710  16c0
+    711  16c0		       8a		      txa
+    712  16c1		       18		      clc
+    713  16c2		       65 1e		      adc	charandr+2
+    714  16c4		       a8		      tay
+    715  16c5		       a5 1a		      lda	temp
+    716  16c7		       99 00 1c 	      sta	(#character_set_begin),y
+    717  16ca
+    718  16ca		       e8		      inx
+    719  16cb		       e0 08		      cpx	#8
+    720  16cd		       d0 db		      bne	update_char_loop
+    721  16cf		       60		      rts
+    722  16d0
+    723  16d0							; if there is a powerup:
+    724  16d0							; for each of 8 bytes:
+    725  16d0							; load tile byte
+    726  16d0							; eor with powerup tile byte
+    727  16d0							; store in char byte
+    728  16d0
+    729  16d0				   draw_squarebot
+    730  16d0		       20 ef 17 	      jsr	get_squarebot_draw_position
+    731  16d3
+    732  16d3		       a9 0e		      lda	#CHAR_U
+    733  16d5		       a0 01		      ldy	#1
+    734  16d7		       91 10		      sta	(squarebot_position),y
+    735  16d9		       a9 00		      lda	#0
+    736  16db		       91 12		      sta	(squarebot_color_position),y
+    737  16dd
+    738  16dd		       a9 0f		      lda	#CHAR_D
+    739  16df		       a0 2d		      ldy	#[[ROW_SIZE*2]+1]
+    740  16e1		       91 10		      sta	(squarebot_position),y
+    741  16e3		       a9 00		      lda	#0
+    742  16e5		       91 12		      sta	(squarebot_color_position),y
+    743  16e7
+    744  16e7		       a9 10		      lda	#CHAR_L
+    745  16e9		       a0 16		      ldy	#ROW_SIZE
+    746  16eb		       91 10		      sta	(squarebot_position),y
+    747  16ed		       a9 00		      lda	#0
+    748  16ef		       91 12		      sta	(squarebot_color_position),y
+    749  16f1
+    750  16f1		       a9 11		      lda	#CHAR_R
+    751  16f3		       a0 18		      ldy	#[ROW_SIZE+2]
+    752  16f5		       91 10		      sta	(squarebot_position),y
+    753  16f7		       a9 00		      lda	#0
+    754  16f9		       91 12		      sta	(squarebot_color_position),y
+    755  16fb
+    756  16fb		       a9 12		      lda	#SQUAREBOT_CHAR
+    757  16fd		       a0 17		      ldy	#[ROW_SIZE+1]
+    758  16ff		       91 10		      sta	(squarebot_position),y
+    759  1701		       a9 02		      lda	#SQUAREBOT_COLOR
+    760  1703		       91 12		      sta	(squarebot_color_position),y
+    761  1705
+    762  1705		       20 0a 18 	      jsr	get_squarebot_game_position
+    763  1708		       60		      rts
+    764  1709
+    765  1709							;real how it works:
+    766  1709
+    767  1709							;l/r movement:
+    768  1709							;store l/r tile you want to move to
+    769  1709							;if you win, win
+    770  1709							;check collision:
+    771  1709							;  store powerup in temp
+    772  1709							;  return whether you can move or not
+    773  1709							;if you can't move, goto j/f movement
+    774  1709							;apply powerup
+    775  1709							;get new position
+    776  1709							;refresh tiles
+    777  1709							;apply powerup logic
+    778  1709							;delete old position
+    779  1709							;update position
+    780  1709							;redraw chars
+    781  1709							;draw new position
+    782  1709							;wait a jiffy maybe
+    783  1709							;check booster
+    784  1709							;
+    785  1709							;j/f movement
+    786  1709							;do similar thing
 ------- FILE src/main.s
 ------- FILE updateGameStateHelper.s LEVEL 2 PASS 3
       0  1709					      include	"updateGameStateHelper.s"
@@ -1648,14 +1638,10 @@
     142  1963
     143  1963				   level_data_start
     144  1963					      incbin	"../data/levels/binary_levels/jesse_1"
-    145  19e7					      incbin	"../data/levels/binary_levels/booster_test"
-    146  19f5					      incbin	"../data/levels/binary_levels/key_test"
-    147  1a0b					      incbin	"../data/levels/binary_levels/2"
-    148  1a23					      incbin	"../data/levels/binary_levels/3"
-    149  1a7b					      incbin	"../data/levels/binary_levels/4"
-    150  1aa7					      incbin	"../data/levels/binary_levels/5"
-    151  1ad3					      incbin	"../data/levels/binary_levels/6"
-    152  1b05
+    145  19e9					      incbin	"../data/levels/binary_levels/jesse_2"
+    146  1a71					      incbin	"../data/levels/binary_levels/jesse_3"
+    147  1b05
+    148  1b05
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
       0  1b05					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
       1  1b05		       0b 04	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
@@ -1669,25 +1655,25 @@
       7  1b05				  -	      err
       8  1b05					      endif
 ------- FILE src/main.s
-    154  1b05
-    155  1b05
-    156  1c00					      org	character_set_begin
-    157  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
-    158  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
-    159  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
-    160  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
-    161  1c20		       ff 9d a3 ac*	      BYTE.b	$FF, $9D, $A3, $AC, $A5, $99, $C3, $FF	; exit (door) 4
-    162  1c28		       ff ff c3 c3*	      BYTE.b	$FF, $FF, $C3, $C3, $E7, $E7, $E7, $FF	; locked wall 5
-    163  1c30		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 6
-    164  1c38		       3c 42 99 bd*	      BYTE.b	$3C, $42, $99, $BD, $89, $91, $42, $3C	; booster powerup 7
-    165  1c40		       3c 42 99 99*	      BYTE.b	$3C, $42, $99, $99, $91, $99, $42, $3C	; key powerup 8
-    166  1c48		       3c 42 91 99*	      BYTE.b	$3C, $42, $91, $99, $BD, $81, $42, $3C	; spike powerup 9
-    167  1c50		       08 38 f0 f0*	      BYTE.b	$08, $38, $F0, $F0, $F0, $F0, $38, $08	; ready booster attachment (R) 10
-    168  1c58		       08 38 f1 ff*	      BYTE.b	$08, $38, $F1, $FF, $FE, $F1, $38, $08	; active booster attachment (R) 11
-    169  1c60		       00 00 fe fe*	      BYTE.b	$00, $00, $FE, $FE, $6A, $0A, $0E, $00	; key attachment (R) 12
-    170  1c68		       80 c0 f0 fe*	      BYTE.b	$80, $C0, $F0, $FE, $F0, $C0, $80, $00	; spike attachment (R) 13
-    171  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU 14
-    172  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 15
-    173  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 16
-    174  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 17
-    175  1c90		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 18
+    150  1b05
+    151  1b05
+    152  1c00					      org	character_set_begin
+    153  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
+    154  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
+    155  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
+    156  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
+    157  1c20		       ff 9d a3 ac*	      BYTE.b	$FF, $9D, $A3, $AC, $A5, $99, $C3, $FF	; exit (door) 4
+    158  1c28		       ff ff c3 c3*	      BYTE.b	$FF, $FF, $C3, $C3, $E7, $E7, $E7, $FF	; locked wall 5
+    159  1c30		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 6
+    160  1c38		       3c 42 99 bd*	      BYTE.b	$3C, $42, $99, $BD, $89, $91, $42, $3C	; booster powerup 7
+    161  1c40		       3c 42 99 99*	      BYTE.b	$3C, $42, $99, $99, $91, $99, $42, $3C	; key powerup 8
+    162  1c48		       3c 42 91 99*	      BYTE.b	$3C, $42, $91, $99, $BD, $81, $42, $3C	; spike powerup 9
+    163  1c50		       10 30 f0 f0*	      BYTE.b	$10, $30, $F0, $F0, $F0, $F0, $30, $10	; ready booster attachment (R) 10
+    164  1c58		       10 30 f1 ff*	      BYTE.b	$10, $30, $F1, $FF, $FE, $F1, $30, $10	; active booster attachment (R) 11
+    165  1c60		       00 00 fe fe*	      BYTE.b	$00, $00, $FE, $FE, $6A, $0A, $0E, $00	; key attachment (R) 12
+    166  1c68		       80 c0 f0 fe*	      BYTE.b	$80, $C0, $F0, $FE, $F0, $C0, $80, $00	; spike attachment (R) 13
+    167  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU 14
+    168  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 15
+    169  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 16
+    170  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 17
+    171  1c90		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 18
