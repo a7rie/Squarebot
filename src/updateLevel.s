@@ -184,9 +184,7 @@ check_if_starting_point
   lda #SQUAREBOT_CHAR
   ldx #SQUAREBOT_COLOR
   jsr draw_char_in_accumulator
-
   rts
-
 
 check_if_wall
   cmp #WALL

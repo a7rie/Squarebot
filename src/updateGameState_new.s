@@ -1,6 +1,7 @@
 START_OF_FIRST_ROW_LOW_BYTE = $e4
 START_OF_FIRST_ROW_HIGH_BYTE = $1f
 
+; main logic until line 113:
 update_game_state
   lda squarebot_position ; likely unnecessary
   sta new_position
@@ -11,12 +12,6 @@ update_game_state
   lda squarebot_color_position+1
   sta new_color_position+1
 
-;maybe we handle jumps first actually
-;continue jumping if already jumping
-;else check if we are on ground
-;if not, fall
-;if yes, check if we want to jump
-;
 jump_logic
   jsr get_jump_num
   cmp #0
@@ -111,6 +106,14 @@ check_if_d_pressed
   bne update_return
   jsr move_right
   jmp update_return
+
+; The rest is subroutines
+
+;current bugs:
+;attached powerup sprites are not working
+;jump direction is not reset properly
+;platforms get deleted sometimes
+;need to replace end screen
 
 move_up
   lda #$0
