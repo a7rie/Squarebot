@@ -45,28 +45,30 @@ def main():
         break
       split_line = list(line)
       
+      if line[0] == ";": continue # to allow for comments in the level files
+
       if split_line[-1] == "\n": # for stylistic reasons, we want the nl in ascii data, but not in the binary output
         split_line.pop()
         
-      if len(split_line) != 22: # levels are 22x23
+      if len(split_line) != 20: # levels are 20x21
         f.close()
-        print(f"Line doesn't contain 22 characters: {split_line}")
+        print(f"Line doesn't contain 20 characters: {split_line}")
         exit(0)
         
       ascii_level += split_line
   
-  if len(ascii_level) != 506:
-    print(f"ascii file contains {len(ascii_level)} characters instead of expected 506")
+  if len(ascii_level) != 420:
+    print(f"ascii file contains {len(ascii_level)} characters instead of expected 420")
     exit(0)
     
   if (DEBUG):
     print("Level data to be converted:")
-    for i in range(0, 507, 22):
-      print("".join(ascii_level[i:i+22]))
+    for i in range(0, 421, 20):
+      print("".join(ascii_level[i:i+20]))
   
 #  now, convert to the squarebot level format
   converted_level_data = []
-  for i in range(0, 506, 2):
+  for i in range(0, 420, 2):
     char1, char2 = ascii_level[i], ascii_level[i+1]
     if char1 not in ascii_to_byte or char2 not in ascii_to_byte:
       print(f"Level data has invalid character(s): {char1, char2}")
@@ -83,8 +85,8 @@ def main():
               ))
     converted_level_data.append(level_byte)
   
-  if len(converted_level_data) != 253:
-    print(f"Error: Level data is {len(converted_level_data)} instead of expected 253.")
+  if len(converted_level_data) != 210:
+    print(f"Error: Level data is {len(converted_level_data)} instead of expected 210.")
     exit(0)    
     
   binary_level_data = [v.to_bytes(1, 'big') for v in converted_level_data]

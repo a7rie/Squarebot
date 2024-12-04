@@ -46,7 +46,7 @@ def main():
   
   print(f"uncompressed level has {len(output)} bytes")
   
-  for i in range(0, len(output), 22):  print(" ".join(output[i:i+22]))
+  for i in range(0, len(output), 20):  print(" ".join(output[i:i+20]))
 
 if __name__ == "__main__":
   main()

@@ -24,6 +24,9 @@ attached_powerups ds.b 2; 4 bits for each side, ordered U,D,L,R.
 ; 0=none  1=readyBooster  2=activeBooster  3=key 4=spike(not implemented)  add more powerups here   8=ignitedBooster
 temp ds.w 1 ; for temporary storage of things. mainly used in updateGameState
 charandr ds.b 3 ; for the incredibly complex operation of anding chars
+count_chars_drawn ds.b 1 ; count number of chars drawn on screen in the current run
+temp_a ds.b 1 ; store acc
+temp_x ds.b 1 ; store x
   seg
 
 ; constants
@@ -138,7 +141,7 @@ check_for_reset_key_return
   include "updateGameStateHelper.s"
 
 compressed_screen_data_start
-  incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
+  incbin "../data/jesseTitleScreen_compressed" ; got via 'bsave ""'
 
 level_data_start
   incbin "../data/levels/binary_levels/jesse_1"
