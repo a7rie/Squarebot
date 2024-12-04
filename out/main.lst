@@ -1,4 +1,4 @@
-------- FILE src/main.s LEVEL 1 PASS 3
+------- FILE main.s LEVEL 1 PASS 3
       1  1c98 ????						; title screen program -- use hand-made compression method (esentially just RLE, see rleEncoding.py)
       2  1c98 ????				      processor	6502
       3  1c98 ????
@@ -75,7 +75,7 @@
       6  1005		       9e 34 31 30*	      dc.b	SYS_CMD_TOKEN, [start]d, 0	; token for sys with operand as address to "start" label
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
-------- FILE src/main.s
+------- FILE main.s
      68  100d
      69  100d				   start
      70  100d							; use combination of RAM (first 128 chars at 7168) & ROM character set
@@ -218,7 +218,7 @@
     113  10b1				   check_if_screen_cursor_at_end_return_true
     114  10b1		       38		      sec
     115  10b2		       60		      rts
-------- FILE src/main.s
+------- FILE main.s
      94  10b3
      95  10b3							; title screen code jumps here once space pressed
      96  10b3				   gameLoop
@@ -583,7 +583,7 @@
     315  1240				   check_if_level_cursor_at_end_return_true
     316  1240		       38		      sec
     317  1241		       60		      rts
-------- FILE src/main.s
+------- FILE main.s
 ------- FILE updateGameState_new.s LEVEL 2 PASS 3
       0  1242					      include	"updateGameState_new.s"
       1  1242		       00 e4	   START_OF_FIRST_ROW_LOW_BYTE =	$e4
@@ -1375,7 +1375,7 @@
     787  1744							;
     788  1744							;j/f movement
     789  1744							;do similar thing
-------- FILE src/main.s
+------- FILE main.s
 ------- FILE updateGameStateHelper.s LEVEL 2 PASS 3
       0  1744					      include	"updateGameStateHelper.s"
       1  1744							; Helper functions for updateGameState
@@ -1695,32 +1695,32 @@
     315  192f		       20 81 17 	      jsr	set_right
     316  1932		       20 7b 18 	      jsr	get_new_game_position	; move new_position and its color pos back
     317  1935		       60		      rts
-------- FILE src/main.s
+------- FILE main.s
     142  1936
     143  1936				   compressed_screen_data_start
     144  1936					      incbin	"../data/jesseTitleScreen_compressed"	; got via 'bsave ""'
     145  19a0
     146  19a0				   level_data_start
     147  19a0					      incbin	"../data/levels/binary_levels/jesse_1"
-    148  19a8					      incbin	"../data/levels/binary_levels/jesse_2"
-    149  19ca					      incbin	"../data/levels/binary_levels/jesse_3"
-    150  19e8					      incbin	"../data/levels/binary_levels/jesse_4"
-    151  1a1a
+    148  19aa					      incbin	"../data/levels/binary_levels/jesse_2"
+    149  19ce					      incbin	"../data/levels/binary_levels/jesse_3"
+    150  19ee					      incbin	"../data/levels/binary_levels/jesse_4"
+    151  1a22
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1a1a					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1a1a		       0a 19	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1a1a		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 2585 bytes used
-      3  1a1a					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  6682
-      4  1a1a					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1a1a				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1a1a				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1a1a				  -	      err
-      8  1a1a					      endif
-------- FILE src/main.s
-    153  1a1a
-    154  1a1a
+      0  1a22					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  1a22		       0a 21	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  1a22		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 2593 bytes used
+      3  1a22					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  6690
+      4  1a22					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  1a22				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  1a22				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  1a22				  -	      err
+      8  1a22					      endif
+------- FILE main.s
+    153  1a22
+    154  1a22
     155  1c00					      org	character_set_begin
     156  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
     157  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
