@@ -231,7 +231,7 @@ collision_handler ; accumulator is the character in the position that squarebot 
   ;else its a powerup
   cmp #BOOSTER_P_CHAR
   bne rpk
-  lda #$0A ;set both hex characters to avoid dumb shifts taking up lots of space
+  lda #$0A
   sta temp
   jmp return_true
 rpk
@@ -543,31 +543,31 @@ draw_squarebot
   jsr get_squarebot_draw_position
 
   lda #CHAR_U
-  ldy #1
+  ldy #DELTA_U
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
   lda #CHAR_D
-  ldy #[[ROW_SIZE*2]+1]
+  ldy #DELTA_D
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
   lda #CHAR_L
-  ldy #ROW_SIZE
+  ldy #DELTA_L
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
   lda #CHAR_R
-  ldy #[ROW_SIZE+2]
+  ldy #DELTA_R
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
   lda #SQUAREBOT_CHAR
-  ldy #[ROW_SIZE+1]
+  ldy #DELTA_M
   sta (squarebot_position),y
   lda #SQUAREBOT_COLOR
   sta (squarebot_color_position),y
