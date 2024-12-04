@@ -17,13 +17,15 @@ new_color_position ds.w 1 ; use to store position of (proposed) new location for
 current_time ds.b 1 ; store only the last byte of the jiffy clock
 squarebot_position ds.w 1
 squarebot_color_position ds.w 1
-jump_info ds.b 1 ; split in half, first hex=jump direction 0=up 1=left 2=right, second half=jumps remaining
-tileStore ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
-;colorStore ds.b 3 ; 0UUU0DDD 0LLL0RRR 00000MMM   not the most efficient storage but it needs to also be efficient to decompress
-attached_powerups ds.b 2; 4 bits for each side, ordered U,D,L,R.
-; 0=none  1=readyBooster  2=activeBooster  3=key 4=spike(not implemented)  add more powerups here   8=ignitedBooster
-temp ds.w 1 ; for temporary storage of things. mainly used in updateGameState
-charandr ds.b 3 ; for the incredibly complex operation of anding chars
+jump_dir ds.b 1 ; 0 = up, 1=left, 2=right
+jump_num ds.b 1
+tile_store ds.b 5
+;colorStore ds.b 5 ; U, D, L, R, M  not the most efficient storage but it needs to also be efficient to decompress
+attached_powerups ds.b 4
+; $0=none  $1=ignitedBooster $A=readyBooster  $B=activeBooster  $C=key  $D=spike(change into shield)
+temp ds.b 4 ; for temporary storage of things. mainly used in updateGameState
+move_dir_store ds.b 1 ; exclusively for move_dir and related subroutines
+chareor ds.b 3 ; for the incredibly complex operation of eoring chars
   seg
 
 ; constants
@@ -52,6 +54,12 @@ SECRET_KEY = $0d ; press P to skip to next  level
 RESET_KEY = $0a ; press R to restart level i assume
 JUMP_SIZE = $01 ; number of characters a jump causes
 ROW_SIZE = $16
+
+DELTA_U = $01 ;1
+DELTA_D = $33 ;rowsize+rowsize+1
+DELTA_L = $16 ;rowsize
+DELTA_R = $18 ;rowsize+2
+DELTA_M = $17 ;rowsize+1
 ; memory locations
 user_memory_start = $1001
 currently_pressed_key =  $c5
@@ -80,12 +88,21 @@ start
   sta current_level+1
 
   lda #0
-  sta jump_info
+  sta jump_num
+  sta jump_dir
   sta attached_powerups
   sta attached_powerups+1
-  sta tileStore
-  sta tileStore+1
-  sta tileStore+2
+  sta attached_powerups+2
+  sta attached_powerups+3
+  sta tile_store
+  sta tile_store+1
+  sta tile_store+2
+  sta tile_store+3
+  sta tile_store+4
+  sta temp
+  sta temp+1
+  sta temp+2
+  sta temp+3
 
   include "titleScreen.s"
 
@@ -146,9 +163,6 @@ level_data_start
   incbin "../data/levels/binary_levels/jesse_3"
   incbin "../data/levels/binary_levels/jesse_4"
 
-  include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
-
-
   org character_set_begin
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; blank 0
   BYTE $7E, $42, $7E, $42, $7E, $42, $7E, $42 ; ladder 1
@@ -160,12 +174,22 @@ level_data_start
   BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 7
   BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 8
   BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike powerup 9
-  BYTE $10, $30, $F0, $F0, $F0, $F0, $30, $10 ; ready booster attachment (R) 10
-  BYTE $10, $30, $F1, $FF, $FE, $F1, $30, $10 ; active booster attachment (R) 11
-  BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R) 12
-  BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R) 13
+  BYTE $10, $30, $F0, $F0, $F0, $F0, $30, $10 ; ready booster attachment (R) 10, u d l r
+  BYTE $10, $30, $F1, $FF, $FE, $F1, $30, $10 ; active booster attachment (R) 11, u d l r
+  BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R) 12, u d l r
+  BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R) 13, u d l r
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU 14
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charD 15
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charL 16
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charR 17
   BYTE $FF, $81, $A5, $81, $BD, $81, $81, $FF ; squarebot 18
+
+  include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
+
+
+  ;assume levels have borders
+  ;shift character set begin as far as i can
+  ;get rid of half-bytes
+  ;16 bit arithmetic
+  ;storing attachments in each rotation
+  ;store delta in an array so you can have a dynamic function that draws each character.

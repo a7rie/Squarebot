@@ -13,98 +13,127 @@ update_game_state
   sta new_color_position+1
 
 jump_logic
-  jsr get_jump_num
-  cmp #0
+  lda jump_num
+  cmp #$00
   beq fall_logic
+  ldy #0 ; up
+  jsr move_dir
+  bcs j_cont ; jump successful
+  lda #$00 ; jump failed
+  sta jump_num
+  jmp update_return
+j_cont
   sec
-  sbc #1
-  jsr set_jump_num
-  jsr move_up
-  jsr get_jump_dir
+  dec jump_num
 j_left
-  cmp #$10
+  lda jump_dir
+  cmp #$01
   bne j_right
   jsr wait_until_next_frame
-  jsr move_left
+  ldy #2 ; left
+  jsr move_dir
   jmp update_return
 j_right
-  cmp #$20
+  cmp #$02
   bne update_return
   jsr wait_until_next_frame
-  jsr move_right
+  ldy #3 ; right
+  jsr move_dir
   jmp update_return
 
 fall_logic
-  jsr get_down
-  jsr fall_check
+  lda tile_store+1 ; down
+  jsr fall_check ; check if we hit the ground, different from collision_handler since platforms are included
   bcc check_if_space_pressed
-  jsr move_down
-  jsr get_down
+  ldy #1 ; down
+  jsr move_dir
+  lda tile_store+1 ; check if we hit ground again, if we didn't we can move in the jump_dir
   jsr fall_check
-  bcc update_return ; don't move if we land
-  jsr get_jump_dir
+  bcs f_left
+  lda #$00 ; otherwise we stay still
+  sta jump_dir
+  jmp update_return
 f_left
-  cmp #$10
+  lda jump_dir
+  cmp #$01
   bne f_right
   jsr wait_until_next_frame
-  jsr move_left
+  ldy #2 ; left
+  jsr move_dir
   jmp update_return
 f_right
-  cmp #$20
+  cmp #$02
   bne update_return
   jsr wait_until_next_frame
-  jsr move_right
+  ldy #3 ; right
+  jsr move_dir
   jmp update_return
 
 update_return
+  clc ; reset numbers that should be
+  lda #0
+  sta temp
+  sta temp+1
+  sta temp+2
+  sta temp+3
   rts
 
 check_if_space_pressed
   lda currently_pressed_key
   cmp #SPACE_KEY
   bne check_if_q_pressed
+  ldy #0 ; up
+  jsr move_dir
+  bcc update_return ; jump failed
   lda #JUMP_SIZE
-  jsr set_jump_num
-  lda #00
-  jsr set_jump_dir
-  jsr move_up
+  sta jump_num
+  lda #$00
+  sta jump_dir
   jmp update_return
 
 check_if_q_pressed
   lda currently_pressed_key
   cmp #Q_KEY
   bne check_if_e_pressed
+  ldy #0 ; up
+  jsr move_dir
+  bcc update_return ; jump failed
   lda #JUMP_SIZE
-  jsr set_jump_num
-  lda #$10
-  jsr set_jump_dir
-  jsr move_up
+  sta jump_num
+  lda #$01
+  sta jump_dir
   jsr wait_until_next_frame
-  jsr move_left
+  ldy #2 ; left
+  jsr move_dir
   jmp update_return
 
 check_if_e_pressed
   cmp #E_KEY
   bne check_if_a_pressed
+  ldy #0 ; up
+  jsr move_dir
+  bcc update_return ; jump failed
   lda #JUMP_SIZE
-  jsr set_jump_num
-  lda #$20
-  jsr set_jump_dir
-  jsr move_up
+  sta jump_num
+  lda #$02
+  sta jump_dir
   jsr wait_until_next_frame
-  jsr move_right
+  ldy #3 ; right
+  jsr move_dir
   jmp update_return
 
 check_if_a_pressed
   cmp #A_KEY
   bne check_if_d_pressed
-  jsr move_left
+  ldy #2 ; left
+  jsr move_dir
   jmp update_return
 
 check_if_d_pressed
   cmp #D_KEY
   bne update_return
-  jsr move_right
+  ldy #3 ; right
+  jsr move_dir
   jmp update_return
 
 ; The rest is subroutines
@@ -115,226 +144,75 @@ check_if_d_pressed
 ;platforms get deleted sometimes
 ;need to replace end screen
 
-move_up
-  lda #$0
-  sta temp
-  jsr get_up
+
+
+;store tile you are moving to
+;if you win, win
+;check collision:
+;  store powerup in temp
+;  return whether you can move or not
+;if you can't move, return false
+;apply powerups you moved into
+;get new position
+;refresh tiles
+;apply powerup logic
+;delete old position
+;update position
+;redraw chars
+;draw new position
+;wait a jiffy maybe
+;check booster if we move again
+move_dir
+  sty move_dir_store
+  lda (tile_store),y ; load colliding tile
   cmp #EXIT_CHAR
-  bne cont_u
-  lda #1
+  bne cont_move
+  lda #1 ; level complete
   sta level_completed
   sta level_reset
-  jmp return_u
-cont_u
+  jmp return_false_move
+cont_move
   jsr collision_handler
-  bcc remove_jumps
-  lda temp
-  cmp #$0
-  beq post_powerup_u
-  and #$F0
-  sta temp
-  lda #$0F
-  and attached_powerups
-  clc
-  adc temp
-  sta attached_powerups
-  lda #$0F
-  and tileStore
-  sta tileStore
-post_powerup_u
+  bcc return_false_move
+  lda temp ; if we hit a powerup this will be its id
+  cmp #$00
+  beq post_powerup_move
+  sta (attached_powerups),y ; attach powerup
+  lda #$00
+  sta (tile_store),y ; remove the powerup tile from the level
+post_powerup_move
   jsr delete_squarebot
-  jsr move_new_position_up
-  jsr get_tiles_u
-  lda attached_powerups
-  and #$0F
-  cmp #$01
-  bne no_booster_u
-  lda attached_powerups
-  and #$F0
-  clc
-  adc #$08
-  sta attached_powerups
-no_booster_u
+  ldy move_dir_store
+  jsr move_new_position
+  jsr get_tiles
+  lda #$01 ; eor y with 1 to get opposite side
+  eor move_dir_store
+  tay
+  lda (attached_powerups),y ; ignite ready booster
+  cmp #$0A
+  bne post_booster
+  lda #$01
+  sta (attached_powerups),y
+post_booster
   jsr apply_powerup_logic
   jsr update_squarebot
   jsr update_chars
   jsr draw_squarebot
   jsr wait_until_next_frame
-  lda attached_powerups
-  and #$0F
-  cmp #$02
-  beq move_up
-return_u
-  rts
-remove_jumps
-  lda jump_info
-  and #$F0 ;remove jumps_remaining since we hit a wall
-  sta jump_info
-  jmp return_u
-
-move_down
-  lda #$0
-  sta temp
-  jsr get_down
-  cmp #EXIT_CHAR
-  bne cont_d
-  lda #1
-  sta level_completed
-  sta level_reset
-  jmp return_d 
-cont_d
-  cmp #PLATFORM_CHAR ; collision_handler assumes we go through these otherwise
-  beq remove_fall
-  jsr collision_handler
-  bcc remove_fall
-  lda temp
-  cmp #$0
-  beq post_powerup_d
-  and #$0F
-  sta temp
-  lda #$F0
-  and attached_powerups
+  lda #$01 ; eor y with 1 to get opposite side
+  eor move_dir_store
+  tay
+  lda (attached_powerups),y
+  cmp #$0B
+  ldy move_dir_store
+  beq move_dir ; if booster activated go again
+  sec
+  rts ; return true move
+return_false_move
   clc
-  adc temp
-  sta attached_powerups
-  lda #$F0
-  and tileStore
-  sta tileStore
-post_powerup_d
-  jsr delete_squarebot
-  jsr move_new_position_down
-  jsr get_tiles_d
-  lda attached_powerups
-  and #$F0
-  cmp #$10
-  bne no_booster_d
-  lda attached_powerups
-  and #$0F
-  clc
-  adc #$80
-  sta attached_powerups
-no_booster_d
-  jsr apply_powerup_logic
-  jsr update_squarebot
-  jsr update_chars
-  jsr draw_squarebot
-  jsr wait_until_next_frame
-  lda attached_powerups
-  and #$F0
-  cmp #$20
-  beq move_down
-return_d
-  rts
-remove_fall
-  lda jump_info
-  and #$00 ;landed on ground so we aren't jumping or falling
-  sta jump_info
-  jmp return_d
-
-move_left
-  lda #$0
-  sta temp ; preset temp to 0 here so collision_handler logic is simpler
-  jsr get_left
-  cmp #EXIT_CHAR ; finish level check
-  bne cont_l
-  lda #1 ; finish level
-  sta level_completed
-  sta level_reset
-  jmp return_l
-cont_l
-  jsr collision_handler ; check collision
-  bcc return_l
-  lda temp
-  cmp #$0
-  beq post_powerup_l
-  and #$F0 ; save left
-  sta temp
-  lda #$0F ; assume we hit a powerup
-  and attached_powerups+1
-  clc
-  adc temp
-  sta attached_powerups+1
-  lda #$0F ; clear left of powerup
-  and tileStore+1
-  sta tileStore+1
-post_powerup_l
-  jsr delete_squarebot ; delete character
-  jsr move_new_position_left
-  jsr get_tiles_l
-  lda attached_powerups+1
-  and #$0F
-  cmp #$01
-  bne no_booster_l
-  lda attached_powerups+1
-  and #$F0
-  clc
-  adc #$08 ; turn on the ignition
-  sta attached_powerups+1
-no_booster_l
-  jsr apply_powerup_logic
-  jsr update_squarebot ; update squarebot_position and its color pos
-  jsr update_chars ; redraw adjacent characters
-  jsr draw_squarebot ; put squarebot on screen
-  jsr wait_until_next_frame
-  lda attached_powerups+1 ; booster time, if we activated booster we move again in the same frame before handling jump logic
-  and #$0F
-  cmp #$02
-  beq move_left
-return_l
-  rts 
-
-move_right
-  lda #$0
-  sta temp ; preset temp to 0 here so collision_handler logic is simpler
-  jsr get_right
-  cmp #EXIT_CHAR ; check here if we finish the level so we can rts to game loop
-  bne cont_r
-  lda #1 ; finish level
-  sta level_completed
-  sta level_reset
-  jmp return_r 
-cont_r
-  jsr collision_handler ; check rest of collision
-  bcc return_r ; collided
-  lda temp ; check for powerup (from collision_handler)
-  cmp #$0 ; collision handler will put a 0 here unless we hit a powerup
-  beq post_powerup_r
-  and #$0F ; save right
-  sta temp
-  lda #$F0 ; its a powerup, add the powerup to attached_powerup
-  and attached_powerups+1
-  clc
-  adc temp
-  sta attached_powerups+1
-  lda #$F0  ; clear right of powerup
-  and tileStore+1
-  sta tileStore+1
-post_powerup_r
-  jsr delete_squarebot ; delete character
-  jsr move_new_position_right ; new position is where we want to move
-  jsr get_tiles_r
-  lda attached_powerups+1 ; if left powerup is readyBooster, change it to ignitedBooster, since apply_powerup_logic doesn't have directional context
-  and #$F0
-  cmp #$10
-  bne no_booster_r
-  lda attached_powerups+1
-  and #$0F
-  clc
-  adc #$80 ; turn on the ignition
-  sta attached_powerups+1
-no_booster_r
-  jsr apply_powerup_logic
-  jsr update_squarebot ; update squarebot_position and its color pos
-  jsr update_chars ; redraw adjacent characters
-  jsr draw_squarebot ; put squarebot on screen
-  jsr wait_until_next_frame
-  lda attached_powerups+1 ; booster time, if we activated booster we move again in the same frame before handling jump logic
-  and #$F0
-  cmp #$20
-  beq move_right
-return_r
   rts
 
+;-----
 collision_handler ; accumulator is the character in the position that squarebot wants to move to
 ; set carry flag if we can move to this char, otherwise clear it
 ; if its a powerup, set temp to be the attached_powerup id + attached_powerup id <<4, otherwise return since temp is already 0
@@ -342,7 +220,8 @@ collision_handler ; accumulator is the character in the position that squarebot 
   beq return_true
   cmp #PLATFORM_CHAR
   beq return_true ; moving down will double check anyway
-  ;I'll figure out ladders later
+  cmp #LADDER_CHAR
+  beq return_true ; not fully implemented though
   cmp #WALL_CHAR
   beq return_false
   cmp #BREAKABLE_WALL_CHAR
@@ -352,19 +231,19 @@ collision_handler ; accumulator is the character in the position that squarebot 
   ;else its a powerup
   cmp #BOOSTER_P_CHAR
   bne rpk
-  lda #$11 ;set both hex characters to avoid dumb shifts taking up lots of space
+  lda #$0A ;set both hex characters to avoid dumb shifts taking up lots of space
   sta temp
   jmp return_true
 rpk
   cmp #KEY_P_CHAR
   bne rps
-  lda #$33
+  lda #$0C
   sta temp
   jmp return_true
 rps
-  cmp #SPIKE_P_CHAR
+  cmp #SPIKE_P_CHAR ; not functional
   bne return_false
-  lda #$44
+  lda #$0D
   sta temp
   jmp return_true
 
@@ -376,6 +255,7 @@ return_false
   clc
   rts
 
+;-----
 fall_check
   cmp #PLATFORM_CHAR
   beq return_false
@@ -389,205 +269,195 @@ fall_check
   beq return_false
   jmp return_true;
 
+;-----
+delete_squarebot
+  jsr get_squarebot_draw_position
+
+  ldy #DELTA_U
+  lda tile_store ; up
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  ldy #DELTA_D
+  lda tile_store+1 ;down
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  ldy #DELTA_L
+  lda tile_store+2 ; left
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  ldy #DELTA_R
+  lda tile_store+3 ;right
+  sta (squarebot_position),y
+  lda #0
+
+  ldy #DELTA_M
+  lda tile_store+4 ; mid
+  sta (squarebot_position),y
+  lda #0
+  sta (squarebot_color_position),y
+
+  jsr get_squarebot_game_position
+  rts
+
+;-----
+move_new_position
+  jsr get_new_draw_position
+
+  clc
+  lda new_position
+  adc (DELTA_U),y ; y is the index of the move_dir
+  sta new_position
+  lda new_position+1
+  adc #0
+  sta new_position+1
+  clc
+  lda new_color_position
+  adc (DELTA_U),y
+  sta new_color_position
+  lda new_color_position+1
+  adc #0
+  sta new_position+1
+  clc
+  rts ; no need to undo get_new_draw_position
+
+;-----
+get_tiles
+  jsr get_new_draw_position
+
+  lda tile_store+4 ; get mid
+  lda #$01 ; eor move_dir with 1 to get opposite side
+  eor move_dir_store
+  tay
+  sta (tile_store),y ; set opposite dir
+
+  ldy move_dir_store
+  lda (tile_store),y ;get dir
+  sta tile_store+4 ; set mid
+
+  lda (DELTA_U),y
+  tay
+  lda (new_position),y ; get tile_dir
+  ldy move_dir_store
+  sta (tile_store),y  ; set tile_dir
+
+  lda #$02 ; get perpendicular tiles
+  eor move_dir_store
+  tay ; eor move_dir with 2 to get perpendicular directions
+  sta temp
+  lda (DELTA_U),y
+  tay
+  lda (new_position),y
+  ldy temp
+  sta (tile_store),y
+
+  lda #$01
+  eor temp
+  tay
+  sta temp
+  lda (DELTA_U),y
+  tay
+  lda (new_position),y
+  ldy temp
+  sta (tile_store),y
+
+  jsr get_new_game_position
+  rts
+
+;-----
 apply_powerup_logic
+  ;call prepare_logic for index temp+3 = 0,1,2, and 3. store index in temp+3 since we change y often
+  lda #$0
+  sta temp+3
+  tay
+  jsr prepare_logic
+  inc temp+3
+  jsr prepare_logic
+  inc temp+3
+  jsr prepare_logic
+  inc temp+3
+  jsr prepare_logic
+  lda #$0
+  sta temp
+  sta temp+1
+  sta temp+2
+  sta temp+3
+  tay ; clean up just to be safe
+  rts
+
+  ;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
+prepare_logic
+  ldy temp+3
+  lda (attached_powerups),y
+  sta temp
+  lda (tile_store),y
+  sta temp+1
+  lda #$01
+  eor temp+3
+  tay ; eor with 1 which gets us the tile opposite the powerup
+  lda (tile_store),y
+  sta temp+2
+  jsr powerup_logic ; perform logic
+  ldy temp+3
+  lda temp
+  sta (attached_powerups),y
+  lda temp+1
+  sta (tile_store),y
+  lda #$01
+  eor temp+3
+  tay
+  lda temp+2
+  sta (tile_store),y
+  rts
+  
 ; ready booster: does nothing
 ; ignited booster: breaks breakable walls and changes to active booster 
 ; active booster: breaks breakable walls and changes to ready booster
 ; key: spends itself to break locked walls
-  lda attached_powerups
-  sta temp
-  jsr get_up
-  asl
-  asl
-  asl
-  asl
-  sta temp+1
-  jsr get_down
-  clc
-  adc temp+1
-  sta temp+1
-  jsr power_pair_logic
+powerup_logic ;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
   lda temp
-  sta attached_powerups
-  lda temp+1
-  lsr
-  lsr
-  lsr
-  lsr
-  jsr set_up ; setting a tile effectively changes that character
-  lda temp+1
-  and #$0F
-  jsr set_down
-
-  lda attached_powerups+1
-  sta temp
-  jsr get_left
-  asl
-  asl
-  asl
-  asl
-  sta temp+1
-  jsr get_right
-  clc
-  adc temp+1
-  sta temp+1
-  jsr power_pair_logic
-  lda temp
-  sta attached_powerups+1
-  lda temp+1
-  lsr
-  lsr
-  lsr
-  lsr
-  jsr set_left
-  lda temp+1
-  and #$0F
-  jsr set_right
-  rts
-  
-power_pair_logic
-  lda temp
-  and #$F0
-  cmp #$80 ; check ignited booster
-  bne ppl1b
-  lda temp+1
-  and #$0F ; check opposite tile
+  cmp #$01 ; check ignited booster
+  bne pl_b
+  lda temp+2 ; check opposite tile
   cmp #BREAKABLE_WALL_CHAR
-  bne ppl1ab
-  lda temp+1
-  and #$F0
-  sta temp+1 ; delete wall
-ppl1ab
-  lda temp
-  and #$0F
-  clc
-  adc #$20 ; set active booster
+  bne pl_ab
+  lda #$00
+  sta temp+2 ; delete wall
+pl_ab
+  lda #$0B ; set active booster
   sta temp
-  jmp ppl2
-ppl1b
-  cmp #$20 ; check active booster
-  bne ppl1k
-  lda temp+1
-  and #$0F ; check opposite tile
+  jmp pl_return
+pl_b
+  cmp #$0B ; check active booster
+  bne pl_k
+  lda temp+2 ; check opposite tile
   cmp #BREAKABLE_WALL_CHAR
-  bne ppl1rb
-  lda temp+1
-  and #$F0
-  sta temp+1 ; delete wall
-ppl1rb
-  lda temp
-  and #$0F
-  clc
-  adc #$10 ; set ready booster
+  bne pl_rb
+  lda #$00
+  sta temp+2 ; delete wall
+pl_rb
+  lda #$0A ; set ready booster
   sta temp
-  jmp ppl2
-ppl1k
-  cmp #$30 ; check key
-  bne ppl2
+  jmp pl_return
+pl_k
+  cmp #$0C ; check key, slightly unnecessary
+  bne pl_return
   lda temp+1
-  and #$F0
-  cmp #[LOCKED_WALL_CHAR << 4]
-  bne ppl2
-  lda temp
-  and #$0F
-  sta temp ; delete key
-  lda temp+1
-  and #$0F
-  sta temp+1 ; delete wall
-  jmp ppl2
-
-ppl2
-  lda temp
-  and #$0F
-  cmp #$08 ; check ignited booster
-  bne ppl2b
-  lda temp+1
-  and #$F0
-  cmp #[BREAKABLE_WALL_CHAR << 4]
-  bne ppl2ab
-  lda temp+1
-  and #$0F
-  sta temp+1 ; delete wall
-ppl2ab
-  lda temp
-  and #$F0
-  clc
-  adc #$02 ; set active booster
-  sta temp
-  jmp pplend
-ppl2b
-  cmp #$02 ; check active booster
-  bne ppl2k
-  lda temp+1
-  and #$F0
-  cmp #[BREAKABLE_WALL_CHAR << 4]
-  bne ppl2rb
-  lda temp+1
-  and #$0F
-  sta temp+1 ; delete wall
-ppl2rb
-  lda temp
-  and #$F0
-  clc
-  adc #$01 ; set ready booster
-  sta temp
-  jmp pplend
-ppl2k
-  cmp #$03 ; key
-  bne pplend
-  lda temp+1
-  and #$0F
   cmp #LOCKED_WALL_CHAR
-  bne pplend
-  lda temp
-  and #$F0
+  bne pl_return
+  lda #$00
   sta temp ; delete key
-  lda temp+1
-  and #$F0
   sta temp+1 ; delete wall
-  jmp pplend
+  jmp pl_return
+pl_return
+  rts ;-64 lines optimized
 
-pplend
-  rts
-
-
-delete_squarebot
-  jsr get_squarebot_draw_position
-
-  ldy #[ROW_SIZE + 1]
-  jsr get_mid
-  sta (squarebot_position),y
-  lda #0
-  sta (squarebot_color_position),y
-
-  ldy #1
-  jsr get_up
-  sta (squarebot_position),y
-  lda #0
-  sta (squarebot_color_position),y
-
-  ldy #[[ROW_SIZE*2] + 1]
-  jsr get_down
-  sta (squarebot_position),y
-  lda #0
-  sta (squarebot_color_position),y
-
-  ldy #ROW_SIZE
-  jsr get_left
-  sta (squarebot_position),y
-  lda #0
-  sta (squarebot_color_position),y
-
-  ldy #[ROW_SIZE + 2]
-  jsr get_right
-  sta (squarebot_position),y
-  lda #0
-
-  jsr get_squarebot_game_position
-
-  rts
-
-
+;-----
 update_squarebot
   lda new_position
   sta squarebot_position
@@ -600,112 +470,50 @@ update_squarebot
   sta squarebot_color_position+1
   rts
 
+;-----
+update_chars ; chareor = tile*8,   chareor+1 = powerup*8,   chareor+2 = char*8
+  ldy #$0
+  sty temp+1 ; x and temp are being used by update_char
 
-update_chars
-  jsr get_up
+update_char_dir_loop
+  lda (tile_store),y
   asl
   asl
-  asl ; multiply by 8
-  sta charandr
-  lda attached_powerups
-  lsr
-  lsr
-  lsr
-  lsr
-  cmp #0
-  beq update_char_u
-  clc
-  adc #$8
+  asl ; multiply by 8 since there are 8 bytes per character
+  sta chareor
+  lda (attached_powerups),y
+  ;add index for rotation
   asl
   asl
-  asl ; we could simplify this but at this rate a few more asls isn't going to be the main thing slowing down the code
-update_char_u
-  sta charandr+1
-  lda #[CHAR_U << 3]
-  sta charandr+2
+  asl
+  sta chareor+1
+  lda (CHAR_U),y
+  asl
+  asl
+  asl
+  sta chareor+2
   jsr update_char
-  ;keep in mind we haven't rotated it yet
+  inc temp+1
+  ldy temp+1
 
-  jsr get_down
-  asl
-  asl
-  asl
-  sta charandr
-  lda attached_powerups
-  and $0F
-  cmp #0
-  beq update_char_d
-  clc
-  adc #$8
-  asl
-  asl
-  asl
-update_char_d
-  sta charandr+1
-  lda #[CHAR_D << 3]
-  sta charandr+2
-  jsr update_char
+  cpy #4
+  bne update_char_dir_loop
 
-  jsr get_left
-  asl
-  asl
-  asl
-  sta charandr
-  lda attached_powerups+1
-  lsr
-  lsr
-  lsr
-  lsr
-  cmp #0
-  beq update_char_l
-  clc
-  adc #$8
-  asl
-  asl
-  asl
-update_char_l
-  sta charandr+1
-  lda #[CHAR_L << 3]
-  sta charandr+2
-  jsr update_char
+  rts
 
-  jsr get_right
-  asl
-  asl
-  asl
-  sta charandr
-  lda attached_powerups+1
-  and $0F
-  cmp #0
-  beq update_char_r
-  adc #$8
-  asl
-  asl
-  asl
-update_char_r
-  sta charandr+1
-
-  lda #[CHAR_R << 3]
-  sta charandr+2
-
-  jsr update_char
-
-  rts ;casual 98 line function
-
-
-update_char
-  ldx #0
+update_char ; chareor = tile*8,   chareor+1 = powerup*8,   chareor+2 = char*8
+  ldx #0 ; x is the incrementer
 update_char_loop
   txa
   clc
-  adc charandr
+  adc chareor
   tay
   lda (#character_set_begin),y
   sta temp
 
   txa
   clc
-  adc charandr+1
+  adc chareor+1
   tay
   lda (#character_set_begin),y
   eor temp
@@ -713,7 +521,7 @@ update_char_loop
 
   txa
   clc
-  adc charandr+2
+  adc chareor+2
   tay
   lda temp
   sta (#character_set_begin),y
@@ -721,6 +529,7 @@ update_char_loop
   inx
   cpx #8
   bne update_char_loop
+
   rts
 
 ; if there is a powerup:
@@ -729,6 +538,7 @@ update_char_loop
 ; eor with powerup tile byte
 ; store in char byte
 
+;-----
 draw_squarebot
   jsr get_squarebot_draw_position
 
@@ -764,26 +574,3 @@ draw_squarebot
 
   jsr get_squarebot_game_position
   rts
-
-;real how it works:
-
-;l/r movement:
-;store l/r tile you want to move to
-;if you win, win
-;check collision:
-;  store powerup in temp
-;  return whether you can move or not
-;if you can't move, goto j/f movement
-;apply powerup
-;get new position
-;refresh tiles
-;apply powerup logic
-;delete old position
-;update position
-;redraw chars
-;draw new position
-;wait a jiffy maybe
-;check booster
-;
-;j/f movement
-;do similar thing

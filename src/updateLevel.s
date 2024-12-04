@@ -89,12 +89,21 @@ continue_update
   sty level_data_index
 
   lda #0
-  sta jump_info
+  sta jump_num
+  sta jump_dir
   sta attached_powerups
   sta attached_powerups+1
-  sta tileStore
-  sta tileStore+1
-  sta tileStore+2
+  sta attached_powerups+2
+  sta attached_powerups+3
+  sta tile_store
+  sta tile_store+1
+  sta tile_store+2
+  sta tile_store+3
+  sta tile_store+4
+  sta temp
+  sta temp+1
+  sta temp+2
+  sta temp+3
 
   ; draw (or redraw on reset) the current level
 draw_level_loop
