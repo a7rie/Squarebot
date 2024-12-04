@@ -26,6 +26,9 @@ attached_powerups ds.b 4
 temp ds.b 4 ; for temporary storage of things. mainly used in updateGameState
 move_dir_store ds.b 1 ; exclusively for move_dir and related subroutines
 chareor ds.b 3 ; for the incredibly complex operation of eoring chars
+count_chars_drawn ds.b 1 ; count number of chars drawn on screen in the current run
+temp_a ds.b 1 ; store acc
+temp_x ds.b 1 ; store x
   seg
 
 ; constants
@@ -155,7 +158,7 @@ check_for_reset_key_return
   include "updateGameStateHelper.s"
 
 compressed_screen_data_start
-  incbin "../data/titleScreenData_compressed" ; got via 'bsave ""'
+  incbin "../data/jesseTitleScreen_compressed" ; got via 'bsave ""'
 
 level_data_start
   incbin "../data/levels/binary_levels/jesse_1"

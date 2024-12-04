@@ -47,7 +47,12 @@ CHAR_D = $0F
 CHAR_L = $10
 CHAR_R = $11
 SQUAREBOT_CHAR = $12
-
+LEVEL_BEGINNING_LOW_BYTE = $17
+LEVEL_BEGINNING_HIGH_BYTE = $1e
+LEVEL_COLOR_BEGINNING_LOW_BYTE = $17
+LEVEL_COLOR_BEGINNING_HIGH_BYTE = $96
+END_OF_LEVEL_LOW_BYTE = $e5
+END_OF_LEVEL_HIGH_BYTE = $1f
 
 update_level
   ; check if the level is completed; set current_level to next_level if so
@@ -65,6 +70,9 @@ update_level
   lda next_level+1
   sta current_level+1
 
+  lda #0
+  sta count_chars_drawn
+
 dont_update
 ; now check if level reset was set
   lda level_reset
@@ -74,14 +82,14 @@ dont_update
 
 continue_update
   ; if it was, update the level
-  lda #SCREEN_CURSOR_BEGINNING_LOW_BYTE
+  lda #LEVEL_BEGINNING_LOW_BYTE
   sta screen_cursor
-  lda #SCREEN_CURSOR_BEGINNING_HIGH_BYTE
+  lda #LEVEL_BEGINNING_HIGH_BYTE
   sta screen_cursor+1
 
-  lda #COLOR_CURSOR_BEGINNING_LOW_BYTE
+  lda #LEVEL_COLOR_BEGINNING_LOW_BYTE
   sta color_cursor
-  lda #COLOR_CURSOR_BEGINNING_HIGH_BYTE
+  lda #LEVEL_COLOR_BEGINNING_HIGH_BYTE
   sta color_cursor+1
 
   ldx #0
@@ -108,6 +116,9 @@ continue_update
   ; draw (or redraw on reset) the current level
 draw_level_loop
 ; y stores our index in the current level data
+  jsr check_if_level_cursor_at_end
+  bcs update_level_return
+
   ldy level_data_index
   lda (current_level),y ; accumulator stores the number of times to repeat the next byte  
 
@@ -117,12 +128,10 @@ draw_level_loop
   iny ; set y to point to next length byte (iterate 2 at a time)
   iny
   sty level_data_index
+  jmp draw_level_loop
 
 
-  jsr check_if_screen_cursor_at_end
-  bcc draw_level_loop
-
-
+update_level_return
   ; update next level pointer to point to byte after current level
   lda current_level
   clc
@@ -277,4 +286,41 @@ draw_char_in_accumulator
   sta (color_cursor),y
 
   jsr add_one_to_screen_cursor ; add to both screen and color cursor
+  jsr update_screen_position_if_on_border
   rts
+
+
+
+update_screen_position_if_on_border
+  lda count_chars_drawn
+  cmp #19
+  bne add_and_return
+  lda #0
+  sta count_chars_drawn
+  jsr add_one_to_screen_cursor
+  jsr add_one_to_screen_cursor
+  rts
+
+  
+add_and_return
+  clc
+  adc #1
+  sta count_chars_drawn
+  rts
+
+check_if_level_cursor_at_end ; set carry flag if screen_cursor at position $1ff9 (8185
+  lda screen_cursor ; load value at screen_cursor low byte
+  cmp #END_OF_LEVEL_LOW_BYTE
+  bne check_if_level_cursor_at_end_return_false ; if low byte doesnt match, return with carry flag as neg
+  
+  lda screen_cursor+1
+  cmp #END_OF_LEVEL_HIGH_BYTE
+  beq check_if_level_cursor_at_end_return_true ; if high byte matches, set carry flag
+
+check_if_level_cursor_at_end_return_false
+  clc
+  rts
+
+check_if_level_cursor_at_end_return_true
+  sec
+  rts 
