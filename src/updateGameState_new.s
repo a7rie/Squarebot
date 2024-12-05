@@ -16,7 +16,7 @@ jump_logic
   lda jump_num
   cmp #$00
   beq fall_logic
-  ldy #0 ; up
+  ldx #0 ; up
   jsr move_dir
   bcs j_cont ; jump successful
   lda #$00 ; jump failed
@@ -30,14 +30,14 @@ j_left
   cmp #$01
   bne j_right
   jsr wait_until_next_frame
-  ldy #2 ; left
+  ldx #2 ; left
   jsr move_dir
   jmp update_return
 j_right
   cmp #$02
   bne update_return
   jsr wait_until_next_frame
-  ldy #3 ; right
+  ldx #3 ; right
   jsr move_dir
   jmp update_return
 
@@ -45,7 +45,7 @@ fall_logic
   lda tile_store+1 ; down
   jsr fall_check ; check if we hit the ground, different from collision_handler since platforms are included
   bcc check_if_space_pressed
-  ldy #1 ; down
+  ldx #1 ; down
   jsr move_dir
   lda tile_store+1 ; check if we hit ground again, if we didn't we can move in the jump_dir
   jsr fall_check
@@ -58,14 +58,14 @@ f_left
   cmp #$01
   bne f_right
   jsr wait_until_next_frame
-  ldy #2 ; left
+  ldx #2 ; left
   jsr move_dir
   jmp update_return
 f_right
   cmp #$02
   bne update_return
   jsr wait_until_next_frame
-  ldy #3 ; right
+  ldx #3 ; right
   jsr move_dir
   jmp update_return
 
@@ -82,7 +82,7 @@ check_if_space_pressed
   lda currently_pressed_key
   cmp #SPACE_KEY
   bne check_if_q_pressed
-  ldy #0 ; up
+  ldx #0 ; up
   jsr move_dir
   bcc update_return ; jump failed
   lda #JUMP_SIZE
@@ -95,7 +95,7 @@ check_if_q_pressed
   lda currently_pressed_key
   cmp #Q_KEY
   bne check_if_e_pressed
-  ldy #0 ; up
+  ldx #0 ; up
   jsr move_dir
   bcc update_return ; jump failed
   lda #JUMP_SIZE
@@ -103,14 +103,14 @@ check_if_q_pressed
   lda #$01
   sta jump_dir
   jsr wait_until_next_frame
-  ldy #2 ; left
+  ldx #2 ; left
   jsr move_dir
   jmp update_return
 
 check_if_e_pressed
   cmp #E_KEY
   bne check_if_a_pressed
-  ldy #0 ; up
+  ldx #0 ; up
   jsr move_dir
   bcc update_return ; jump failed
   lda #JUMP_SIZE
@@ -118,21 +118,21 @@ check_if_e_pressed
   lda #$02
   sta jump_dir
   jsr wait_until_next_frame
-  ldy #3 ; right
+  ldx #3 ; right
   jsr move_dir
   jmp update_return
 
 check_if_a_pressed
   cmp #A_KEY
   bne check_if_d_pressed
-  ldy #2 ; left
+  ldx #2 ; left
   jsr move_dir
   jmp update_return
 
 check_if_d_pressed
   cmp #D_KEY
   bne update_return
-  ldy #3 ; right
+  ldx #3 ; right
   jsr move_dir
   jmp update_return
 
@@ -163,8 +163,8 @@ check_if_d_pressed
 ;wait a jiffy maybe
 ;check booster if we move again
 move_dir
-  sty move_dir_store
-  lda (tile_store),y ; load colliding tile
+  stx move_dir_store
+  lda tile_store_addr,x ; load colliding tile
   cmp #EXIT_CHAR
   bne cont_move
   lda #1 ; level complete
@@ -177,22 +177,22 @@ cont_move
   lda temp ; if we hit a powerup this will be its id
   cmp #$00
   beq post_powerup_move
-  sta (attached_powerups),y ; attach powerup
+  sta attached_powerups_addr,x ; attach powerup
   lda #$00
-  sta (tile_store),y ; remove the powerup tile from the level
+  sta tile_store_addr,x ; remove the powerup tile from the level
 post_powerup_move
   jsr delete_squarebot
-  ldy move_dir_store
+  ldx move_dir_store
   jsr move_new_position
   jsr get_tiles
   lda #$01 ; eor y with 1 to get opposite side
   eor move_dir_store
-  tay
-  lda (attached_powerups),y ; ignite ready booster
+  tax
+  lda attached_powerups_addr,x ; ignite ready booster
   cmp #$0A
   bne post_booster
   lda #$01
-  sta (attached_powerups),y
+  sta attached_powerups_addr,x
 post_booster
   jsr apply_powerup_logic
   jsr update_squarebot
@@ -201,10 +201,10 @@ post_booster
   jsr wait_until_next_frame
   lda #$01 ; eor y with 1 to get opposite side
   eor move_dir_store
-  tay
-  lda (attached_powerups),y
+  tax
+  lda attached_powerups_addr,x
   cmp #$0B
-  ldy move_dir_store
+  ldx move_dir_store
   beq move_dir ; if booster activated go again
   sec
   rts ; return true move
@@ -272,35 +272,18 @@ fall_check
 ;-----
 delete_squarebot
   jsr get_squarebot_draw_position
+  ldx #$0
 
-  ldy #DELTA_U
-  lda tile_store ; up
+delete_loop
+  ldy delta_addr,x
+  lda tile_store_addr,X
   sta (squarebot_position),y
-  lda #0
+  lda #0 ; EVERYTHING IS BLACK
   sta (squarebot_color_position),y
 
-  ldy #DELTA_D
-  lda tile_store+1 ;down
-  sta (squarebot_position),y
-  lda #0
-  sta (squarebot_color_position),y
-
-  ldy #DELTA_L
-  lda tile_store+2 ; left
-  sta (squarebot_position),y
-  lda #0
-  sta (squarebot_color_position),y
-
-  ldy #DELTA_R
-  lda tile_store+3 ;right
-  sta (squarebot_position),y
-  lda #0
-
-  ldy #DELTA_M
-  lda tile_store+4 ; mid
-  sta (squarebot_position),y
-  lda #0
-  sta (squarebot_color_position),y
+  inx
+  cpx #5
+  bne delete_loop
 
   jsr get_squarebot_game_position
   rts
@@ -311,14 +294,14 @@ move_new_position
 
   clc
   lda new_position
-  adc (DELTA_U),y ; y is the index of the move_dir
+  adc delta_addr,x ; x is the index of the move_dir
   sta new_position
   lda new_position+1
   adc #0
   sta new_position+1
   clc
   lda new_color_position
-  adc (DELTA_U),y
+  adc delta_addr,x
   sta new_color_position
   lda new_color_position+1
   adc #0
@@ -333,38 +316,33 @@ get_tiles
   lda tile_store+4 ; get mid
   lda #$01 ; eor move_dir with 1 to get opposite side
   eor move_dir_store
-  tay
-  sta (tile_store),y ; set opposite dir
+  tax
+  sta tile_store_addr,x ; set opposite dir
 
-  ldy move_dir_store
-  lda (tile_store),y ;get dir
+  ldx move_dir_store
+  lda tile_store_addr,x ;get dir
   sta tile_store+4 ; set mid
 
-  lda (DELTA_U),y
+  lda delta_addr,x
   tay
   lda (new_position),y ; get tile_dir
-  ldy move_dir_store
-  sta (tile_store),y  ; set tile_dir
+  sta tile_store_addr,x  ; set tile_dir
 
   lda #$02 ; get perpendicular tiles
   eor move_dir_store
-  tay ; eor move_dir with 2 to get perpendicular directions
-  sta temp
-  lda (DELTA_U),y
+  tax ; eor move_dir with 2 to get perpendicular directions
+  lda delta_addr,x
   tay
   lda (new_position),y
-  ldy temp
-  sta (tile_store),y
+  sta tile_store_addr,x
 
-  lda #$01
-  eor temp
-  tay
-  sta temp
-  lda (DELTA_U),y
+  lda #$03
+  eor move_dir_store
+  tax
+  lda delta_addr,x
   tay
   lda (new_position),y
-  ldy temp
-  sta (tile_store),y
+  sta tile_store_addr,x
 
   jsr get_new_game_position
   rts
@@ -374,7 +352,7 @@ apply_powerup_logic
   ;call prepare_logic for index temp+3 = 0,1,2, and 3. store index in temp+3 since we change y often
   lda #$0
   sta temp+3
-  tay
+  tax
   jsr prepare_logic
   inc temp+3
   jsr prepare_logic
@@ -387,32 +365,32 @@ apply_powerup_logic
   sta temp+1
   sta temp+2
   sta temp+3
-  tay ; clean up just to be safe
+  tax ; clean up just to be safe
   rts
 
   ;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
 prepare_logic
-  ldy temp+3
-  lda (attached_powerups),y
+  ldx temp+3
+  lda attached_powerups_addr,x
   sta temp
-  lda (tile_store),y
+  lda tile_store_addr,x
   sta temp+1
   lda #$01
   eor temp+3
-  tay ; eor with 1 which gets us the tile opposite the powerup
-  lda (tile_store),y
+  tax ; eor with 1 which gets us the tile opposite the powerup
+  lda tile_store_addr,x
   sta temp+2
   jsr powerup_logic ; perform logic
-  ldy temp+3
+  ldx temp+3
   lda temp
-  sta (attached_powerups),y
+  sta attached_powerups_addr,x
   lda temp+1
-  sta (tile_store),y
+  sta tile_store_addr,x
   lda #$01
   eor temp+3
-  tay
+  tax
   lda temp+2
-  sta (tile_store),y
+  sta tile_store_addr,x
   rts
   
 ; ready booster: does nothing
@@ -472,29 +450,29 @@ update_squarebot
 
 ;-----
 update_chars ; chareor = tile*8,   chareor+1 = powerup*8,   chareor+2 = char*8
-  ldy #$0
-  sty temp+1 ; x and temp are being used by update_char
+  ldx #$0
+  stx temp
 
 update_char_dir_loop
-  lda (tile_store),y
+  lda tile_store_addr,x
   asl
   asl
   asl ; multiply by 8 since there are 8 bytes per character
   sta chareor
-  lda (attached_powerups),y
+  lda attached_powerups_addr,x
   ;add index for rotation
   asl
   asl
   asl
   sta chareor+1
-  lda (CHAR_U),y
+  lda chars_addr,x
   asl
   asl
   asl
   sta chareor+2
   jsr update_char
-  inc temp+1
-  ldy temp+1
+  inc temp
+  ldx temp
 
   cpy #4
   bne update_char_dir_loop
@@ -502,28 +480,29 @@ update_char_dir_loop
   rts
 
 update_char ; chareor = tile*8,   chareor+1 = powerup*8,   chareor+2 = char*8
-  ldx #0 ; x is the incrementer
+  lda #0
+  sta temp+1
 update_char_loop
-  txa
+  lda temp+1
   clc
   adc chareor
   tay
   lda (#character_set_begin),y
-  sta temp
+  sta temp+2
 
-  txa
+  lda temp+1
   clc
   adc chareor+1
   tay
   lda (#character_set_begin),y
-  eor temp
-  sta temp
+  eor temp+2
+  sta temp+2
 
-  txa
+  lda temp+1
   clc
   adc chareor+2
   tay
-  lda temp
+  lda temp+2
   sta (#character_set_begin),y
 
   inx
@@ -542,32 +521,32 @@ update_char_loop
 draw_squarebot
   jsr get_squarebot_draw_position
 
-  lda #CHAR_U
-  ldy #DELTA_U
+  lda #chars ;u
+  ldy #delta
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
-  lda #CHAR_D
-  ldy #DELTA_D
+  lda #chars+1
+  ldy #delta+1 ;d
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
-  lda #CHAR_L
-  ldy #DELTA_L
+  lda #chars+2
+  ldy #delta+2 ;l
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
-  lda #CHAR_R
-  ldy #DELTA_R
+  lda #chars+3
+  ldy #delta+3 ;r
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
   lda #SQUAREBOT_CHAR
-  ldy #DELTA_M
+  ldy #delta+4 ;m
   sta (squarebot_position),y
   lda #SQUAREBOT_COLOR
   sta (squarebot_color_position),y

@@ -23,6 +23,8 @@ tile_store ds.b 5
 ;colorStore ds.b 5 ; U, D, L, R, M  not the most efficient storage but it needs to also be efficient to decompress
 attached_powerups ds.b 4
 ; $0=none  $1=ignitedBooster $A=readyBooster  $B=activeBooster  $C=key  $D=spike(change into shield)
+delta ds.b 5 ; U D L R M
+chars ds.b 4
 temp ds.b 4 ; for temporary storage of things. mainly used in updateGameState
 move_dir_store ds.b 1 ; exclusively for move_dir and related subroutines
 chareor ds.b 3 ; for the incredibly complex operation of eoring chars
@@ -58,17 +60,16 @@ RESET_KEY = $0a ; press R to restart level i assume
 JUMP_SIZE = $01 ; number of characters a jump causes
 ROW_SIZE = $16
 
-DELTA_U = $01 ;1
-DELTA_D = $33 ;rowsize+rowsize+1
-DELTA_L = $16 ;rowsize
-DELTA_R = $18 ;rowsize+2
-DELTA_M = $17 ;rowsize+1
 ; memory locations
 user_memory_start = $1001
 currently_pressed_key =  $c5
 jiffy_clock = $A0
 character_info_register = $9005
 character_set_begin = $1c00
+tile_store_addr = $16
+attached_powerups_addr = $1b
+delta_addr = $1f
+chars_addr = $24
 
   ; begin location counter at 4096 (user memory)
   org user_memory_start
@@ -106,6 +107,24 @@ start
   sta temp+1
   sta temp+2
   sta temp+3
+  lda #$01 ; deltas to access adjacent tiles
+  sta delta
+  lda #$33
+  sta delta+1
+  lda #$16
+  sta delta+2
+  lda #$18
+  sta delta+3
+  lda #$17
+  sta delta+4
+  lda #$0E ; index of powerup characters
+  sta chars
+  lda #$0F
+  sta chars+1
+  lda #$10
+  sta chars+2
+  lda #$11
+  sta chars+3
 
   include "titleScreen.s"
 
