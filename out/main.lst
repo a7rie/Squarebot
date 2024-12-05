@@ -1,4 +1,4 @@
-------- FILE main.s LEVEL 1 PASS 3
+------- FILE src/main.s LEVEL 1 PASS 3
       1  1c50 ????						; title screen program -- use hand-made compression method (esentially just RLE, see rleEncoding.py)
       2  1c50 ????				      processor	6502
       3  1c50 ????
@@ -54,7 +54,7 @@
      53  1c50 ????
      54  1c50 ????						; memory locations
      55  1c50 ????	       10 01	   user_memory_start =	$1001
-     56  1c50 ????	       00 c5	   currently_pressed_key =	$c5	;proposed fix: mem editor 028 abc space bar loops
+     56  1c50 ????	       00 c5	   currently_pressed_key =	$c5
      57  1c50 ????	       00 a0	   jiffy_clock =	$A0
      58  1c50 ????	       90 05	   character_info_register =	$9005
      59  1c50 ????	       1c 00	   character_set_begin =	$1c00
@@ -71,7 +71,7 @@
       6  1005		       9e 34 31 30*	      dc.b	SYS_CMD_TOKEN, [start]d, 0	; token for sys with operand as address to "start" label
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
-------- FILE main.s
+------- FILE src/main.s
      64  100d
      65  100d				   start
      66  100d		       a9 0e		      LDA	#14	; black screen blue border
@@ -213,7 +213,7 @@
     111  10b2		       38		      sec
     112  10b3		       60		      rts
     113  10b4
-------- FILE main.s
+------- FILE src/main.s
      91  10b4
      92  10b4
      93  10b4							; title screen code jumps here once space pressed
@@ -527,7 +527,7 @@
     261  1207
     262  1207		       20 89 10 	      jsr	add_one_to_screen_cursor	; add to both screen and color cursor
     263  120a		       60		      rts
-------- FILE main.s
+------- FILE src/main.s
 ------- FILE updateGameState.s LEVEL 2 PASS 3
       0  120b					      include	"updateGameState.s"
       1  120b
@@ -854,7 +854,7 @@
     322  13ba		       a5 14		      lda	squarebot_color_position+1
     323  13bc		       85 0f		      sta	new_color_position+1
     324  13be		       60		      rts
-------- FILE main.s
+------- FILE src/main.s
     141  13bf
     142  13bf				   compressed_screen_data_start
     143  13bf					      incbin	"../data/titleScreenData_compressed"	; got via 'bsave ""'
@@ -887,7 +887,7 @@
       6  15e3				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
       7  15e3				  -	      err
       8  15e3					      endif
-------- FILE main.s
+------- FILE src/main.s
     162  15e3
     163  15e3
     164  1c00					      org	character_set_begin

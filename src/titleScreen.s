@@ -1,4 +1,5 @@
-WHITE_COLOR_CODE = 1
+TITLE_SCREEN_CHAR_COLOR = 0
+ENTER_KEY = $0f
 
 display_title_screen
   lda #SCREEN_CURSOR_BEGINNING_LOW_BYTE
@@ -17,6 +18,7 @@ display_title_screen
   jsr draw_title_screen_chars_loop
   ldy #$0 ; to use for indirect indexed addressing
   ldx #$0
+
 
 infinite_loop
   lda currently_pressed_key
@@ -47,12 +49,13 @@ draw_character
   ldy #0 
   lda compressed_screen_data_start+1,X ; load cur char to draw
 
+; solid block in the title screen editor is the a0 character; we convert that to the equivalent here (wall), as we cant access that char
   cmp #$a0
-  bne dont_convert_a0_to_3
-  lda #129
+  bne dont_map_wall
+  lda #WALL_CHAR-128
   clc
 
-dont_convert_a0_to_3
+dont_map_wall
   adc #128
   sta (screen_cursor),Y ; draw it on screen
 
@@ -63,7 +66,7 @@ dont_convert_a0_to_3
   cmp #BLANK_CHAR
   beq dont_color
 
-  lda #WHITE_COLOR_CODE
+  lda #TITLE_SCREEN_CHAR_COLOR
   sta (color_cursor),Y
 
 dont_color
@@ -110,4 +113,3 @@ check_if_screen_cursor_at_end_return_false
 check_if_screen_cursor_at_end_return_true
   sec
   rts 
-
