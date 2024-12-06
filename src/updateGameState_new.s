@@ -99,16 +99,12 @@ check_if_e_pressed
 check_if_a_pressed
   cmp #A_KEY
   bne check_if_d_pressed
-  lda #$10
-  sta jump_info ; fall left if we go off a ledge
   jsr move_left
   jmp update_return
 
 check_if_d_pressed
   cmp #D_KEY
   bne update_return
-  lda #$20
-  sta jump_info ; fall right if we go off a ledge
   jsr move_right
   jmp update_return
 
