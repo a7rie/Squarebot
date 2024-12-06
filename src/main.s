@@ -203,7 +203,7 @@ level_data_start
   BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; wall 3
   BYTE 0,60,98,94,86,102,60,0 ; exit (door) 4
   BYTE 255,129,157,161,173,153,129,255 ; locked exit 5
-  BYTE 255,231,219,219,129,153,129,255 ; locked wall 6
+  BYTE 255,231,219,219,129,129,129,255 ; locked wall 6
   BYTE $FF, $EE, $F1, $EF, $57, $8F, $F3, $FF ; breakable wall 7
   BYTE 18,214,124,63,252,62,107,72 ; spike ball 8                     PETSCII WHY?? I CAN'T READ THIS!
   BYTE 24,60,60,60,126,82,8,36 ; booster powerup 9
