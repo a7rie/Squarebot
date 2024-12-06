@@ -78,9 +78,9 @@
       0  1001					      include	"stub.s"	; stub contains BASIC sys cmd to run the machine language code
       1  1001		       00 9e	   SYS_CMD_TOKEN =	$9e
       2  1001		       00 0a	   STUB_LINE_NUMBER =	10
-      3  1001							; BASIC stub -- SYS cmd to run machine language 
+      3  1001							; BASIC stub -- SYS cmd to run machine language
       4  1001		       0b 10		      dc.w	nextstmt	; link; beginning of basic
-      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number 
+      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number
       6  1005		       9e 34 31 30*	      dc.b	SYS_CMD_TOKEN, [start]d, 0	; token for sys with operand as address to "start" label
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
@@ -433,7 +433,7 @@
     124  1192		       b0 10		      bcs	update_level_return
     125  1194
     126  1194		       a4 0a		      ldy	level_data_index
-    127  1196		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
+    127  1196		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte
     128  1198
     129  1198		       20 b2 11 	      jsr	draw_sequence
     130  119b
@@ -1055,7 +1055,7 @@
     405  151e		       60		      rts
     406  151f
     407  151f							; ready booster: does nothing
-    408  151f							; ignited booster: breaks breakable walls and changes to active booster 
+    408  151f							; ignited booster: breaks breakable walls and changes to active booster
     409  151f							; active booster: breaks breakable walls and changes to ready booster
     410  151f							; key: spends itself to break locked walls
     411  151f				   powerup_logic		;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
@@ -1136,7 +1136,7 @@
     486  1591		       b5 1b		      lda	attached_powerups_addr,x
     487  1593		       c9 00		      cmp	#$00
     488  1595		       f0 03		      beq	no_powerup
-    489  1597		       18		      clc		;add index for rotation 
+    489  1597		       18		      clc		;add index for rotation
     490  1598		       65 28		      adc	temp
     491  159a				   no_powerup
     492  159a		       0a		      asl
@@ -1340,7 +1340,7 @@
     218  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 10
     219  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 11
     220  1c90		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 12
-    221  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13 
+    221  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13
     222  1ca0
     223  1ca0							; attachments
     224  1ca0		       00 00 00 00*	      BYTE.b	0,0,0,0,195,126,126,60	; ready booster attachment up 14

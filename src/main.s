@@ -194,10 +194,10 @@ level_data_start
   incbin "../data/levels/binary_levels/jesse_5"
   incbin "../data/levels/binary_levels/jesse_6"
   incbin "../data/levels/binary_levels/jesse_7"
-
+  ; byte 2469
   ;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
 
-  org character_set_begin
+  org character_set_begin ; starts at byte 3079 i think
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; blank 0
   BYTE $7E, $42, $7E, $42, $7E, $42, $7E, $42 ; ladder 1
   BYTE $FF, $5A, $00, $00, $00, $00, $00, $00 ; platform 2
@@ -251,13 +251,10 @@ level_data_start
   BYTE 255,0,0,0,0,0,0,255 ;2D
   BYTE 7,0,0,0,0,0,0,255 ;2E
   BYTE 129,193,1,1,1,1,1,255 ;2F
-  
+  ;byte 3455
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
-
-  ;assume levels have borders
+  ;possible optimizations:
   ;shift character set begin as far as i can
-  ;get rid of half-bytes
-  ;16 bit arithmetic
-  ;storing attachments in each rotation
-  ;store delta in an array so you can have a dynamic function that draws each character.
+  ;generalize 16 bit arithmetic
+  ;reuse switch statements
