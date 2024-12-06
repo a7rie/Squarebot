@@ -1,5 +1,8 @@
 # Squarebot
 
+*This version of Squarebot is a more traditional, much simpler 2D puzzle platformer. It shares a lot of code with the main branch version of
+Squarebot, but the main difference is that this version of the game contains no attachable powerups.*
+
 Retro puzzle game for the unexpanded VIC-20, written in 6502 Assembly. Developed by Amin Elnasri, Jesse Dirks, and Gui Marques.
 
 
