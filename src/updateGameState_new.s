@@ -60,6 +60,8 @@ update_return
   rts
 
 check_if_space_pressed
+  lda #$00
+  sta jump_info ; double check we aren't falling in a direction
   lda currently_pressed_key
   cmp #SPACE_KEY
   bne check_if_q_pressed
@@ -71,7 +73,6 @@ check_if_space_pressed
   jmp update_return
 
 check_if_q_pressed
-  lda currently_pressed_key
   cmp #Q_KEY
   bne check_if_e_pressed
   lda #JUMP_SIZE
@@ -98,12 +99,16 @@ check_if_e_pressed
 check_if_a_pressed
   cmp #A_KEY
   bne check_if_d_pressed
+  lda #$10
+  sta jump_info ; fall left if we go off a ledge
   jsr move_left
   jmp update_return
 
 check_if_d_pressed
   cmp #D_KEY
   bne update_return
+  lda #$20
+  sta jump_info ; fall right if we go off a ledge
   jsr move_right
   jmp update_return
 
@@ -139,8 +144,8 @@ cont_u
   adc temp
   sta attached_powerups
   lda #$0F
-  and tileStore
-  sta tileStore
+  and tile_store
+  sta tile_store
 post_powerup_u
   jsr delete_squarebot
   jsr move_new_position_up
@@ -198,8 +203,8 @@ cont_d
   adc temp
   sta attached_powerups
   lda #$F0
-  and tileStore
-  sta tileStore
+  and tile_store
+  sta tile_store
 post_powerup_d
   jsr delete_squarebot
   jsr move_new_position_down
@@ -226,8 +231,7 @@ no_booster_d
 return_d
   rts
 remove_fall
-  lda jump_info
-  and #$00 ;landed on ground so we aren't jumping or falling
+  lda #$00 ;landed on ground so we aren't jumping or falling
   sta jump_info
   jmp return_d
 
@@ -255,8 +259,8 @@ cont_l
   adc temp
   sta attached_powerups+1
   lda #$0F ; clear left of powerup
-  and tileStore+1
-  sta tileStore+1
+  and tile_store+1
+  sta tile_store+1
 post_powerup_l
   jsr delete_squarebot ; delete character
   jsr move_new_position_left
@@ -307,8 +311,8 @@ cont_r
   adc temp
   sta attached_powerups+1
   lda #$F0  ; clear right of powerup
-  and tileStore+1
-  sta tileStore+1
+  and tile_store+1
+  sta tile_store+1
 post_powerup_r
   jsr delete_squarebot ; delete character
   jsr move_new_position_right ; new position is where we want to move
@@ -612,10 +616,10 @@ update_chars
   lsr
   lsr
   lsr
-  cmp #0
+  cmp #$00
   beq update_char_u
   clc
-  adc #$8
+  adc #$09
   asl
   asl
   asl ; we could simplify this but at this rate a few more asls isn't going to be the main thing slowing down the code
@@ -632,11 +636,11 @@ update_char_u
   asl
   sta charandr
   lda attached_powerups
-  and $0F
-  cmp #0
+  and #$0F
+  cmp #$00
   beq update_char_d
   clc
-  adc #$8
+  adc #$09
   asl
   asl
   asl
@@ -656,10 +660,10 @@ update_char_d
   lsr
   lsr
   lsr
-  cmp #0
+  cmp #$00
   beq update_char_l
   clc
-  adc #$8
+  adc #$09
   asl
   asl
   asl
@@ -675,26 +679,25 @@ update_char_l
   asl
   sta charandr
   lda attached_powerups+1
-  and $0F
-  cmp #0
+  and #$0F
+  cmp #$00
   beq update_char_r
-  adc #$8
+  clc
+  adc #$09
   asl
   asl
   asl
 update_char_r
   sta charandr+1
-
   lda #[CHAR_R << 3]
   sta charandr+2
-
   jsr update_char
 
   rts ;casual 98 line function
 
 
 update_char
-  ldx #0
+  ldx #$00
 update_char_loop
   txa
   clc
@@ -719,7 +722,7 @@ update_char_loop
   sta (#character_set_begin),y
 
   inx
-  cpx #8
+  cpx #$08
   bne update_char_loop
   rts
 

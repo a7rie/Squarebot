@@ -27,12 +27,12 @@ set_jump_num
   rts
 
 get_right
-  lda tileStore+1
+  lda tile_store+1
   and #$0F
   rts
 
 get_left
-  lda tileStore+1
+  lda tile_store+1
   lsr
   lsr
   lsr
@@ -40,12 +40,12 @@ get_left
   rts
 
 get_down
-  lda tileStore
+  lda tile_store
   and #$0F
   rts
 
 get_up
-  lda tileStore
+  lda tile_store
   lsr
   lsr
   lsr
@@ -53,18 +53,18 @@ get_up
   rts
 
 get_mid
-  lda tileStore+2
-  and $0F
+  lda tile_store+2
+  and #$0F
   rts
 
 
 set_right
   sta temp
   lda #$F0
-  and tileStore+1
+  and tile_store+1
   clc
   adc temp
-  sta tileStore+1
+  sta tile_store+1
   rts
 
 set_left
@@ -74,19 +74,19 @@ set_left
   asl
   sta temp
   lda #$0F
-  and tileStore+1
+  and tile_store+1
   clc
   adc temp
-  sta tileStore+1
+  sta tile_store+1
   rts
 
 set_down
   sta temp
   lda #$F0
-  and tileStore
+  and tile_store
   clc
   adc temp
-  sta tileStore
+  sta tile_store
   rts
 
 set_up
@@ -96,15 +96,15 @@ set_up
   asl
   sta temp
   lda #$0F
-  and tileStore
+  and tile_store
   clc
   adc temp
-  sta tileStore
+  sta tile_store
   rts
 
 set_mid
   and #$0F
-  sta tileStore+2
+  sta tile_store+2
   rts
 
 move_new_position_right

@@ -18,7 +18,7 @@ current_time ds.b 1 ; store only the last byte of the jiffy clock
 squarebot_position ds.w 1
 squarebot_color_position ds.w 1
 jump_info ds.b 1 ; split in half, first hex=jump direction 0=up 1=left 2=right, second half=jumps remaining
-tileStore ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
+tile_store ds.b 3 ; UUUUDDDD LLLLRRRR 0000MMMM
 ;colorStore ds.b 3 ; 0UUU0DDD 0LLL0RRR 00000MMM   not the most efficient storage but it needs to also be efficient to decompress
 attached_powerups ds.b 2; 4 bits for each side, ordered U,D,L,R.
 ; 0=none  1=readyBooster  2=activeBooster  3=key 4=spike(not implemented)  add more powerups here   8=ignitedBooster
@@ -86,9 +86,9 @@ start
   sta jump_info
   sta attached_powerups
   sta attached_powerups+1
-  sta tileStore
-  sta tileStore+1
-  sta tileStore+2
+  sta tile_store
+  sta tile_store+1
+  sta tile_store+2
 
   include "titleScreen.s"
 
@@ -120,6 +120,7 @@ check_for_secret_key
   lda currently_pressed_key
   cmp #SECRET_KEY
   bne check_for_secret_key_return
+  jsr delete_squarebot
   lda #1
   sta level_completed
   lda #1
@@ -131,6 +132,7 @@ check_for_reset_key
   lda currently_pressed_key
   cmp #RESET_KEY
   bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
+  jsr delete_squarebot
   lda #1
   sta level_reset
 check_for_reset_key_return
