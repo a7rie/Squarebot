@@ -92,6 +92,7 @@ start
   sta current_level+1
 
   lda #0
+  sta count_chars_drawn
   sta jump_num
   sta jump_dir
   sta attached_powerups
