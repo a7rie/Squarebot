@@ -484,8 +484,11 @@ update_char_dir_loop
   asl
   sta chareor+2
   lda attached_powerups_addr,x
-  ;clc ;add index for rotation 
-  ;adc temp
+  cmp #$00
+  beq no_powerup
+  clc ;add index for rotation 
+  adc temp
+no_powerup
   asl
   asl
   asl
