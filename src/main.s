@@ -156,6 +156,7 @@ check_for_secret_key
   lda currently_pressed_key
   cmp #SECRET_KEY
   bne check_for_secret_key_return
+  jsr delete_squarebot
   lda #1
   sta level_completed
   lda #1
@@ -167,6 +168,7 @@ check_for_reset_key
   lda currently_pressed_key
   cmp #RESET_KEY
   bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
+  jsr delete_squarebot
   lda #1
   sta level_reset
 check_for_reset_key_return

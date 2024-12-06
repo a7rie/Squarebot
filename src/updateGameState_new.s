@@ -450,7 +450,7 @@ update_squarebot
 
 ;-----
 update_chars ; chareor = tile*8,   chareor+1 = powerup*8,   chareor+2 = char*8
-  ldx #$0
+  ldx #$00
   stx temp
 
 update_char_dir_loop
@@ -474,13 +474,13 @@ update_char_dir_loop
   inc temp
   ldx temp
 
-  cpy #4
+  cpx #4
   bne update_char_dir_loop
 
   rts
 
 update_char ; chareor = tile*8,   chareor+1 = powerup*8,   chareor+2 = char*8
-  lda #0
+  lda #$00
   sta temp+1
 update_char_loop
   lda temp+1
