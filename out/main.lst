@@ -1,4 +1,4 @@
-------- FILE src/main.s LEVEL 1 PASS 3
+------- FILE main.s LEVEL 1 PASS 3
       1  1c50 ????						; title screen program -- use hand-made compression method (esentially just RLE, see rleEncoding.py)
       2  1c50 ????				      processor	6502
       3  1c50 ????
@@ -71,7 +71,7 @@
       6  1005		       9e 34 31 30*	      dc.b	SYS_CMD_TOKEN, [start]d, 0	; token for sys with operand as address to "start" label
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
-------- FILE src/main.s
+------- FILE main.s
      64  100d
      65  100d				   start
      66  100d		       a9 0e		      LDA	#14	; black screen blue border
@@ -88,7 +88,7 @@
      77  101d		       85 09		      sta	level_completed
      78  101f		       85 18		      sta	gravity_flipped
      79  1021
-     80  1021		       a9 6a		      lda	#<level_data_start
+     80  1021		       a9 72		      lda	#<level_data_start
      81  1023		       85 04		      sta	current_level
      82  1025		       a9 14		      lda	#>level_data_start
      83  1027		       85 05		      sta	current_level+1
@@ -213,7 +213,7 @@
     111  10b2		       38		      sec
     112  10b3		       60		      rts
     113  10b4
-------- FILE src/main.s
+------- FILE main.s
      91  10b4
      92  10b4
      93  10b4							; title screen code jumps here once space pressed
@@ -528,7 +528,7 @@
     261  120a
     262  120a		       20 89 10 	      jsr	add_one_to_screen_cursor	; add to both screen and color cursor
     263  120d		       60		      rts
-------- FILE src/main.s
+------- FILE main.s
 ------- FILE updateGameState.s LEVEL 2 PASS 3
       0  120e					      include	"updateGameState.s"
       1  120e
@@ -855,48 +855,48 @@
     322  13bd		       a5 14		      lda	squarebot_color_position+1
     323  13bf		       85 0f		      sta	new_color_position+1
     324  13c1		       60		      rts
-------- FILE src/main.s
+------- FILE main.s
     142  13c2
     143  13c2				   compressed_screen_data_start
     144  13c2					      incbin	"../data/titleScreenData_compressed"	; got via 'bsave ""'
-    145  146a
-    146  146a				   level_data_start
-    147  146a					      incbin	"../data/levels/binary_levels/1"
-    148  1472					      incbin	"../data/levels/binary_levels/2"
-    149  148a					      incbin	"../data/levels/binary_levels/3"
-    150  14b4					      incbin	"../data/levels/binary_levels/4"
-    151  14c8					      incbin	"../data/levels/binary_levels/5"
-    152  14f2					      incbin	"../data/levels/binary_levels/6"
-    153  150a					      incbin	"../data/levels/binary_levels/7"
-    154  154c					      incbin	"../data/levels/binary_levels/8"
-    155  15ea					      incbin	"../data/levels/binary_levels/9"
-    156  15fe					      incbin	"../data/levels/binary_levels/10"
-    157  161c					      incbin	"../data/levels/binary_levels/11"
-    158  1638					      incbin	"../data/levels/binary_levels/12"
-    159  167c					      incbin	"../data/levels/binary_levels/13"
-    160  16f2					      incbin	"../data/levels/binary_levels/14"
-    161  1704					      incbin	"../data/levels/binary_levels/15"
-    162  1716					      incbin	"../data/levels/binary_levels/16"
-    163  1764					      incbin	"../data/levels/binary_levels/17"
-    164  1780					      incbin	"../data/levels/binary_levels/18"
-    165  17a4					      incbin	"../data/levels/binary_levels/19"
-    166  17cc					      incbin	"../data/levels/binary_levels/20"
-    167  1824
+    145  1472
+    146  1472				   level_data_start
+    147  1472					      incbin	"../data/levels/binary_levels/1"
+    148  147a					      incbin	"../data/levels/binary_levels/2"
+    149  1492					      incbin	"../data/levels/binary_levels/3"
+    150  14bc					      incbin	"../data/levels/binary_levels/4"
+    151  14d0					      incbin	"../data/levels/binary_levels/5"
+    152  14fa					      incbin	"../data/levels/binary_levels/6"
+    153  1512					      incbin	"../data/levels/binary_levels/7"
+    154  1554					      incbin	"../data/levels/binary_levels/8"
+    155  15f2					      incbin	"../data/levels/binary_levels/9"
+    156  1606					      incbin	"../data/levels/binary_levels/10"
+    157  1624					      incbin	"../data/levels/binary_levels/11"
+    158  1640					      incbin	"../data/levels/binary_levels/12"
+    159  1684					      incbin	"../data/levels/binary_levels/13"
+    160  16fa					      incbin	"../data/levels/binary_levels/14"
+    161  170c					      incbin	"../data/levels/binary_levels/15"
+    162  171e					      incbin	"../data/levels/binary_levels/16"
+    163  176c					      incbin	"../data/levels/binary_levels/17"
+    164  1788					      incbin	"../data/levels/binary_levels/18"
+    165  17ac					      incbin	"../data/levels/binary_levels/19"
+    166  17d4					      incbin	"../data/levels/binary_levels/20"
+    167  182c
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1824					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1824		       08 23	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1824		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 2083 bytes used
-      3  1824					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  6180
-      4  1824					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1824				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1824				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1824				  -	      err
-      8  1824					      endif
-------- FILE src/main.s
-    169  1824
-    170  1824
+      0  182c					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  182c		       08 2b	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  182c		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 2091 bytes used
+      3  182c					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  6188
+      4  182c					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  182c				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  182c				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  182c				  -	      err
+      8  182c					      endif
+------- FILE main.s
+    169  182c
+    170  182c
     171  1c00					      org	character_set_begin
     172  1c00		       00 18 3c 7e*	      BYTE.b	0,24,60,126,24,24,24,24	; gravity powerup 0
     173  1c08		       ff 81 a5 81*	      BYTE.b	255,129,165,129,165,153,129,255	; squarebot 1
