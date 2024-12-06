@@ -118,13 +118,13 @@ start
   sta delta+3
   lda #[ROW_SIZE+1] ; mid
   sta delta+4
-  lda #$0E ; index of powerup characters
+  lda #CHAR_U ; index of powerup characters
   sta chars
-  lda #$0F
+  lda #CHAR_D
   sta chars+1
-  lda #$10
+  lda #CHAR_L
   sta chars+2
-  lda #$11
+  lda #CHAR_R
   sta chars+3
 
   include "titleScreen.s"
@@ -186,31 +186,47 @@ level_data_start
   incbin "../data/levels/binary_levels/jesse_1"
   incbin "../data/levels/binary_levels/jesse_2"
   incbin "../data/levels/binary_levels/jesse_3"
-  incbin "../data/levels/binary_levels/jesse_4"
   incbin "../data/levels/binary_levels/amin_1"
   incbin "../data/levels/binary_levels/amin_2"
   incbin "../data/levels/binary_levels/amin_3"
+  incbin "../data/levels/binary_levels/jesse_4"
+  incbin "../data/levels/binary_levels/jesse_5"
+  incbin "../data/levels/binary_levels/jesse_6"
+  incbin "../data/levels/binary_levels/jesse_7"
+
+  ;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
 
   org character_set_begin
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; blank 0
   BYTE $7E, $42, $7E, $42, $7E, $42, $7E, $42 ; ladder 1
   BYTE $FF, $5A, $00, $00, $00, $00, $00, $00 ; platform 2
   BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; wall 3
-  BYTE $FF, $9D, $A3, $AC, $A5, $99, $C3, $FF ; exit (door) 4
-  BYTE $FF, $FF, $C3, $C3, $E7, $E7, $E7, $FF ; locked wall 5
-  BYTE $FF, $EE, $F1, $EF, $57, $8F, $F3, $FF ; breakable wall 6
-  BYTE $3C, $42, $99, $BD, $89, $91, $42, $3C ; booster powerup 7
-  BYTE $3C, $42, $99, $99, $91, $99, $42, $3C ; key powerup 8
-  BYTE $3C, $42, $91, $99, $BD, $81, $42, $3C ; spike powerup 9
-  BYTE $10, $30, $F0, $F0, $F0, $F0, $30, $10 ; ready booster attachment (R) 10, u d l r
-  BYTE $10, $30, $F1, $FF, $FE, $F1, $30, $10 ; active booster attachment (R) 11, u d l r
-  BYTE $00, $00, $FE, $FE, $6A, $0A, $0E, $00 ; key attachment (R) 12, u d l r
-  BYTE $80, $C0, $F0, $FE, $F0, $C0, $80, $00 ; spike attachment (R) 13, u d l r
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU 14
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charD 15
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charL 16
-  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charR 17
-  BYTE $FF, $81, $A5, $81, $BD, $81, $81, $FF ; squarebot 18
+  BYTE 0,60,98,94,86,102,60,0 ; exit (door) 4
+  BYTE 255,129,157,161,173,153,129,255 ; locked exit 5
+  BYTE 255,231,219,219,129,153,129,255 ; locked wall 6
+  BYTE $FF, $EE, $F1, $EF, $57, $8F, $F3, $FF ; breakable wall 7
+  BYTE 18,214,124,63,252,62,107,72 ; spike ball 8                     PETSCII WHY?? I CAN'T READ THIS!
+  BYTE 24,60,60,60,126,82,8,36 ; booster powerup 9
+  BYTE 24,36,36,24,16,24,16,24 ; key powerup A
+  ; attachments
+  ;BYTE 0,0,0,0,195,126,126,60 ; ready booster attachment up B
+  ;BYTE 60,126,126,195,0,0,0,0 ; rb down C
+  ;BYTE 8,14,7,7,7,7,14,8 ; rb left D
+  BYTE 16,112,224,224,224,224,112,16 ; rb right E      actually   B
+  ;BYTE 60,126,60,24,219,126,126,60 ; active booster attachment up F
+  ;BYTE 60,126,126,219,24,60,126,60 ; ab down 10
+  ;BYTE 8,78,231,255,255,231,78,8 ; ab left 11
+  BYTE 16,114,231,255,255,231,114,16 ; ab right 12   actually C
+  ;BYTE 0,30,20,30,24,24,24,60 ; key attachment up 13
+  ;BYTE 60,24,24,24,30,20,30,0 ; key down 14
+  ;BYTE 0,0,1,127,95,113,80,0 ; key left 15
+  BYTE 0,0,128,254,250,142,10,0 ; key right 16       actually D
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charU E
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charD F
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charL 10
+  BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charR 11
+  BYTE $FF, $81, $A5, $81, $BD, $81, $81, $FF ; squarebot 12 
+  
   ; for the title screen.......
   BYTE 255,128,128,128,128,129,131,135 ;19
   BYTE 255,0,0,0,192,224,48,248 ;20
@@ -229,7 +245,7 @@ level_data_start
   BYTE 7,0,0,0,0,0,0,255 ;33
   BYTE 129,193,1,1,1,1,1,255 ;34
   
-   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
+  include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
 
   ;assume levels have borders

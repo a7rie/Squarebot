@@ -20,6 +20,7 @@ ascii_to_byte = {
     'S': 0b00001001, # spike
     'K': 0b00001000, # key powerup
     'B': 0b00001010, # booster powerup
+    'X': 0b00001011, # locked exit
 }
 
 

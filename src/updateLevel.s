@@ -15,16 +15,17 @@ PLATFORM = 112 ; 01110000
 KEY = 128 ; 10000000
 SPIKE = 144 ; 10010000
 BOOSTER = 160 ; 10100000
+LOCKED_EXIT = 176 ; 1011000
 
 WALL_COLOR = 0
 BREAKABLE_WALL_COLOR = 0
 LOCKED_WALL_COLOR = 0
 LADDER_COLOR = 0 ;6
 EXIT_COLOR = 0 ;6
+LOCKED_EXIT_COLOR = 0
 PLATFORM_COLOR = 0 ;4
 SPIKE_COLOR = 0 ;2
 KEY_P_COLOR = 0 ;7
-SPIKE_P_COLOR = 0 ;6
 BOOSTER_P_COLOR = 0 ;6
 SQUAREBOT_COLOR = 2
 
@@ -33,15 +34,15 @@ LADDER_CHAR = $01
 PLATFORM_CHAR = $02
 WALL_CHAR = $03
 EXIT_CHAR = $04
-LOCKED_WALL_CHAR = $05
-BREAKABLE_WALL_CHAR = $06
-BOOSTER_P_CHAR = $07
-KEY_P_CHAR =  $08
-SPIKE_P_CHAR = $09
-BOOSTER_A_CHAR = $0A
-BOOSTER_AA_CHAR = $0B
-KEY_A_CHAR = $0C
-SPIKE_A_CHAR = $0D
+LOCKED_EXIT_CHAR = $05
+LOCKED_WALL_CHAR = $06
+BREAKABLE_WALL_CHAR = $07
+SPIKE_CHAR = $08
+BOOSTER_P_CHAR = $09
+KEY_P_CHAR =  $0A
+RBOOSTER_A_CHAR = $0B
+ABOOSTER_A_CHAR = $0C
+KEY_A_CHAR = $0D
 CHAR_U = $0E
 CHAR_D = $0F
 CHAR_L = $10
@@ -241,9 +242,17 @@ check_if_ladder
 
 check_if_exit
   cmp #EXIT
-  bne check_if_platform
+  bne check_if_locked_exit
   lda #EXIT_CHAR
   ldx #EXIT_COLOR
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_locked_exit
+  cmp #LOCKED_EXIT
+  bne check_if_platform
+  lda #LOCKED_EXIT_CHAR
+  ldx #LOCKED_EXIT_COLOR
   jsr draw_char_in_accumulator
   rts
 
@@ -266,8 +275,8 @@ check_if_key
 check_if_spike
   cmp #SPIKE
   bne check_if_booster
-  lda #SPIKE_P_CHAR
-  ldx #SPIKE_P_COLOR
+  lda #SPIKE_CHAR
+  ldx #SPIKE_COLOR
   jsr draw_char_in_accumulator
   rts
   

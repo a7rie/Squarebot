@@ -169,10 +169,16 @@ move_dir
   sta temp
   lda tile_store_addr,x ; load colliding tile
   cmp #EXIT_CHAR
-  bne cont_move
+  bne spike_check
   lda #1 ; level complete
   sta level_completed
   sta level_reset
+  jmp return_false_move
+spike_check
+  cmp #SPIKE_CHAR
+  bne cont_move
+  lda #1
+  sta level_reset ; died
   jmp return_false_move
 cont_move
   jsr collision_handler
@@ -192,9 +198,9 @@ post_powerup_move
   eor move_dir_store
   tax
   lda attached_powerups_addr,x ; ignite ready booster
-  cmp #$0A
+  cmp #RBOOSTER_A_CHAR
   bne post_booster
-  lda #$01
+  lda #$01 ; ignited booster is a ladder because its not shown
   sta attached_powerups_addr,x
 post_booster
   jsr apply_powerup_logic
@@ -206,9 +212,13 @@ post_booster
   eor move_dir_store
   tax
   lda attached_powerups_addr,x
+  cmp #ABOOSTER_A_CHAR
+  bne return_true_move ; if booster activated go again
+  jsr wait_until_next_frame ; give them time to see active booster
+  jsr wait_until_next_frame
   ldx move_dir_store
-  cmp #$0B
-  beq move_dir ; if booster activated go again
+  jmp move_dir
+return_true_move
   sec
   rts ; return true move
 return_false_move
@@ -229,24 +239,20 @@ collision_handler ; accumulator is the character in the position that squarebot 
   beq return_false
   cmp #BREAKABLE_WALL_CHAR
   beq return_false
+  cmp #LOCKED_EXIT_CHAR
+  beq return_false
   cmp #LOCKED_WALL_CHAR
   beq return_false
   ;else its a powerup
   cmp #BOOSTER_P_CHAR
   bne rpk
-  lda #$0A
+  lda #RBOOSTER_A_CHAR
   sta temp
   jmp return_true
 rpk
   cmp #KEY_P_CHAR
-  bne rps
-  lda #$0C
-  sta temp
-  jmp return_true
-rps
-  cmp #SPIKE_P_CHAR ; not functional
   bne return_false
-  lda #$0D
+  lda #KEY_A_CHAR
   sta temp
   jmp return_true
 
@@ -263,6 +269,8 @@ fall_check
   cmp #PLATFORM_CHAR
   beq return_false
   cmp #WALL_CHAR
+  beq return_false
+  cmp #LOCKED_EXIT_CHAR
   beq return_false
   cmp #LOCKED_WALL_CHAR
   beq return_false
@@ -407,36 +415,44 @@ powerup_logic ;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile o
   lda temp+2 ; check opposite tile
   cmp #BREAKABLE_WALL_CHAR
   bne pl_ab
-  lda #$00
+  lda #BLANK_TILE_CHAR
   sta temp+2 ; delete wall
 pl_ab
-  lda #$0B ; set active booster
+  lda #ABOOSTER_A_CHAR ; set active booster
   sta temp
   jmp pl_return
 pl_b
-  cmp #$0B ; check active booster
+  cmp #ABOOSTER_A_CHAR ; check active booster
   bne pl_k
   lda temp+2 ; check opposite tile
   cmp #BREAKABLE_WALL_CHAR
   bne pl_rb
-  lda #$00
+  lda #BLANK_TILE_CHAR
   sta temp+2 ; delete wall
 pl_rb
-  lda #$0A ; set ready booster
+  lda #RBOOSTER_A_CHAR ; set ready booster
   sta temp
   jmp pl_return
 pl_k
-  cmp #$0C ; check key, slightly unnecessary
+  cmp #KEY_A_CHAR ; check key, slightly unnecessary
   bne pl_return
   lda temp+1
   cmp #LOCKED_WALL_CHAR
-  bne pl_return
-  lda #$00
+  bne pl_ke
+  lda #BLANK_TILE_CHAR
   sta temp ; delete key
   sta temp+1 ; delete wall
   jmp pl_return
+pl_ke
+  cmp #LOCKED_EXIT_CHAR
+  bne pl_return
+  lda #BLANK_TILE_CHAR
+  sta temp
+  lda #EXIT_CHAR
+  sta temp+1
+  jmp pl_return
 pl_return
-  rts ;-64 lines optimized
+  rts
 
 ;-----
 update_squarebot
@@ -462,17 +478,18 @@ update_char_dir_loop
   asl
   asl ; multiply by 8 since there are 8 bytes per character
   sta chareor
-  lda attached_powerups_addr,x
-  ;add index for rotation
-  asl
-  asl
-  asl
-  sta chareor+1
   lda chars_addr,x
   asl
   asl
   asl
   sta chareor+2
+  lda attached_powerups_addr,x
+  ;clc ;add index for rotation 
+  ;adc temp
+  asl
+  asl
+  asl
+  sta chareor+1
   jsr update_char
   inc temp
   ldx temp
