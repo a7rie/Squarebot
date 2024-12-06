@@ -164,6 +164,8 @@ check_if_d_pressed
 ;check booster if we move again
 move_dir
   stx move_dir_store
+  lda #$00
+  sta temp
   lda tile_store_addr,x ; load colliding tile
   cmp #EXIT_CHAR
   bne cont_move
@@ -203,8 +205,8 @@ post_booster
   eor move_dir_store
   tax
   lda attached_powerups_addr,x
-  cmp #$0B
   ldx move_dir_store
+  cmp #$0B
   beq move_dir ; if booster activated go again
   sec
   rts ; return true move
@@ -305,7 +307,7 @@ move_new_position
   sta new_color_position
   lda new_color_position+1
   adc #0
-  sta new_position+1
+  sta new_color_position+1
   clc
   rts ; no need to undo get_new_draw_position
 
@@ -313,10 +315,10 @@ move_new_position
 get_tiles
   jsr get_new_draw_position
 
-  lda tile_store+4 ; get mid
   lda #$01 ; eor move_dir with 1 to get opposite side
   eor move_dir_store
   tax
+  lda tile_store+4 ; get mid
   sta tile_store_addr,x ; set opposite dir
 
   ldx move_dir_store
@@ -487,14 +489,14 @@ update_char_loop
   clc
   adc chareor
   tay
-  lda (#character_set_begin),y
+  lda character_set_begin,y
   sta temp+2
 
   lda temp+1
   clc
   adc chareor+1
   tay
-  lda (#character_set_begin),y
+  lda character_set_begin,y
   eor temp+2
   sta temp+2
 
@@ -503,10 +505,11 @@ update_char_loop
   adc chareor+2
   tay
   lda temp+2
-  sta (#character_set_begin),y
+  sta character_set_begin,y
 
-  inx
-  cpx #8
+  inc temp+1
+  lda temp+1
+  cmp #8
   bne update_char_loop
 
   rts
@@ -521,32 +524,32 @@ update_char_loop
 draw_squarebot
   jsr get_squarebot_draw_position
 
-  lda #chars ;u
-  ldy #delta
+  lda chars ;u
+  ldy delta
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
-  lda #chars+1
-  ldy #delta+1 ;d
+  lda chars+1
+  ldy delta+1 ;d
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
-  lda #chars+2
-  ldy #delta+2 ;l
+  lda chars+2
+  ldy delta+2 ;l
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
-  lda #chars+3
-  ldy #delta+3 ;r
+  lda chars+3
+  ldy delta+3 ;r
   sta (squarebot_position),y
   lda #0
   sta (squarebot_color_position),y
 
   lda #SQUAREBOT_CHAR
-  ldy #delta+4 ;m
+  ldy delta+4 ;m
   sta (squarebot_position),y
   lda #SQUAREBOT_COLOR
   sta (squarebot_color_position),y

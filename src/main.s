@@ -108,15 +108,15 @@ start
   sta temp+1
   sta temp+2
   sta temp+3
-  lda #$01 ; deltas to access adjacent tiles
+  lda #1 ; up
   sta delta
-  lda #$33
+  lda #[ROW_SIZE+ROW_SIZE+1] ; down
   sta delta+1
-  lda #$16
+  lda #ROW_SIZE ; left
   sta delta+2
-  lda #$18
+  lda #[ROW_SIZE+2] ; right
   sta delta+3
-  lda #$17
+  lda #[ROW_SIZE+1] ; mid
   sta delta+4
   lda #$0E ; index of powerup characters
   sta chars
