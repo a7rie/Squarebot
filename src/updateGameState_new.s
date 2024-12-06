@@ -122,7 +122,6 @@ move_up
   jsr get_up
   cmp #EXIT_CHAR
   bne cont_u
-  jsr delete_squarebot
   lda #1
   sta level_completed
   sta level_reset
@@ -180,7 +179,6 @@ move_down
   jsr get_down
   cmp #EXIT_CHAR
   bne cont_d
-  jsr delete_squarebot
   lda #1
   sta level_completed
   sta level_reset
@@ -239,7 +237,6 @@ move_left
   jsr get_left
   cmp #EXIT_CHAR ; finish level check
   bne cont_l
-  jsr delete_squarebot
   lda #1 ; finish level
   sta level_completed
   sta level_reset
@@ -292,7 +289,6 @@ move_right
   jsr get_right
   cmp #EXIT_CHAR ; check here if we finish the level so we can rts to game loop
   bne cont_r
-  jsr delete_squarebot
   lda #1 ; finish level
   sta level_completed
   sta level_reset

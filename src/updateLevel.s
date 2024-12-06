@@ -64,6 +64,9 @@ update_level
   lda #LEVEL_NOT_DONE
   sta level_completed
 
+  ;delete squarebot first
+  jsr delete_squarebot
+
   ; now set current_level to next_level
   lda next_level
   sta current_level
