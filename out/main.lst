@@ -78,9 +78,9 @@
       0  1001					      include	"stub.s"	; stub contains BASIC sys cmd to run the machine language code
       1  1001		       00 9e	   SYS_CMD_TOKEN =	$9e
       2  1001		       00 0a	   STUB_LINE_NUMBER =	10
-      3  1001							; BASIC stub -- SYS cmd to run machine language
+      3  1001							; BASIC stub -- SYS cmd to run machine language 
       4  1001		       0b 10		      dc.w	nextstmt	; link; beginning of basic
-      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number
+      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number 
       6  1005		       9e 34 31 30*	      dc.b	SYS_CMD_TOKEN, [start]d, 0	; token for sys with operand as address to "start" label
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
@@ -433,7 +433,7 @@
     124  1192		       b0 10		      bcs	update_level_return
     125  1194
     126  1194		       a4 0a		      ldy	level_data_index
-    127  1196		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte
+    127  1196		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
     128  1198
     129  1198		       20 b2 11 	      jsr	draw_sequence
     130  119b
@@ -1055,7 +1055,7 @@
     405  151e		       60		      rts
     406  151f
     407  151f							; ready booster: does nothing
-    408  151f							; ignited booster: breaks breakable walls and changes to active booster
+    408  151f							; ignited booster: breaks breakable walls and changes to active booster 
     409  151f							; active booster: breaks breakable walls and changes to ready booster
     410  151f							; key: spends itself to break locked walls
     411  151f				   powerup_logic		;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
@@ -1134,7 +1134,7 @@
     484  158e		       0a		      asl
     485  158f		       85 2f		      sta	chareor+2
     486  1591		       b5 1b		      lda	attached_powerups_addr,x
-    487  1593							;clc ;add index for rotation
+    487  1593							;clc ;add index for rotation 
     488  1593							;adc temp
     489  1593		       0a		      asl
     490  1594		       0a		      asl
@@ -1307,63 +1307,64 @@
     188  174d					      incbin	"../data/levels/binary_levels/jesse_3"
     189  1797					      incbin	"../data/levels/binary_levels/amin_1"
     190  17cb					      incbin	"../data/levels/binary_levels/amin_2"
-    191  17f1					      incbin	"../data/levels/binary_levels/amin_3"
-    192  181f					      incbin	"../data/levels/binary_levels/jesse_4"
-    193  1865					      incbin	"../data/levels/binary_levels/jesse_5"
-    194  18bf					      incbin	"../data/levels/binary_levels/jesse_6"
-    195  1931					      incbin	"../data/levels/binary_levels/jesse_7"
-    196  194b
-    197  194b							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
-    198  194b
-    199  1c00					      org	character_set_begin
-    200  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
-    201  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
-    202  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
-    203  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
-    204  1c20		       00 3c 62 5e*	      BYTE.b	0,60,98,94,86,102,60,0	; exit (door) 4
-    205  1c28		       ff 81 9d a1*	      BYTE.b	255,129,157,161,173,153,129,255	; locked exit 5
-    206  1c30		       ff e7 db db*	      BYTE.b	255,231,219,219,129,153,129,255	; locked wall 6
-    207  1c38		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 7
-    208  1c40		       12 d6 7c 3f*	      BYTE.b	18,214,124,63,252,62,107,72	; spike ball 8 		    PETSCII WHY?? I CAN'T READ THIS!
-    209  1c48		       18 3c 3c 3c*	      BYTE.b	24,60,60,60,126,82,8,36	; booster powerup 9
-    210  1c50		       18 24 24 18*	      BYTE.b	24,36,36,24,16,24,16,24	; key powerup A
-    211  1c58							; attachments
-    212  1c58							;BYTE 0,0,0,0,195,126,126,60 ; ready booster attachment up B
-    213  1c58							;BYTE 60,126,126,195,0,0,0,0 ; rb down C
-    214  1c58							;BYTE 8,14,7,7,7,7,14,8 ; rb left D
-    215  1c58		       10 70 e0 e0*	      BYTE.b	16,112,224,224,224,224,112,16	; rb right E	   actually   B
-    216  1c60							;BYTE 60,126,60,24,219,126,126,60 ; active booster attachment up F
-    217  1c60							;BYTE 60,126,126,219,24,60,126,60 ; ab down 10
-    218  1c60							;BYTE 8,78,231,255,255,231,78,8 ; ab left 11
-    219  1c60		       10 72 e7 ff*	      BYTE.b	16,114,231,255,255,231,114,16	; ab right 12	 actually C
-    220  1c68							;BYTE 0,30,20,30,24,24,24,60 ; key attachment up 13
-    221  1c68							;BYTE 60,24,24,24,30,20,30,0 ; key down 14
-    222  1c68							;BYTE 0,0,1,127,95,113,80,0 ; key left 15
-    223  1c68		       00 00 80 fe*	      BYTE.b	0,0,128,254,250,142,10,0	; key right 16       actually D
-    224  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU E
-    225  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD F
-    226  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 10
-    227  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 11
-    228  1c90		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 12
-    229  1c98
-    230  1c98							; for the title screen.......
-    231  1c98		       ff 80 80 80*	      BYTE.b	255,128,128,128,128,129,131,135	;19
-    232  1ca0		       ff 00 00 00*	      BYTE.b	255,0,0,0,192,224,48,248	;20
-    233  1ca8		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,0	;21
-    234  1cb0		       ff 01 01 01*	      BYTE.b	255,1,1,1,1,1,1,1	;22
-    235  1cb8		       8f 9b 83 83*	      BYTE.b	143,155,131,131,128,128,128,128	;23
-    236  1cc0		       e0 e0 e0 e0*	      BYTE.b	224,224,224,224,0,0,0,0	;24
-    237  1cc8		       01 07 1f 07*	      BYTE.b	1,7,31,7,7,7,0,0	;25
-    238  1cd0		       f1 c1 c1 c1*	      BYTE.b	241,193,193,193,193,193,1,1	;26
-    239  1cd8		       80 80 81 80*	      BYTE.b	128,128,129,128,152,152,156,143	;27
-    240  1ce0		       00 00 c0 70*	      BYTE.b	0,0,192,112,30,3,0,255	;28
-    241  1ce8		       00 00 00 00*	      BYTE.b	0,0,0,0,0,128,240,28	;29
-    242  1cf0		       01 01 01 01*	      BYTE.b	1,1,1,1,1,1,1,1	;30
-    243  1cf8		       8f 9f 9f 9e*	      BYTE.b	143,159,159,158,128,128,128,255	;31
-    244  1d00		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,255	;32
-    245  1d08		       07 00 00 00*	      BYTE.b	7,0,0,0,0,0,0,255	;33
-    246  1d10		       81 c1 01 01*	      BYTE.b	129,193,1,1,1,1,1,255	;34
-    247  1d18
+    191  1807					      incbin	"../data/levels/binary_levels/amin_3"
+    192  1835					      incbin	"../data/levels/binary_levels/amin_4"
+    193  1873					      incbin	"../data/levels/binary_levels/jesse_4"
+    194  18b9					      incbin	"../data/levels/binary_levels/jesse_5"
+    195  1913					      incbin	"../data/levels/binary_levels/jesse_6"
+    196  1985					      incbin	"../data/levels/binary_levels/jesse_7"
+    197  199f
+    198  199f							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
+    199  199f
+    200  1c00					      org	character_set_begin
+    201  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
+    202  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
+    203  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
+    204  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
+    205  1c20		       00 3c 62 5e*	      BYTE.b	0,60,98,94,86,102,60,0	; exit (door) 4
+    206  1c28		       ff 81 9d a1*	      BYTE.b	255,129,157,161,173,153,129,255	; locked exit 5
+    207  1c30		       ff e7 db db*	      BYTE.b	255,231,219,219,129,129,129,255	; locked wall 6
+    208  1c38		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 7
+    209  1c40		       12 d6 7c 3f*	      BYTE.b	18,214,124,63,252,62,107,72	; spike ball 8 		    PETSCII WHY?? I CAN'T READ THIS!
+    210  1c48		       18 3c 3c 3c*	      BYTE.b	24,60,60,60,126,82,8,36	; booster powerup 9
+    211  1c50		       18 24 24 18*	      BYTE.b	24,36,36,24,16,24,16,24	; key powerup A
+    212  1c58							; attachments
+    213  1c58							;BYTE 0,0,0,0,195,126,126,60 ; ready booster attachment up B
+    214  1c58							;BYTE 60,126,126,195,0,0,0,0 ; rb down C
+    215  1c58							;BYTE 8,14,7,7,7,7,14,8 ; rb left D
+    216  1c58		       10 70 e0 e0*	      BYTE.b	16,112,224,224,224,224,112,16	; rb right E	   actually   B
+    217  1c60							;BYTE 60,126,60,24,219,126,126,60 ; active booster attachment up F
+    218  1c60							;BYTE 60,126,126,219,24,60,126,60 ; ab down 10
+    219  1c60							;BYTE 8,78,231,255,255,231,78,8 ; ab left 11
+    220  1c60		       10 72 e7 ff*	      BYTE.b	16,114,231,255,255,231,114,16	; ab right 12	 actually C
+    221  1c68							;BYTE 0,30,20,30,24,24,24,60 ; key attachment up 13
+    222  1c68							;BYTE 60,24,24,24,30,20,30,0 ; key down 14
+    223  1c68							;BYTE 0,0,1,127,95,113,80,0 ; key left 15
+    224  1c68		       00 00 80 fe*	      BYTE.b	0,0,128,254,250,142,10,0	; key right 16       actually D
+    225  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU E
+    226  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD F
+    227  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 10
+    228  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 11
+    229  1c90		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 12 
+    230  1c98
+    231  1c98							; for the title screen.......
+    232  1c98		       ff 80 80 80*	      BYTE.b	255,128,128,128,128,129,131,135	;19
+    233  1ca0		       ff 00 00 00*	      BYTE.b	255,0,0,0,192,224,48,248	;20
+    234  1ca8		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,0	;21
+    235  1cb0		       ff 01 01 01*	      BYTE.b	255,1,1,1,1,1,1,1	;22
+    236  1cb8		       8f 9b 83 83*	      BYTE.b	143,155,131,131,128,128,128,128	;23
+    237  1cc0		       e0 e0 e0 e0*	      BYTE.b	224,224,224,224,0,0,0,0	;24
+    238  1cc8		       01 07 1f 07*	      BYTE.b	1,7,31,7,7,7,0,0	;25
+    239  1cd0		       f1 c1 c1 c1*	      BYTE.b	241,193,193,193,193,193,1,1	;26
+    240  1cd8		       80 80 81 80*	      BYTE.b	128,128,129,128,152,152,156,143	;27
+    241  1ce0		       00 00 c0 70*	      BYTE.b	0,0,192,112,30,3,0,255	;28
+    242  1ce8		       00 00 00 00*	      BYTE.b	0,0,0,0,0,128,240,28	;29
+    243  1cf0		       01 01 01 01*	      BYTE.b	1,1,1,1,1,1,1,1	;30
+    244  1cf8		       8f 9f 9f 9e*	      BYTE.b	143,159,159,158,128,128,128,255	;31
+    245  1d00		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,255	;32
+    246  1d08		       07 00 00 00*	      BYTE.b	7,0,0,0,0,0,0,255	;33
+    247  1d10		       81 c1 01 01*	      BYTE.b	129,193,1,1,1,1,1,255	;34
+    248  1d18
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
       0  1d18					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
       1  1d18		       0d 17	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
@@ -1377,11 +1378,11 @@
       7  1d18				  -	      err
       8  1d18					      endif
 ------- FILE main.s
-    249  1d18
     250  1d18
-    251  1d18							;assume levels have borders
-    252  1d18							;shift character set begin as far as i can
-    253  1d18							;get rid of half-bytes
-    254  1d18							;16 bit arithmetic
-    255  1d18							;storing attachments in each rotation
-    256  1d18							;store delta in an array so you can have a dynamic function that draws each character.
+    251  1d18
+    252  1d18							;assume levels have borders
+    253  1d18							;shift character set begin as far as i can
+    254  1d18							;get rid of half-bytes
+    255  1d18							;16 bit arithmetic
+    256  1d18							;storing attachments in each rotation
+    257  1d18							;store delta in an array so you can have a dynamic function that draws each character.

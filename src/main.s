@@ -189,6 +189,7 @@ level_data_start
   incbin "../data/levels/binary_levels/amin_1"
   incbin "../data/levels/binary_levels/amin_2"
   incbin "../data/levels/binary_levels/amin_3"
+  incbin "../data/levels/binary_levels/amin_4"
   incbin "../data/levels/binary_levels/jesse_4"
   incbin "../data/levels/binary_levels/jesse_5"
   incbin "../data/levels/binary_levels/jesse_6"
