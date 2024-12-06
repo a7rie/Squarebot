@@ -62,7 +62,7 @@ ROW_SIZE = $16
 
 ; memory locations
 user_memory_start = $1001
-currently_pressed_key =  $c5
+currently_pressed_key =  $c5 ;proposed fix: mem editor 028 abc space bar loops
 jiffy_clock = $A0
 character_info_register = $9005
 character_set_begin = $1c00
@@ -180,13 +180,16 @@ check_for_reset_key_return
   include "updateGameStateHelper.s"
 
 compressed_screen_data_start
-  incbin "../data/jesseTitleScreen_compressed" ; got via 'bsave ""'
+  incbin "../data/titleScreenData_compressed" 
 
 level_data_start
   incbin "../data/levels/binary_levels/jesse_1"
   incbin "../data/levels/binary_levels/jesse_2"
   incbin "../data/levels/binary_levels/jesse_3"
   incbin "../data/levels/binary_levels/jesse_4"
+  incbin "../data/levels/binary_levels/amin_1"
+  incbin "../data/levels/binary_levels/amin_2"
+  incbin "../data/levels/binary_levels/amin_3"
 
   org character_set_begin
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; blank 0
@@ -208,8 +211,25 @@ level_data_start
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charL 16
   BYTE $00, $00, $00, $00, $00, $00, $00, $00 ; charR 17
   BYTE $FF, $81, $A5, $81, $BD, $81, $81, $FF ; squarebot 18
-
-  include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
+  ; for the title screen.......
+  BYTE 255,128,128,128,128,129,131,135 ;19
+  BYTE 255,0,0,0,192,224,48,248 ;20
+  BYTE 255,0,0,0,0,0,0,0 ;21
+  BYTE 255,1,1,1,1,1,1,1 ;22
+  BYTE 143,155,131,131,128,128,128,128 ;23
+  BYTE 224,224,224,224,0,0,0,0 ;24
+  BYTE 1,7,31,7,7,7,0,0 ;25
+  BYTE 241,193,193,193,193,193,1,1 ;26
+  BYTE 128,128,129,128,152,152,156,143 ;27
+  BYTE 0,0,192,112,30,3,0,255 ;28
+  BYTE 0,0,0,0,0,128,240,28 ;29
+  BYTE 1,1,1,1,1,1,1,1 ;30
+  BYTE 143,159,159,158,128,128,128,255 ;31
+  BYTE 255,0,0,0,0,0,0,255 ;32
+  BYTE 7,0,0,0,0,0,0,255 ;33
+  BYTE 129,193,1,1,1,1,1,255 ;34
+  
+   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
 
 
   ;assume levels have borders

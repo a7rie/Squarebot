@@ -79,6 +79,8 @@ update_return
   rts
 
 check_if_space_pressed
+  lda #$00
+  sta jump_dir ; double check we aren't falling in a direction
   lda currently_pressed_key
   cmp #SPACE_KEY
   bne check_if_q_pressed
@@ -92,7 +94,6 @@ check_if_space_pressed
   jmp update_return
 
 check_if_q_pressed
-  lda currently_pressed_key
   cmp #Q_KEY
   bne check_if_e_pressed
   ldx #0 ; up

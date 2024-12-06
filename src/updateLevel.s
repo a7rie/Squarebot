@@ -28,7 +28,7 @@ SPIKE_P_COLOR = 0 ;6
 BOOSTER_P_COLOR = 0 ;6
 SQUAREBOT_COLOR = 2
 
-BLANK_TILE_CHAR = $00 ; use this instead of BLANK_CHAR, allows me to save space with tileStore
+BLANK_TILE_CHAR = $00 ; use this instead of BLANK_CHAR, allows me to save space with tile_store
 LADDER_CHAR = $01
 PLATFORM_CHAR = $02
 WALL_CHAR = $03
@@ -98,7 +98,7 @@ continue_update
   ldx #0
   ldy #0
   sty level_data_index
-
+  
   lda #0
   sta jump_num
   sta jump_dir

@@ -37,11 +37,11 @@ It's possible that it becomes unable to progress in certain levels (soft-locked)
 
 ### Powerups
 
-There are currently two powerups implemented in Squarebot.
-- **Booster**: After getting the booster (colliding with the booster powerup character), your next jump will be twice as high.
-- **Key**: After getting the key, the next locked door that you collide with will disappear, allowing you to access whatever space (if any) it may have been blocking.
+There are three powerups in Squarebot:
+- **Booster**: After getting the booster (colliding with the booster powerup character), your next jump will be twice as high. Only one can be held at a time.
+- **Key**: After getting the key, the next locked door that you collide with will disappear, allowing you to access whatever space (if any) it may have been blocking. Only one can be held at a time.
+- **Gravity**: This powerup reverses gravity -- the ceiling becomes the floor, and vice versa. It can be flipped back to normal by grabbing another gravity powerup.
 
-Only one of each powerup can be held at a time, although levels may have multiple of the same powerups.
 
 ## Levels
 
@@ -56,7 +56,7 @@ Here's a mapping of how we map each four bit pattern to level element:
 | 0010 | Wall |  W |
 | 0011|  Breakable Wall |  T |
 | 0100 | Locked Wall |  L |
-| 0101 | Ladder | #  |
+| 0101 | Gravity Powerup | #  |
 | 0110 | Exit (complete current level) | E  |
 | 0111 | Platform | _ |
 | 1001 | Spike | S |

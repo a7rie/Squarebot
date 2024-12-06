@@ -1,391 +1,317 @@
-;DEPRECATED
+LEVEL_IS_DONE = 1
+LEVEL_NOT_DONE = 0
+SHOULD_RESET = 1
+SHOULD_NOT_RESET = 0
 
+; only first 4 bits really matter here; refer to readme for guide on lvl format
+BLANK_SPACE = 0 ; 000000000
+STARTING_POINT = 16 ; 00010000
+WALL = 32 ; 00100000
+BREAKABLE_WALL = 48 ; 00110000
+LOCKED_WALL = 64 ; 01000000
+LADDER = 80 ; 01010000
+EXIT = 96 ; 01100000
+PLATFORM = 112 ; 01110000
+KEY = 128 ; 10000000
+SPIKE = 144 ; 10010000
+BOOSTER = 160 ; 10100000
 
-MOVE_LEFT = 1
-MOVE_RIGHT = 2
-SQUAREBOT_CHAR = $1
-SQUAREBOT_COLOR = $2
-START_OF_FIRST_ROW_LOW_BYTE = $e4
-START_OF_FIRST_ROW_HIGH_BYTE = $1f
+WALL_COLOR = 0
+BREAKABLE_WALL_COLOR = 0
+LOCKED_WALL_COLOR = 0
+LADDER_COLOR = 0 ;6
+EXIT_COLOR = 0 ;6
+PLATFORM_COLOR = 0 ;4
+SPIKE_COLOR = 0 ;2
+KEY_P_COLOR = 0 ;7
+SPIKE_P_COLOR = 0 ;6
+BOOSTER_P_COLOR = 0 ;6
+SQUAREBOT_COLOR = 2
 
-  lda squarebot_position
-  sta new_position
-  lda squarebot_position+1
-  sta new_position+1
-  lda squarebot_color_position
-  sta new_color_position
-  lda squarebot_color_position+1
-  sta new_color_position+1
+BLANK_TILE_CHAR = $00 ; use this instead of BLANK_CHAR, allows me to save space with tileStore
+LADDER_CHAR = $01
+PLATFORM_CHAR = $02
+WALL_CHAR = $03
+EXIT_CHAR = $04
+LOCKED_WALL_CHAR = $05
+BREAKABLE_WALL_CHAR = $06
+BOOSTER_P_CHAR = $07
+KEY_P_CHAR =  $08
+SPIKE_P_CHAR = $09
+BOOSTER_A_CHAR = $0A
+BOOSTER_AA_CHAR = $0B
+KEY_A_CHAR = $0C
+SPIKE_A_CHAR = $0D
+CHAR_U = $0E
+CHAR_D = $0F
+CHAR_L = $10
+CHAR_R = $11
+SQUAREBOT_CHAR = $12
+LEVEL_BEGINNING_LOW_BYTE = $17
+LEVEL_BEGINNING_HIGH_BYTE = $1e
+LEVEL_COLOR_BEGINNING_LOW_BYTE = $17
+LEVEL_COLOR_BEGINNING_HIGH_BYTE = $96
+END_OF_LEVEL_LOW_BYTE = $e5
+END_OF_LEVEL_HIGH_BYTE = $1f
 
-  lda currently_pressed_key
-  cmp #A_KEY
-  bne check_if_d_pressed
-  jsr move_new_position_to_left
-  jmp check_if_new_position_valid
+update_level
+  ; check if the level is completed; set current_level to next_level if so
+  lda level_completed
+  cmp #LEVEL_IS_DONE ; (try optimizing later)
+  bne dont_update
+  
+  ; level is done; reset level completed
+  lda #LEVEL_NOT_DONE
+  sta level_completed
 
-check_if_d_pressed
-  cmp #D_KEY
-  bne check_if_new_position_valid
-  jsr move_new_position_to_right
-  jmp check_if_new_position_valid
+  ; now set current_level to next_level
+  lda next_level
+  sta current_level
+  lda next_level+1
+  sta current_level+1
 
-check_if_new_position_valid
-  ldy #0
-  lda (new_position),y
-  cmp #EXIT_CHAR
-  bne continue_level
-  jsr level_has_finished
+  lda #0
+  sta count_chars_drawn
+
+dont_update
+; now check if level reset was set
+  lda level_reset
+  cmp #0
+  bne continue_update ; if not, go back to game loop
   rts
 
-continue_level
-  jsr collision_handler
-  bcc handle_jump_logic
+continue_update
+  ; if it was, update the level
+  lda #LEVEL_BEGINNING_LOW_BYTE
+  sta screen_cursor
+  lda #LEVEL_BEGINNING_HIGH_BYTE
+  sta screen_cursor+1
 
-  jsr update_squarebot_position
+  lda #LEVEL_COLOR_BEGINNING_LOW_BYTE
+  sta color_cursor
+  lda #LEVEL_COLOR_BEGINNING_HIGH_BYTE
+  sta color_cursor+1
 
-handle_jump_logic
-  lda jump_remaining ; how many more upward motions for current jump
-  cmp #0
-  bne handle_jumps_remaining
-
-
-handle_no_jumps_remaining ; if no jumps left, then start jump if space is pressed, otherwise just skip and handle gravity
-  lda currently_pressed_key
-  cmp #SPACE_KEY
-  bne handle_gravity
-
-  jsr squarebot_on_first_row ; if on first row, we dont care about what character lies below
-  bcs skip_validity_check
-
-; check if character below is blank; if so dont allow us to set jump_remaining
-  ldy #ROW_SIZE
-  lda (squarebot_position),y
-  
-  cmp #EXIT_CHAR
-  beq level_has_finished
-  
-  jsr collision_handler
-  bcs handle_gravity
-
-skip_validity_check
-  lda has_booster ; if we have the booster, set jump_remaining to twice as high, then get rid of the booster
-  cmp #1
-  bne regular_jump
-  lda #JUMP_SIZE*2
-  sta jump_remaining
-  lda #0
-  sta has_booster
-  jmp handle_jumps_remaining
-
-
-regular_jump
-  lda #JUMP_SIZE
-  sta jump_remaining
-
-handle_jumps_remaining
-  jsr move_new_position_up
+  ldx #0
   ldy #0
-  lda (new_position),y
-  cmp #EXIT_CHAR
-  beq level_has_finished
+  sty level_data_index
+
+  lda #0
+  sta jump_info
+  sta attached_powerups
+  sta attached_powerups+1
+  sta tileStore
+  sta tileStore+1
+  sta tileStore+2
+
+  ; draw (or redraw on reset) the current level
+draw_level_loop
+; y stores our index in the current level data
+  jsr check_if_level_cursor_at_end
+  bcs update_level_return
+
+  ldy level_data_index
+  lda (current_level),y ; accumulator stores the number of times to repeat the next byte  
+
+  jsr draw_sequence
+
+  ldy level_data_index
+  iny ; set y to point to next length byte (iterate 2 at a time)
+  iny
+  sty level_data_index
+  jmp draw_level_loop
+
+
+update_level_return
+  ; update next level pointer to point to byte after current level
+  lda current_level
+  clc
+  adc level_data_index
+  sta next_level
+  lda current_level+1
+  adc #0
+  sta next_level+1
+  rts
   
-  jsr collision_handler
-  bcc jump_is_invalid
-  
-  jsr update_squarebot_position
-  
-  lda jump_remaining
+
+
+draw_sequence
+; if acc == 0, return; otherwise subtract 1, draw the next 2 chars
+  beq draw_sequence_end
   sec
   sbc #1
-  sta jump_remaining
-  rts ; no gravity effect after moving upwards from jump
+  pha ; push accumulator onto stack
 
-
-jump_is_invalid
-  lda #0
-  sta jump_remaining
-  rts
-
-handle_gravity ; on first row - do nothing
-  jsr move_new_position_down
-
-  jsr squarebot_on_first_row
-  bcs do_nothing
-
-  ldy #0
-  lda (new_position),y
-
-  cmp #EXIT_CHAR
-  beq level_has_finished
+  ldy level_data_index
+  iny ; (so we can access the "element" byte after the length byte)
+  lda (current_level),y ; get formatted byte (see squarebot doc)
+  asl ; lol
+  asl
+  asl
+  asl 
+  jsr draw_high_bits ; draw char represented by the 4 high bits
   
-  jsr collision_handler
-  bcc do_nothing
+  ldy level_data_index
+  iny
 
+  lda (current_level),y 
+  jsr draw_high_bits
 
-  jsr update_squarebot_position
+  pla 
+  jmp draw_sequence
 
-do_nothing
+draw_sequence_end
   rts
 
-update_squarebot_position
-  jsr remove_char
-  ; new positions are valid; set them to current positions
 
-  lda new_position
+; put the character in the high 4 bits of accumulator on screen (see readme), and move the color and screen cursors ahead
+draw_high_bits
+  and #240 ; shave off last 4 bits
+
+  cmp #BLANK_SPACE
+  bne check_if_starting_point
+  lda #BLANK_TILE_CHAR ; todo; replace with actual chars
+  ldx #1
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_starting_point
+  cmp #STARTING_POINT
+  bne check_if_wall
+  
+   ; set squarebot to starting point
+  lda screen_cursor
   sta squarebot_position
-  lda new_position+1
+  lda screen_cursor+1
   sta squarebot_position+1
 
-  lda new_color_position
+  lda color_cursor
   sta squarebot_color_position
-  lda new_color_position+1
+  lda color_cursor+1
   sta squarebot_color_position+1
 
-  ldy #0
   lda #SQUAREBOT_CHAR
-  sta (squarebot_position),y
-  lda #SQUAREBOT_COLOR
-  sta (squarebot_color_position),y
+  ldx #SQUAREBOT_COLOR
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_wall
+  cmp #WALL
+  bne check_if_breakable_wall
+  lda #WALL_CHAR 
+  ldx #WALL_COLOR
+  jsr draw_char_in_accumulator
+  rts
   
+check_if_breakable_wall
+  cmp #BREAKABLE_WALL
+  bne check_if_locked_wall
+  lda #BREAKABLE_WALL_CHAR
+  ldx #BREAKABLE_WALL_COLOR
+  jsr draw_char_in_accumulator
   rts
 
-level_has_finished
-  lda #1
-  sta level_completed
-  sta level_reset
-  rts 
-
-move_new_position_to_right
-  clc
-  lda new_position ; load and add to low byte
-  adc #$1
-  sta new_position
-  lda new_position+1
-  adc #$0 ; add if carry flag is set (low byte overflowed)
-  sta new_position+1
-  clc
-  lda new_color_position ; load and add to low byte
-  adc #$1
-  sta new_color_position
-  lda new_color_position+1
-  adc #$0 ; add if carry flag is set (low byte overflowed)
-  sta new_color_position+1
+check_if_locked_wall
+  cmp #LOCKED_WALL
+  bne check_if_ladder
+  lda #LOCKED_WALL_CHAR
+  ldx #LOCKED_WALL_COLOR
+  jsr draw_char_in_accumulator
   rts
 
-move_new_position_to_left
-  sec
-  lda new_position 
-  sbc #$1
-  sta new_position
-  lda new_position+1
-  sbc #$0 
-  sta new_position+1
-  sec
-  lda new_color_position 
-  sbc #$1
-  sta new_color_position
-  lda new_color_position+1
-  sbc #$0 
-  sta new_color_position+1
+check_if_ladder
+  cmp #LADDER
+  bne check_if_exit
+  lda #LADDER_CHAR
+  ldx #LADDER_COLOR
+  jsr draw_char_in_accumulator
   rts
 
+check_if_exit
+  cmp #EXIT
+  bne check_if_platform
+  lda #EXIT_CHAR
+  ldx #EXIT_COLOR
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_platform
+  cmp #PLATFORM
+  bne check_if_key
+  lda #PLATFORM_CHAR
+  ldx #PLATFORM_COLOR
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_key
+  cmp #KEY
+  bne check_if_spike
+  lda #KEY_P_CHAR
+  ldx #KEY_P_COLOR
+  jsr draw_char_in_accumulator
+  rts
+
+check_if_spike
+  cmp #SPIKE
+  bne check_if_booster
+  lda #SPIKE_P_CHAR
+  ldx #SPIKE_P_COLOR
+  jsr draw_char_in_accumulator
+  rts
   
-move_new_position_up
-  sec
-  lda new_position 
-  sbc #ROW_SIZE
-  sta new_position
-  lda new_position+1
-  sbc #$0 
-  sta new_position+1
-  sec
-  lda new_color_position 
-  sbc #ROW_SIZE
-  sta new_color_position
-  lda new_color_position+1
-  sbc #$0 
-  sta new_color_position+1
-  rts
-
-move_new_position_down
-  clc
-  lda new_position ; load and add to low byte
-  adc #ROW_SIZE
-  sta new_position
-  lda new_position+1
-  adc #$0 ; add if carry flag is set (low byte overflowed)
-  sta new_position+1
-  clc
-  lda new_color_position ; load and add to low byte
-  adc #ROW_SIZE
-  sta new_color_position
-  lda new_color_position+1
-  adc #$0 ; add if carry flag is set (low byte overflowed)
-  sta new_color_position+1
+check_if_booster
+  lda #BOOSTER_P_CHAR
+  ldx #BOOSTER_P_COLOR
+  jsr draw_char_in_accumulator
   rts
 
 
-remove_char ; remove squarebot from current screen location
+
+; char in accumulator goes in screen cursor, color in x register goes in color cursor, then update cursors
+
+draw_char_in_accumulator
   ldy #0
-  lda #BLANK_CHAR
-  sta (squarebot_position),Y
-  lda #1
-  sta (squarebot_color_position),Y
+  sta (screen_cursor),y
+
+  txa
+  sta (color_cursor),y
+
+  jsr add_one_to_screen_cursor ; add to both screen and color cursor
+  jsr update_screen_position_if_on_border
   rts
 
-collision_handler ; accumulator is the character (the actual character code) in the position that squarebot wants to move to
-; set carry flag if we can move to this char, otherwise clear it
-  cmp #BLANK_CHAR
-  beq return_true
-  
-  CMP #BOOSTER_P_CHAR
-  bne key_check
-  lda #1
-  sta has_booster
-  jmp return_true
-
-key_check
-  cmp #KEY_P_CHAR
-  bne locked_wall_check
-  lda #1
-  sta has_key
-  jmp return_true
-
-locked_wall_check
-  cmp #LOCKED_WALL_CHAR
-  bne return_false
-
-  lda has_key ; if locked wall, but player doesnt have key, cant do anything
-  cmp #0
-  beq return_false
-  
-  lda #0 ; but if locked wall and has key, get rid of the locked wall and the key
-  sta has_key
-  jmp return_true
 
 
-squarebot_on_first_row ; set carry flag to 0 if squarebot_position is on bottom of screen; otherwise set to 1
-  lda squarebot_position+1
-  cmp #START_OF_FIRST_ROW_HIGH_BYTE
-  bcc return_false ; compare high bits; return false if current position high bit is smaller than high bit of leftmost position on first row
-  lda squarebot_position
-  cmp #START_OF_FIRST_ROW_LOW_BYTE
-  bcc return_false
-
-return_true
-  sec
+update_screen_position_if_on_border
+  lda count_chars_drawn
+  cmp #19
+  bne add_and_return
+  lda #0
+  sta count_chars_drawn
+  jsr add_one_to_screen_cursor
+  jsr add_one_to_screen_cursor
   rts
 
-return_false
+  
+add_and_return
+  clc
+  adc #1
+  sta count_chars_drawn
+  rts
+
+check_if_level_cursor_at_end ; set carry flag if screen_cursor at position $1ff9 (8185
+  lda screen_cursor ; load value at screen_cursor low byte
+  cmp #END_OF_LEVEL_LOW_BYTE
+  bne check_if_level_cursor_at_end_return_false ; if low byte doesnt match, return with carry flag as neg
+  
+  lda screen_cursor+1
+  cmp #END_OF_LEVEL_HIGH_BYTE
+  beq check_if_level_cursor_at_end_return_true ; if high byte matches, set carry flag
+
+check_if_level_cursor_at_end_return_false
   clc
   rts
 
-
-;plan for attachable powerups
-;5 variables to store the 5 tiles the player is on: tileU, tileD, tileR, tileL, tileM
-;maybe combine to save space?
-;4 characters to store each powerup spot: charU, charD, charR, charL
-;1 variable to store character's current powerups: attached_powerups
-
-;when moving the character right: ASSUMING THIS DOESN'T FLICKER
-;  delete L, U and D and draw original tiles there
-;  tileU = new, tileD = new, tileL = tileM, tileM = tileR, tileR = new
-;  update chars
-;  draw chars in the new place
-;same deal for moving in any direction
-
-
-;for moving while jumping, something about register 028C which counts down until a refresh on the button or something
-
-
-;this is for drawing the attachable powerup.
-;first draw the tile onto the character
-
-;set x to the address of the attachment
-;set y to 1
-;go to nestedloop
-
-;outerloop:
-;if y && 128 = 1 end loop
-;otherwise shift y right 1
-;run nestedloop
-
-;nestedloop:
-  ;lda [character_set_begin+[16*8]]^[[character_set_begin+[16*8]]&arithTemp]
-
-;target row = targetrow ^ [x & y]
-;go through each row at x, check if x && y = 1
-;if yes, XOR the correct bit on the character with 1 I think xor is ^
-;if the loop is done go to outerloop
-;otherwise nestedloop
-
-
-;option 2:
-
-;store each row of charL ^ powerup in tempArith
-;load tempArith into accumulator and store it in charL
-;clear tempArith
-
-;so
-;for each a=1 a<<1 a < 129
-;and charL
-
-;I don't think there is a generalized way to do this
-;it has to be brute force, unique for each direction i think
-;there is no simple way to store the fact that a bit is 1 and dynamically figure out how to change the character accordingly
-;unless?
-
-
-
-;variables: position (first 4 bits are byte position, second 4 bits are bit position)
-;good gosh you can't shift accumulator multiple bits at a time.
-
-;check each bit of the attachment, if its 1 set accumulator to 1 - nested for loop
-;go to directional implementation
-
-;right
-;shift accumulator to the correct bit - for loop since accumulator only shifts 1 bit at a time
-; ldx -1
-;shiftloop:
-; inx
-; asl
-; cpx [position>>4]%16
-; bne shiftloop
-
-;eor accumulator with the correct row in charR - EOR charR+[position%16]
-;increase position
-
-;
-
-;lets figure out the rest of the logic.
-;start of level need to set the tiles and chars and everything, and when you reset too
-
-;check if you press a or d:
-; check tile if you can move
-; if you can't, jump to fall
-; otherwise, move new position and apply powerup if you collide with one
-; refresh tiles
-; call powerup logic for each powerup.
-; draw powerup characters
-; delete old character
-; display character and powerups
-; wait a jiffy probably
-; booster check, if booster activated do this move again
-
-;check if you are falling or jumping
-; basically do all the same stuff but for up and down
-
-
-
-
-
-;powerup logic:
-
-
-
-;feedback:
-;more intermediate levels
-;jump left and jump right (uncontrollable jump movement)
-;better colored powerups
-;tutorial text
-;jumping animation? change his face.
+check_if_level_cursor_at_end_return_true
+  sec
+  rts 

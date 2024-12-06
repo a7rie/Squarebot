@@ -10,7 +10,7 @@ byte_to_ascii = {
     32: 'W', # wall
     48: 'T', # breakable wall
     64: 'L', # locked wall
-    80: '#', # ladder
+    80: '#', # Gravity Powerup
     96: 'E', # exit (go to next level)
     112: '_', # jump-through platform
     144: 'S', # spike 

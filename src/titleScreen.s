@@ -50,20 +50,22 @@ draw_character
   lda compressed_screen_data_start+1,X ; load cur char to draw
 
 ; solid block in the title screen editor is the a0 character; we convert that to the equivalent here (wall), as we cant access that char
-  cmp #$a0
-  bne dont_map_wall
-  lda #WALL_CHAR-128
-  clc
-
-dont_map_wall
+  cmp #100
+  bcc below_100 ; below 100 - add 128, map directly
+  sec
+  sbc #100
+  jmp draw_title_screen_char
+; dont_map_wall
+below_100
   adc #128
+draw_title_screen_char
   sta (screen_cursor),Y ; draw it on screen
 
   
   ; add color to the screen location if it's not a space
   ; because our title screen only has one color, and only displays it for characters that arent space, we can get away with this "optimization",
   ; and avoid adding color data
-  cmp #BLANK_CHAR
+  cmp #BLANK_CHAR+128
   beq dont_color
 
   lda #TITLE_SCREEN_CHAR_COLOR

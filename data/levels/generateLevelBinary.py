@@ -14,7 +14,7 @@ ascii_to_byte = {
     'W': 0b00000010, # wall
     'T': 0b00000011, # breakable wall
     'L': 0b00000100, # locked wall
-    '#': 0b00000101, # ladder
+    'G': 0b00000101, # gravity powerup
     'E': 0b00000110, # exit (go to next level)
     '_': 0b00000111, # jump-through platform
     'S': 0b00001001, # spike
