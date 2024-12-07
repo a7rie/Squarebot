@@ -85,6 +85,7 @@ check_if_w_pressed
   cmp #W_KEY
   bne check_if_q_pressed
   ldx #0 ; up
+  jsr player_movement
   jsr move_dir
   bcc update_return ; jump failed
   lda #JUMP_SIZE
@@ -97,6 +98,7 @@ check_if_q_pressed
   cmp #Q_KEY
   bne check_if_e_pressed
   ldx #0 ; up
+  jsr player_movement
   jsr move_dir
   bcc update_return ; jump failed
   lda #JUMP_SIZE
@@ -112,6 +114,7 @@ check_if_e_pressed
   cmp #E_KEY
   bne check_if_a_pressed
   ldx #0 ; up
+  jsr player_movement
   jsr move_dir
   bcc update_return ; jump failed
   lda #JUMP_SIZE
@@ -127,6 +130,7 @@ check_if_a_pressed
   cmp #A_KEY
   bne check_if_d_pressed
   ldx #2 ; left
+  jsr player_movement
   jsr move_dir
   jmp update_return
 
@@ -134,6 +138,7 @@ check_if_d_pressed
   cmp #D_KEY
   bne update_return
   ldx #3 ; right
+  jsr player_movement
   jsr move_dir
   jmp update_return
 
@@ -220,7 +225,6 @@ post_booster
   jmp move_dir
 return_true_move
   sec
-  jsr player_movement
   rts ; return true move
 return_false_move
   clc

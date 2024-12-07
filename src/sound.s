@@ -3,6 +3,8 @@ SV      = $900e                 ; volume
 JC      = $00a2                 ; jiffy clock
 
 STARTM  = 214                   ; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
+STARTC  = 150                   ; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
+STARTG  = 255                   ; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
 
 player_movement                 ; CALL THIS SUBROUTINE TO PLAY THE SOUND
         ldx #0
