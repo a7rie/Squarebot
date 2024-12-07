@@ -129,7 +129,7 @@ start
 
   include "titleScreen.s"
 
-; title screen code jumps here once space pressed
+; title screen code jumps here once enter pressed
 gameLoop
   jsr update_level
   lda #0
@@ -177,6 +177,7 @@ check_for_reset_key_return
 
   include "updateLevel.s"
   include "updateGameState_new.s"
+  include "sound.s"
   include "updateGameStateHelper.s"
 
 compressed_screen_data_start

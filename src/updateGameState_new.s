@@ -44,7 +44,7 @@ j_right
 fall_logic
   lda tile_store+1 ; down
   jsr fall_check ; check if we hit the ground, different from collision_handler since platforms are included
-  bcc check_if_space_pressed
+  bcc check_if_w_pressed
   ldx #1 ; down
   jsr move_dir
   lda tile_store+1 ; check if we hit ground again, if we didn't we can move in the jump_dir
@@ -78,11 +78,11 @@ update_return
   sta temp+3
   rts
 
-check_if_space_pressed
+check_if_w_pressed
   lda #$00
   sta jump_dir ; double check we aren't falling in a direction
   lda currently_pressed_key
-  cmp #SPACE_KEY
+  cmp #W_KEY
   bne check_if_q_pressed
   ldx #0 ; up
   jsr move_dir
@@ -220,6 +220,7 @@ post_booster
   jmp move_dir
 return_true_move
   sec
+  jsr player_movement
   rts ; return true move
 return_false_move
   clc
