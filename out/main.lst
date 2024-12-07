@@ -79,9 +79,9 @@
       0  1001					      include	"stub.s"	; stub contains BASIC sys cmd to run the machine language code
       1  1001		       00 9e	   SYS_CMD_TOKEN =	$9e
       2  1001		       00 0a	   STUB_LINE_NUMBER =	10
-      3  1001							; BASIC stub -- SYS cmd to run machine language
+      3  1001							; BASIC stub -- SYS cmd to run machine language 
       4  1001		       0b 10		      dc.w	nextstmt	; link; beginning of basic
-      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number
+      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number 
       6  1005		       9e 34 31 30*	      dc.b	SYS_CMD_TOKEN, [start]d, 0	; token for sys with operand as address to "start" label
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
@@ -179,7 +179,7 @@
      36  1097		       90 f3		      bcc	draw_title_screen_chars_loop
      37  1099		       60		      rts
      38  109a
-     39  109a				   back_to_start		;if menu button is pressed go back to start
+     39  109a				   back_to_start		;if menu button is pressed go back to start 
      40  109a		       4c 0d 10 	      jmp	start
      41  109d
      42  109d							; draw the character in Y register for (value of accumulator) number of times
@@ -267,7 +267,7 @@
     135  10f1		       20 46 11 	      jsr	update_level
     136  10f4		       a9 00		      lda	#0
     137  10f6		       85 08		      sta	level_reset
-    138  10f8		       20 b1 12 	      jsr	update_game_state
+    138  10f8		       20 d2 12 	      jsr	update_game_state
     139  10fb		       20 1b 11 	      jsr	check_extra_keys
     140  10fe		       b0 9a		      bcs	back_to_start
     141  1100		       20 12 11 	      jsr	wait_until_next_frame
@@ -288,14 +288,14 @@
     156  111b		       a5 c5		      lda	currently_pressed_key
     157  111d		       c9 32		      cmp	#RESET_KEY
     158  111f		       d0 0a		      bne	check_skip
-    159  1121		       20 76 14 	      jsr	delete_squarebot
+    159  1121		       20 94 14 	      jsr	delete_squarebot
     160  1124		       a9 01		      lda	#1
     161  1126		       85 08		      sta	level_reset
     162  1128		       4c 44 11 	      jmp	return_check
     163  112b				   check_skip
     164  112b		       c9 0d		      cmp	#SKIP_KEY
     165  112d		       d0 0c		      bne	check_menu
-    166  112f		       20 76 14 	      jsr	delete_squarebot
+    166  112f		       20 94 14 	      jsr	delete_squarebot
     167  1132		       a9 01		      lda	#1
     168  1134		       85 09		      sta	level_completed
     169  1136		       85 08		      sta	level_reset
@@ -303,7 +303,7 @@
     171  113b				   check_menu
     172  113b		       c9 34		      cmp	#MENU_KEY
     173  113d		       d0 05		      bne	return_check
-    174  113f		       20 76 14 	      jsr	delete_squarebot
+    174  113f		       20 94 14 	      jsr	delete_squarebot
     175  1142		       38		      sec
     176  1143		       60		      rts		; tell them to restart
     177  1144				   return_check
@@ -373,902 +373,904 @@
      59  1146							; check if the level is completed; set current_level to next_level if so
      60  1146		       a5 09		      lda	level_completed
      61  1148		       c9 01		      cmp	#LEVEL_IS_DONE	; (try optimizing later)
-     62  114a		       d0 13		      bne	dont_update
+     62  114a		       d0 16		      bne	dont_update
      63  114c
      64  114c							; level is done; reset level completed
      65  114c		       a9 00		      lda	#LEVEL_NOT_DONE
      66  114e		       85 09		      sta	level_completed
      67  1150
      68  1150							; delete squarebot
-     69  1150		       20 76 14 	      jsr	delete_squarebot
+     69  1150		       20 94 14 	      jsr	delete_squarebot
      70  1153
      71  1153							; now set current_level to next_level
-     72  1153		       a5 06		      lda	next_level
-     73  1155		       85 04		      sta	current_level
-     74  1157		       a5 07		      lda	next_level+1
-     75  1159		       85 05		      sta	current_level+1
-     76  115b
-     77  115b		       a9 00		      lda	#0
-     78  115d		       85 30		      sta	count_chars_drawn
-     79  115f
-     80  115f				   dont_update
-     81  115f							; now check if level reset was set
-     82  115f		       a5 08		      lda	level_reset
-     83  1161		       c9 00		      cmp	#0
-     84  1163		       d0 01		      bne	continue_update	; if not, go back to game loop
-     85  1165		       60		      rts
-     86  1166
-     87  1166				   continue_update
-     88  1166							; if it was, update the level
-     89  1166		       a9 17		      lda	#LEVEL_BEGINNING_LOW_BYTE
-     90  1168		       85 00		      sta	screen_cursor
-     91  116a		       a9 1e		      lda	#LEVEL_BEGINNING_HIGH_BYTE
-     92  116c		       85 01		      sta	screen_cursor+1
-     93  116e
-     94  116e		       a9 17		      lda	#LEVEL_COLOR_BEGINNING_LOW_BYTE
-     95  1170		       85 02		      sta	color_cursor
-     96  1172		       a9 96		      lda	#LEVEL_COLOR_BEGINNING_HIGH_BYTE
-     97  1174		       85 03		      sta	color_cursor+1
-     98  1176
-     99  1176		       a2 00		      ldx	#0
-    100  1178		       a0 00		      ldy	#0
-    101  117a		       84 0a		      sty	level_data_index
-    102  117c
-    103  117c		       a9 00		      lda	#0
-    104  117e		       85 15		      sta	jump_num
-    105  1180		       85 14		      sta	jump_dir
-    106  1182		       85 1b		      sta	attached_powerups
-    107  1184		       85 1c		      sta	attached_powerups+1
-    108  1186		       85 1d		      sta	attached_powerups+2
-    109  1188		       85 1e		      sta	attached_powerups+3
-    110  118a		       85 16		      sta	tile_store
-    111  118c		       85 17		      sta	tile_store+1
-    112  118e		       85 18		      sta	tile_store+2
-    113  1190		       85 19		      sta	tile_store+3
-    114  1192		       85 1a		      sta	tile_store+4
-    115  1194		       85 28		      sta	temp
-    116  1196		       85 29		      sta	temp+1
-    117  1198		       85 2a		      sta	temp+2
-    118  119a		       85 2b		      sta	temp+3
-    119  119c
-    120  119c							; draw (or redraw on reset) the current level
-    121  119c				   draw_level_loop
-    122  119c							; y stores our index in the current level data
-    123  119c		       20 a1 12 	      jsr	check_if_level_cursor_at_end
-    124  119f		       b0 10		      bcs	update_level_return
-    125  11a1
-    126  11a1		       a4 0a		      ldy	level_data_index
-    127  11a3		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte
-    128  11a5
-    129  11a5		       20 bf 11 	      jsr	draw_sequence
-    130  11a8
-    131  11a8		       a4 0a		      ldy	level_data_index
-    132  11aa		       c8		      iny		; set y to point to next length byte (iterate 2 at a time)
-    133  11ab		       c8		      iny
-    134  11ac		       84 0a		      sty	level_data_index
-    135  11ae		       4c 9c 11 	      jmp	draw_level_loop
-    136  11b1
-    137  11b1
-    138  11b1				   update_level_return
-    139  11b1							; update next level pointer to point to byte after current level
-    140  11b1		       a5 04		      lda	current_level
-    141  11b3		       18		      clc
-    142  11b4		       65 0a		      adc	level_data_index
-    143  11b6		       85 06		      sta	next_level
-    144  11b8		       a5 05		      lda	current_level+1
-    145  11ba		       69 00		      adc	#0
-    146  11bc		       85 07		      sta	next_level+1
-    147  11be		       60		      rts
-    148  11bf
-    149  11bf
-    150  11bf
-    151  11bf				   draw_sequence
-    152  11bf							; if acc == 0, return; otherwise subtract 1, draw the next 2 chars
-    153  11bf		       f0 1c		      beq	draw_sequence_end
-    154  11c1		       38		      sec
-    155  11c2		       e9 01		      sbc	#1
-    156  11c4		       48		      pha		; push accumulator onto stack
-    157  11c5
-    158  11c5		       a4 0a		      ldy	level_data_index
-    159  11c7		       c8		      iny		; (so we can access the "element" byte after the length byte)
-    160  11c8		       b1 04		      lda	(current_level),y	; get formatted byte (see squarebot doc)
-    161  11ca		       0a		      asl		; lol
-    162  11cb		       0a		      asl
-    163  11cc		       0a		      asl
-    164  11cd		       0a		      asl
-    165  11ce		       20 de 11 	      jsr	draw_high_bits	; draw char represented by the 4 high bits
-    166  11d1
-    167  11d1		       a4 0a		      ldy	level_data_index
-    168  11d3		       c8		      iny
-    169  11d4
-    170  11d4		       b1 04		      lda	(current_level),y
-    171  11d6		       20 de 11 	      jsr	draw_high_bits
-    172  11d9
-    173  11d9		       68		      pla
-    174  11da		       4c bf 11 	      jmp	draw_sequence
-    175  11dd
-    176  11dd				   draw_sequence_end
-    177  11dd		       60		      rts
-    178  11de
-    179  11de
-    180  11de							; put the character in the high 4 bits of accumulator on screen (see readme), and move the color and screen cursors ahead
-    181  11de				   draw_high_bits
-    182  11de		       29 f0		      and	#240	; shave off last 4 bits
-    183  11e0
-    184  11e0		       c9 00		      cmp	#BLANK_SPACE
-    185  11e2		       d0 08		      bne	check_if_starting_point
-    186  11e4		       a9 00		      lda	#BLANK_TILE_CHAR	; todo; replace with actual chars
-    187  11e6		       a2 01		      ldx	#1
-    188  11e8		       20 7c 12 	      jsr	draw_char_in_accumulator
-    189  11eb		       60		      rts
-    190  11ec
-    191  11ec				   check_if_starting_point
-    192  11ec		       c9 10		      cmp	#STARTING_POINT
-    193  11ee		       d0 18		      bne	check_if_wall
-    194  11f0
-    195  11f0							; set squarebot to starting point
-    196  11f0		       a5 00		      lda	screen_cursor
-    197  11f2		       85 10		      sta	squarebot_position
-    198  11f4		       a5 01		      lda	screen_cursor+1
-    199  11f6		       85 11		      sta	squarebot_position+1
-    200  11f8
-    201  11f8		       a5 02		      lda	color_cursor
-    202  11fa		       85 12		      sta	squarebot_color_position
-    203  11fc		       a5 03		      lda	color_cursor+1
-    204  11fe		       85 13		      sta	squarebot_color_position+1
-    205  1200
-    206  1200		       a9 13		      lda	#SQUAREBOT_CHAR
-    207  1202		       a2 02		      ldx	#SQUAREBOT_COLOR
-    208  1204		       20 7c 12 	      jsr	draw_char_in_accumulator
-    209  1207		       60		      rts
-    210  1208
-    211  1208				   check_if_wall
-    212  1208		       c9 20		      cmp	#WALL
-    213  120a		       d0 08		      bne	check_if_breakable_wall
-    214  120c		       a9 03		      lda	#WALL_CHAR
-    215  120e		       a2 00		      ldx	#WALL_COLOR
-    216  1210		       20 7c 12 	      jsr	draw_char_in_accumulator
-    217  1213		       60		      rts
-    218  1214
-    219  1214				   check_if_breakable_wall
-    220  1214		       c9 30		      cmp	#BREAKABLE_WALL
-    221  1216		       d0 08		      bne	check_if_locked_wall
-    222  1218		       a9 07		      lda	#BREAKABLE_WALL_CHAR
-    223  121a		       a2 00		      ldx	#BREAKABLE_WALL_COLOR
-    224  121c		       20 7c 12 	      jsr	draw_char_in_accumulator
-    225  121f		       60		      rts
-    226  1220
-    227  1220				   check_if_locked_wall
-    228  1220		       c9 40		      cmp	#LOCKED_WALL
-    229  1222		       d0 08		      bne	check_if_ladder
-    230  1224		       a9 06		      lda	#LOCKED_WALL_CHAR
-    231  1226		       a2 00		      ldx	#LOCKED_WALL_COLOR
-    232  1228		       20 7c 12 	      jsr	draw_char_in_accumulator
-    233  122b		       60		      rts
-    234  122c
-    235  122c				   check_if_ladder
-    236  122c		       c9 50		      cmp	#LADDER
-    237  122e		       d0 08		      bne	check_if_exit
-    238  1230		       a9 01		      lda	#LADDER_CHAR
-    239  1232		       a2 00		      ldx	#LADDER_COLOR
-    240  1234		       20 7c 12 	      jsr	draw_char_in_accumulator
-    241  1237		       60		      rts
-    242  1238
-    243  1238				   check_if_exit
-    244  1238		       c9 60		      cmp	#EXIT
-    245  123a		       d0 08		      bne	check_if_locked_exit
-    246  123c		       a9 04		      lda	#EXIT_CHAR
-    247  123e		       a2 00		      ldx	#EXIT_COLOR
-    248  1240		       20 7c 12 	      jsr	draw_char_in_accumulator
-    249  1243		       60		      rts
-    250  1244
-    251  1244				   check_if_locked_exit
-    252  1244		       c9 b0		      cmp	#LOCKED_EXIT
-    253  1246		       d0 08		      bne	check_if_platform
-    254  1248		       a9 05		      lda	#LOCKED_EXIT_CHAR
-    255  124a		       a2 00		      ldx	#LOCKED_EXIT_COLOR
-    256  124c		       20 7c 12 	      jsr	draw_char_in_accumulator
-    257  124f		       60		      rts
-    258  1250
-    259  1250				   check_if_platform
-    260  1250		       c9 70		      cmp	#PLATFORM
-    261  1252		       d0 08		      bne	check_if_key
-    262  1254		       a9 02		      lda	#PLATFORM_CHAR
-    263  1256		       a2 00		      ldx	#PLATFORM_COLOR
-    264  1258		       20 7c 12 	      jsr	draw_char_in_accumulator
-    265  125b		       60		      rts
-    266  125c
-    267  125c				   check_if_key
-    268  125c		       c9 80		      cmp	#KEY
-    269  125e		       d0 08		      bne	check_if_spike
-    270  1260		       a9 0a		      lda	#KEY_P_CHAR
-    271  1262		       a2 00		      ldx	#KEY_P_COLOR
-    272  1264		       20 7c 12 	      jsr	draw_char_in_accumulator
-    273  1267		       60		      rts
-    274  1268
-    275  1268				   check_if_spike
-    276  1268		       c9 90		      cmp	#SPIKE
-    277  126a		       d0 08		      bne	check_if_booster
-    278  126c		       a9 08		      lda	#SPIKE_CHAR
-    279  126e		       a2 00		      ldx	#SPIKE_COLOR
-    280  1270		       20 7c 12 	      jsr	draw_char_in_accumulator
-    281  1273		       60		      rts
-    282  1274
-    283  1274				   check_if_booster
-    284  1274		       a9 09		      lda	#BOOSTER_P_CHAR
-    285  1276		       a2 00		      ldx	#BOOSTER_P_COLOR
-    286  1278		       20 7c 12 	      jsr	draw_char_in_accumulator
-    287  127b		       60		      rts
-    288  127c
-    289  127c
-    290  127c
-    291  127c							; char in accumulator goes in screen cursor, color in x register goes in color cursor, then update cursors
-    292  127c
-    293  127c				   draw_char_in_accumulator
-    294  127c		       a0 00		      ldy	#0
-    295  127e		       91 00		      sta	(screen_cursor),y
-    296  1280
-    297  1280		       8a		      txa
-    298  1281		       91 02		      sta	(color_cursor),y
-    299  1283
-    300  1283		       20 c6 10 	      jsr	add_one_to_screen_cursor	; add to both screen and color cursor
-    301  1286		       20 8a 12 	      jsr	update_screen_position_if_on_border
-    302  1289		       60		      rts
-    303  128a
-    304  128a
-    305  128a
-    306  128a				   update_screen_position_if_on_border
-    307  128a		       a5 30		      lda	count_chars_drawn
-    308  128c		       c9 13		      cmp	#19
-    309  128e		       d0 0b		      bne	add_and_return
-    310  1290		       a9 00		      lda	#0
-    311  1292		       85 30		      sta	count_chars_drawn
-    312  1294		       20 c6 10 	      jsr	add_one_to_screen_cursor
+     72  1153		       20 b4 12 	      jsr	player_movement
+     73  1156		       a5 06		      lda	next_level
+     74  1158		       85 04		      sta	current_level
+     75  115a		       a5 07		      lda	next_level+1
+     76  115c		       85 05		      sta	current_level+1
+     77  115e
+     78  115e		       a9 00		      lda	#0
+     79  1160		       85 30		      sta	count_chars_drawn
+     80  1162
+     81  1162				   dont_update
+     82  1162							; now check if level reset was set
+     83  1162		       a5 08		      lda	level_reset
+     84  1164		       c9 00		      cmp	#0
+     85  1166		       d0 01		      bne	continue_update	; if not, go back to game loop
+     86  1168		       60		      rts
+     87  1169
+     88  1169				   continue_update
+     89  1169							; if it was, update the level
+     90  1169		       a9 17		      lda	#LEVEL_BEGINNING_LOW_BYTE
+     91  116b		       85 00		      sta	screen_cursor
+     92  116d		       a9 1e		      lda	#LEVEL_BEGINNING_HIGH_BYTE
+     93  116f		       85 01		      sta	screen_cursor+1
+     94  1171
+     95  1171		       a9 17		      lda	#LEVEL_COLOR_BEGINNING_LOW_BYTE
+     96  1173		       85 02		      sta	color_cursor
+     97  1175		       a9 96		      lda	#LEVEL_COLOR_BEGINNING_HIGH_BYTE
+     98  1177		       85 03		      sta	color_cursor+1
+     99  1179
+    100  1179		       a2 00		      ldx	#0
+    101  117b		       a0 00		      ldy	#0
+    102  117d		       84 0a		      sty	level_data_index
+    103  117f
+    104  117f		       a9 00		      lda	#0
+    105  1181		       85 15		      sta	jump_num
+    106  1183		       85 14		      sta	jump_dir
+    107  1185		       85 1b		      sta	attached_powerups
+    108  1187		       85 1c		      sta	attached_powerups+1
+    109  1189		       85 1d		      sta	attached_powerups+2
+    110  118b		       85 1e		      sta	attached_powerups+3
+    111  118d		       85 16		      sta	tile_store
+    112  118f		       85 17		      sta	tile_store+1
+    113  1191		       85 18		      sta	tile_store+2
+    114  1193		       85 19		      sta	tile_store+3
+    115  1195		       85 1a		      sta	tile_store+4
+    116  1197		       85 28		      sta	temp
+    117  1199		       85 29		      sta	temp+1
+    118  119b		       85 2a		      sta	temp+2
+    119  119d		       85 2b		      sta	temp+3
+    120  119f
+    121  119f							; draw (or redraw on reset) the current level
+    122  119f				   draw_level_loop
+    123  119f							; y stores our index in the current level data
+    124  119f		       20 a4 12 	      jsr	check_if_level_cursor_at_end
+    125  11a2		       b0 10		      bcs	update_level_return
+    126  11a4
+    127  11a4		       a4 0a		      ldy	level_data_index
+    128  11a6		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
+    129  11a8
+    130  11a8		       20 c2 11 	      jsr	draw_sequence
+    131  11ab
+    132  11ab		       a4 0a		      ldy	level_data_index
+    133  11ad		       c8		      iny		; set y to point to next length byte (iterate 2 at a time)
+    134  11ae		       c8		      iny
+    135  11af		       84 0a		      sty	level_data_index
+    136  11b1		       4c 9f 11 	      jmp	draw_level_loop
+    137  11b4
+    138  11b4
+    139  11b4				   update_level_return
+    140  11b4							; update next level pointer to point to byte after current level
+    141  11b4		       a5 04		      lda	current_level
+    142  11b6		       18		      clc
+    143  11b7		       65 0a		      adc	level_data_index
+    144  11b9		       85 06		      sta	next_level
+    145  11bb		       a5 05		      lda	current_level+1
+    146  11bd		       69 00		      adc	#0
+    147  11bf		       85 07		      sta	next_level+1
+    148  11c1		       60		      rts
+    149  11c2
+    150  11c2
+    151  11c2
+    152  11c2				   draw_sequence
+    153  11c2							; if acc == 0, return; otherwise subtract 1, draw the next 2 chars
+    154  11c2		       f0 1c		      beq	draw_sequence_end
+    155  11c4		       38		      sec
+    156  11c5		       e9 01		      sbc	#1
+    157  11c7		       48		      pha		; push accumulator onto stack
+    158  11c8
+    159  11c8		       a4 0a		      ldy	level_data_index
+    160  11ca		       c8		      iny		; (so we can access the "element" byte after the length byte)
+    161  11cb		       b1 04		      lda	(current_level),y	; get formatted byte (see squarebot doc)
+    162  11cd		       0a		      asl		; lol
+    163  11ce		       0a		      asl
+    164  11cf		       0a		      asl
+    165  11d0		       0a		      asl
+    166  11d1		       20 e1 11 	      jsr	draw_high_bits	; draw char represented by the 4 high bits
+    167  11d4
+    168  11d4		       a4 0a		      ldy	level_data_index
+    169  11d6		       c8		      iny
+    170  11d7
+    171  11d7		       b1 04		      lda	(current_level),y
+    172  11d9		       20 e1 11 	      jsr	draw_high_bits
+    173  11dc
+    174  11dc		       68		      pla
+    175  11dd		       4c c2 11 	      jmp	draw_sequence
+    176  11e0
+    177  11e0				   draw_sequence_end
+    178  11e0		       60		      rts
+    179  11e1
+    180  11e1
+    181  11e1							; put the character in the high 4 bits of accumulator on screen (see readme), and move the color and screen cursors ahead
+    182  11e1				   draw_high_bits
+    183  11e1		       29 f0		      and	#240	; shave off last 4 bits
+    184  11e3
+    185  11e3		       c9 00		      cmp	#BLANK_SPACE
+    186  11e5		       d0 08		      bne	check_if_starting_point
+    187  11e7		       a9 00		      lda	#BLANK_TILE_CHAR	; todo; replace with actual chars
+    188  11e9		       a2 01		      ldx	#1
+    189  11eb		       20 7f 12 	      jsr	draw_char_in_accumulator
+    190  11ee		       60		      rts
+    191  11ef
+    192  11ef				   check_if_starting_point
+    193  11ef		       c9 10		      cmp	#STARTING_POINT
+    194  11f1		       d0 18		      bne	check_if_wall
+    195  11f3
+    196  11f3							; set squarebot to starting point
+    197  11f3		       a5 00		      lda	screen_cursor
+    198  11f5		       85 10		      sta	squarebot_position
+    199  11f7		       a5 01		      lda	screen_cursor+1
+    200  11f9		       85 11		      sta	squarebot_position+1
+    201  11fb
+    202  11fb		       a5 02		      lda	color_cursor
+    203  11fd		       85 12		      sta	squarebot_color_position
+    204  11ff		       a5 03		      lda	color_cursor+1
+    205  1201		       85 13		      sta	squarebot_color_position+1
+    206  1203
+    207  1203		       a9 13		      lda	#SQUAREBOT_CHAR
+    208  1205		       a2 02		      ldx	#SQUAREBOT_COLOR
+    209  1207		       20 7f 12 	      jsr	draw_char_in_accumulator
+    210  120a		       60		      rts
+    211  120b
+    212  120b				   check_if_wall
+    213  120b		       c9 20		      cmp	#WALL
+    214  120d		       d0 08		      bne	check_if_breakable_wall
+    215  120f		       a9 03		      lda	#WALL_CHAR
+    216  1211		       a2 00		      ldx	#WALL_COLOR
+    217  1213		       20 7f 12 	      jsr	draw_char_in_accumulator
+    218  1216		       60		      rts
+    219  1217
+    220  1217				   check_if_breakable_wall
+    221  1217		       c9 30		      cmp	#BREAKABLE_WALL
+    222  1219		       d0 08		      bne	check_if_locked_wall
+    223  121b		       a9 07		      lda	#BREAKABLE_WALL_CHAR
+    224  121d		       a2 00		      ldx	#BREAKABLE_WALL_COLOR
+    225  121f		       20 7f 12 	      jsr	draw_char_in_accumulator
+    226  1222		       60		      rts
+    227  1223
+    228  1223				   check_if_locked_wall
+    229  1223		       c9 40		      cmp	#LOCKED_WALL
+    230  1225		       d0 08		      bne	check_if_ladder
+    231  1227		       a9 06		      lda	#LOCKED_WALL_CHAR
+    232  1229		       a2 00		      ldx	#LOCKED_WALL_COLOR
+    233  122b		       20 7f 12 	      jsr	draw_char_in_accumulator
+    234  122e		       60		      rts
+    235  122f
+    236  122f				   check_if_ladder
+    237  122f		       c9 50		      cmp	#LADDER
+    238  1231		       d0 08		      bne	check_if_exit
+    239  1233		       a9 01		      lda	#LADDER_CHAR
+    240  1235		       a2 00		      ldx	#LADDER_COLOR
+    241  1237		       20 7f 12 	      jsr	draw_char_in_accumulator
+    242  123a		       60		      rts
+    243  123b
+    244  123b				   check_if_exit
+    245  123b		       c9 60		      cmp	#EXIT
+    246  123d		       d0 08		      bne	check_if_locked_exit
+    247  123f		       a9 04		      lda	#EXIT_CHAR
+    248  1241		       a2 00		      ldx	#EXIT_COLOR
+    249  1243		       20 7f 12 	      jsr	draw_char_in_accumulator
+    250  1246		       60		      rts
+    251  1247
+    252  1247				   check_if_locked_exit
+    253  1247		       c9 b0		      cmp	#LOCKED_EXIT
+    254  1249		       d0 08		      bne	check_if_platform
+    255  124b		       a9 05		      lda	#LOCKED_EXIT_CHAR
+    256  124d		       a2 00		      ldx	#LOCKED_EXIT_COLOR
+    257  124f		       20 7f 12 	      jsr	draw_char_in_accumulator
+    258  1252		       60		      rts
+    259  1253
+    260  1253				   check_if_platform
+    261  1253		       c9 70		      cmp	#PLATFORM
+    262  1255		       d0 08		      bne	check_if_key
+    263  1257		       a9 02		      lda	#PLATFORM_CHAR
+    264  1259		       a2 00		      ldx	#PLATFORM_COLOR
+    265  125b		       20 7f 12 	      jsr	draw_char_in_accumulator
+    266  125e		       60		      rts
+    267  125f
+    268  125f				   check_if_key
+    269  125f		       c9 80		      cmp	#KEY
+    270  1261		       d0 08		      bne	check_if_spike
+    271  1263		       a9 0a		      lda	#KEY_P_CHAR
+    272  1265		       a2 00		      ldx	#KEY_P_COLOR
+    273  1267		       20 7f 12 	      jsr	draw_char_in_accumulator
+    274  126a		       60		      rts
+    275  126b
+    276  126b				   check_if_spike
+    277  126b		       c9 90		      cmp	#SPIKE
+    278  126d		       d0 08		      bne	check_if_booster
+    279  126f		       a9 08		      lda	#SPIKE_CHAR
+    280  1271		       a2 00		      ldx	#SPIKE_COLOR
+    281  1273		       20 7f 12 	      jsr	draw_char_in_accumulator
+    282  1276		       60		      rts
+    283  1277
+    284  1277				   check_if_booster
+    285  1277		       a9 09		      lda	#BOOSTER_P_CHAR
+    286  1279		       a2 00		      ldx	#BOOSTER_P_COLOR
+    287  127b		       20 7f 12 	      jsr	draw_char_in_accumulator
+    288  127e		       60		      rts
+    289  127f
+    290  127f
+    291  127f
+    292  127f							; char in accumulator goes in screen cursor, color in x register goes in color cursor, then update cursors
+    293  127f
+    294  127f				   draw_char_in_accumulator
+    295  127f		       a0 00		      ldy	#0
+    296  1281		       91 00		      sta	(screen_cursor),y
+    297  1283
+    298  1283		       8a		      txa
+    299  1284		       91 02		      sta	(color_cursor),y
+    300  1286
+    301  1286		       20 c6 10 	      jsr	add_one_to_screen_cursor	; add to both screen and color cursor
+    302  1289		       20 8d 12 	      jsr	update_screen_position_if_on_border
+    303  128c		       60		      rts
+    304  128d
+    305  128d
+    306  128d
+    307  128d				   update_screen_position_if_on_border
+    308  128d		       a5 30		      lda	count_chars_drawn
+    309  128f		       c9 13		      cmp	#19
+    310  1291		       d0 0b		      bne	add_and_return
+    311  1293		       a9 00		      lda	#0
+    312  1295		       85 30		      sta	count_chars_drawn
     313  1297		       20 c6 10 	      jsr	add_one_to_screen_cursor
-    314  129a		       60		      rts
-    315  129b
-    316  129b
-    317  129b				   add_and_return
-    318  129b		       18		      clc
-    319  129c		       69 01		      adc	#1
-    320  129e		       85 30		      sta	count_chars_drawn
-    321  12a0		       60		      rts
-    322  12a1
-    323  12a1				   check_if_level_cursor_at_end 		; set carry flag if screen_cursor at position $1ff9 (8185
-    324  12a1		       a5 00		      lda	screen_cursor	; load value at screen_cursor low byte
-    325  12a3		       c9 e5		      cmp	#END_OF_LEVEL_LOW_BYTE
-    326  12a5		       d0 06		      bne	check_if_level_cursor_at_end_return_false	; if low byte doesnt match, return with carry flag as neg
-    327  12a7
-    328  12a7		       a5 01		      lda	screen_cursor+1
-    329  12a9		       c9 1f		      cmp	#END_OF_LEVEL_HIGH_BYTE
-    330  12ab		       f0 02		      beq	check_if_level_cursor_at_end_return_true	; if high byte matches, set carry flag
-    331  12ad
-    332  12ad				   check_if_level_cursor_at_end_return_false
-    333  12ad		       18		      clc
-    334  12ae		       60		      rts
-    335  12af
-    336  12af				   check_if_level_cursor_at_end_return_true
-    337  12af		       38		      sec
-    338  12b0		       60		      rts
-------- FILE main.s
-------- FILE updateGameState_new.s LEVEL 2 PASS 3
-      0  12b1					      include	"updateGameState_new.s"
-      1  12b1		       00 e4	   START_OF_FIRST_ROW_LOW_BYTE =	$e4
-      2  12b1		       00 1f	   START_OF_FIRST_ROW_HIGH_BYTE =	$1f
-      3  12b1
-      4  12b1							; main logic until line 113:
-      5  12b1				   update_game_state
-      6  12b1		       a5 10		      lda	squarebot_position	; likely unnecessary
-      7  12b3		       85 0b		      sta	new_position
-      8  12b5		       a5 11		      lda	squarebot_position+1
-      9  12b7		       85 0c		      sta	new_position+1
-     10  12b9		       a5 12		      lda	squarebot_color_position
-     11  12bb		       85 0d		      sta	new_color_position
-     12  12bd		       a5 13		      lda	squarebot_color_position+1
-     13  12bf		       85 0e		      sta	new_color_position+1
-     14  12c1
-     15  12c1				   jump_logic
-     16  12c1		       a5 15		      lda	jump_num
-     17  12c3		       c9 00		      cmp	#$00
-     18  12c5		       f0 31		      beq	fall_logic
-     19  12c7		       a2 00		      ldx	#0	; up
-     20  12c9		       20 ae 13 	      jsr	move_dir
-     21  12cc		       b0 07		      bcs	j_cont	; jump successful
-     22  12ce		       a9 00		      lda	#$00	; jump failed
-     23  12d0		       85 15		      sta	jump_num
-     24  12d2		       4c 32 13 	      jmp	update_return
-     25  12d5				   j_cont
-     26  12d5		       38		      sec
-     27  12d6		       c6 15		      dec	jump_num
-     28  12d8				   j_left
-     29  12d8		       a5 14		      lda	jump_dir
-     30  12da		       c9 01		      cmp	#$01
-     31  12dc		       d0 0b		      bne	j_right
-     32  12de		       20 12 11 	      jsr	wait_until_next_frame
-     33  12e1		       a2 02		      ldx	#2	; left
-     34  12e3		       20 ae 13 	      jsr	move_dir
-     35  12e6		       4c 32 13 	      jmp	update_return
-     36  12e9				   j_right
-     37  12e9		       c9 02		      cmp	#$02
-     38  12eb		       d0 45		      bne	update_return
-     39  12ed		       20 12 11 	      jsr	wait_until_next_frame
-     40  12f0		       a2 03		      ldx	#3	; right
-     41  12f2		       20 ae 13 	      jsr	move_dir
-     42  12f5		       4c 32 13 	      jmp	update_return
-     43  12f8
-     44  12f8				   fall_logic
-     45  12f8		       a5 17		      lda	tile_store+1	; down
-     46  12fa		       20 5b 14 	      jsr	fall_check	; check if we hit the ground, different from collision_handler since platforms are included
-     47  12fd		       90 3f		      bcc	check_if_w_pressed
-     48  12ff		       a2 01		      ldx	#1	; down
-     49  1301		       20 ae 13 	      jsr	move_dir
-     50  1304		       a5 17		      lda	tile_store+1	; check if we hit ground again, if we didn't we can move in the jump_dir
-     51  1306		       20 5b 14 	      jsr	fall_check
-     52  1309		       b0 07		      bcs	f_left
-     53  130b		       a9 00		      lda	#$00	; otherwise we stay still
-     54  130d		       85 14		      sta	jump_dir
-     55  130f		       4c 32 13 	      jmp	update_return
-     56  1312				   f_left
-     57  1312		       a5 14		      lda	jump_dir
-     58  1314		       c9 01		      cmp	#$01
-     59  1316		       d0 0b		      bne	f_right
-     60  1318		       20 12 11 	      jsr	wait_until_next_frame
-     61  131b		       a2 02		      ldx	#2	; left
-     62  131d		       20 ae 13 	      jsr	move_dir
-     63  1320		       4c 32 13 	      jmp	update_return
-     64  1323				   f_right
-     65  1323		       c9 02		      cmp	#$02
-     66  1325		       d0 0b		      bne	update_return
-     67  1327		       20 12 11 	      jsr	wait_until_next_frame
-     68  132a		       a2 03		      ldx	#3	; right
-     69  132c		       20 ae 13 	      jsr	move_dir
-     70  132f		       4c 32 13 	      jmp	update_return
-     71  1332
-     72  1332				   update_return
-     73  1332		       18		      clc		; reset numbers that should be
-     74  1333		       a9 00		      lda	#0
-     75  1335		       85 28		      sta	temp
-     76  1337		       85 29		      sta	temp+1
-     77  1339		       85 2a		      sta	temp+2
-     78  133b		       85 2b		      sta	temp+3
-     79  133d		       60		      rts
-     80  133e
-     81  133e				   check_if_w_pressed
-     82  133e		       a9 00		      lda	#$00
-     83  1340		       85 14		      sta	jump_dir	; double check we aren't falling in a direction
-     84  1342		       a5 c5		      lda	currently_pressed_key
-     85  1344		       c9 09		      cmp	#W_KEY
-     86  1346		       d0 12		      bne	check_if_q_pressed
-     87  1348		       a2 00		      ldx	#0	; up
-     88  134a		       20 ae 13 	      jsr	move_dir
-     89  134d		       90 e3		      bcc	update_return	; jump failed
-     90  134f		       a9 01		      lda	#JUMP_SIZE
-     91  1351		       85 15		      sta	jump_num
-     92  1353		       a9 00		      lda	#$00
-     93  1355		       85 14		      sta	jump_dir
-     94  1357		       4c 32 13 	      jmp	update_return
-     95  135a
-     96  135a				   check_if_q_pressed
-     97  135a		       c9 30		      cmp	#Q_KEY
-     98  135c		       d0 1a		      bne	check_if_e_pressed
-     99  135e		       a2 00		      ldx	#0	; up
-    100  1360		       20 ae 13 	      jsr	move_dir
-    101  1363		       90 cd		      bcc	update_return	; jump failed
-    102  1365		       a9 01		      lda	#JUMP_SIZE
-    103  1367		       85 15		      sta	jump_num
-    104  1369		       a9 01		      lda	#$01
-    105  136b		       85 14		      sta	jump_dir
-    106  136d		       20 12 11 	      jsr	wait_until_next_frame
-    107  1370		       a2 02		      ldx	#2	; left
-    108  1372		       20 ae 13 	      jsr	move_dir
-    109  1375		       4c 32 13 	      jmp	update_return
-    110  1378
-    111  1378				   check_if_e_pressed
-    112  1378		       c9 31		      cmp	#E_KEY
-    113  137a		       d0 1a		      bne	check_if_a_pressed
-    114  137c		       a2 00		      ldx	#0	; up
-    115  137e		       20 ae 13 	      jsr	move_dir
-    116  1381		       90 af		      bcc	update_return	; jump failed
-    117  1383		       a9 01		      lda	#JUMP_SIZE
-    118  1385		       85 15		      sta	jump_num
-    119  1387		       a9 02		      lda	#$02
-    120  1389		       85 14		      sta	jump_dir
-    121  138b		       20 12 11 	      jsr	wait_until_next_frame
-    122  138e		       a2 03		      ldx	#3	; right
-    123  1390		       20 ae 13 	      jsr	move_dir
-    124  1393		       4c 32 13 	      jmp	update_return
-    125  1396
-    126  1396				   check_if_a_pressed
-    127  1396		       c9 11		      cmp	#A_KEY
-    128  1398		       d0 08		      bne	check_if_d_pressed
-    129  139a		       a2 02		      ldx	#2	; left
-    130  139c		       20 ae 13 	      jsr	move_dir
-    131  139f		       4c 32 13 	      jmp	update_return
-    132  13a2
-    133  13a2				   check_if_d_pressed
-    134  13a2		       c9 12		      cmp	#D_KEY
-    135  13a4		       d0 8c		      bne	update_return
-    136  13a6		       a2 03		      ldx	#3	; right
-    137  13a8		       20 ae 13 	      jsr	move_dir
-    138  13ab		       4c 32 13 	      jmp	update_return
-    139  13ae
-    140  13ae							; The rest is subroutines
-    141  13ae
-    142  13ae							;current bugs:
-    143  13ae							;attached powerup sprites are not working
-    144  13ae							;jump direction is not reset properly
-    145  13ae							;platforms get deleted sometimes
-    146  13ae							;need to replace end screen
-    147  13ae
-    148  13ae
-    149  13ae
-    150  13ae							;store tile you are moving to
-    151  13ae							;if you win, win
-    152  13ae							;check collision:
-    153  13ae							;  store powerup in temp
-    154  13ae							;  return whether you can move or not
-    155  13ae							;if you can't move, return false
-    156  13ae							;apply powerups you moved into
-    157  13ae							;get new position
-    158  13ae							;refresh tiles
-    159  13ae							;apply powerup logic
-    160  13ae							;delete old position
-    161  13ae							;update position
-    162  13ae							;redraw chars
-    163  13ae							;draw new position
-    164  13ae							;wait a jiffy maybe
-    165  13ae							;check booster if we move again
-    166  13ae				   move_dir
-    167  13ae		       86 2c		      stx	move_dir_store
-    168  13b0		       a9 00		      lda	#$00
-    169  13b2		       85 28		      sta	temp
-    170  13b4		       b5 16		      lda	tile_store_addr,x	; load colliding tile
-    171  13b6		       c9 04		      cmp	#EXIT_CHAR
-    172  13b8		       d0 09		      bne	spike_check
-    173  13ba		       a9 01		      lda	#1	; level complete
-    174  13bc		       85 09		      sta	level_completed
-    175  13be		       85 08		      sta	level_reset
-    176  13c0		       4c 23 14 	      jmp	return_false_move
-    177  13c3				   spike_check
-    178  13c3		       c9 08		      cmp	#SPIKE_CHAR
-    179  13c5		       d0 07		      bne	cont_move
-    180  13c7		       a9 01		      lda	#1
-    181  13c9		       85 08		      sta	level_reset	; died
-    182  13cb		       4c 23 14 	      jmp	return_false_move
-    183  13ce				   cont_move
-    184  13ce		       20 25 14 	      jsr	collision_handler
-    185  13d1		       90 50		      bcc	return_false_move
-    186  13d3		       a5 28		      lda	temp	; if we hit a powerup this will be its id
-    187  13d5		       c9 00		      cmp	#$00
-    188  13d7		       f0 06		      beq	post_powerup_move
-    189  13d9		       95 1b		      sta	attached_powerups_addr,x	; attach powerup
-    190  13db		       a9 00		      lda	#$00
-    191  13dd		       95 16		      sta	tile_store_addr,x	; remove the powerup tile from the level
-    192  13df				   post_powerup_move
-    193  13df		       20 76 14 	      jsr	delete_squarebot
-    194  13e2		       a6 2c		      ldx	move_dir_store
-    195  13e4		       20 8e 14 	      jsr	move_new_position
-    196  13e7		       20 ad 14 	      jsr	get_tiles
-    197  13ea		       a9 01		      lda	#$01	; eor y with 1 to get opposite side
-    198  13ec		       45 2c		      eor	move_dir_store
-    199  13ee		       aa		      tax
-    200  13ef		       b5 1b		      lda	attached_powerups_addr,x	; ignite ready booster
-    201  13f1		       c9 14		      cmp	#RBOOSTER_A_CHAR
-    202  13f3		       d0 04		      bne	post_booster
-    203  13f5		       a9 01		      lda	#$01	; ignited booster is a ladder because its not shown
-    204  13f7		       95 1b		      sta	attached_powerups_addr,x
-    205  13f9				   post_booster
-    206  13f9		       20 e2 14 	      jsr	apply_powerup_logic
-    207  13fc		       20 7e 15 	      jsr	update_squarebot
-    208  13ff		       20 8f 15 	      jsr	update_chars
-    209  1402		       20 eb 15 	      jsr	draw_squarebot
-    210  1405		       20 12 11 	      jsr	wait_until_next_frame
-    211  1408		       a9 01		      lda	#$01	; eor y with 1 to get opposite side
-    212  140a		       45 2c		      eor	move_dir_store
-    213  140c		       aa		      tax
-    214  140d		       b5 1b		      lda	attached_powerups_addr,x
-    215  140f		       c9 18		      cmp	#ABOOSTER_A_CHAR
-    216  1411		       d0 0b		      bne	return_true_move	; if booster activated go again
-    217  1413		       20 12 11 	      jsr	wait_until_next_frame	; give them time to see active booster
-    218  1416		       20 12 11 	      jsr	wait_until_next_frame
-    219  1419		       a6 2c		      ldx	move_dir_store
-    220  141b		       4c ae 13 	      jmp	move_dir
-    221  141e				   return_true_move
-    222  141e		       38		      sec
-    223  141f		       20 24 16 	      jsr	player_movement
-    224  1422		       60		      rts		; return true move
-    225  1423				   return_false_move
-    226  1423		       18		      clc
-    227  1424		       60		      rts
-    228  1425
-    229  1425							;-----
-    230  1425				   collision_handler		; accumulator is the character in the position that squarebot wants to move to
-    231  1425							; set carry flag if we can move to this char, otherwise clear it
-    232  1425							; if its a powerup, set temp to be the attached_powerup id + attached_powerup id <<4, otherwise return since temp is already 0
-    233  1425		       c9 00		      cmp	#BLANK_TILE_CHAR
-    234  1427		       f0 2e		      beq	return_true
-    235  1429		       c9 02		      cmp	#PLATFORM_CHAR
-    236  142b		       f0 2a		      beq	return_true	; moving down will double check anyway
-    237  142d		       c9 01		      cmp	#LADDER_CHAR
-    238  142f		       f0 26		      beq	return_true	; not fully implemented though
-    239  1431		       c9 03		      cmp	#WALL_CHAR
-    240  1433		       f0 24		      beq	return_false
-    241  1435		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
-    242  1437		       f0 20		      beq	return_false
-    243  1439		       c9 05		      cmp	#LOCKED_EXIT_CHAR
-    244  143b		       f0 1c		      beq	return_false
-    245  143d		       c9 06		      cmp	#LOCKED_WALL_CHAR
-    246  143f		       f0 18		      beq	return_false
-    247  1441							;else its a powerup
-    248  1441		       c9 09		      cmp	#BOOSTER_P_CHAR
-    249  1443		       d0 07		      bne	rpk
-    250  1445		       a9 14		      lda	#RBOOSTER_A_CHAR
-    251  1447		       85 28		      sta	temp
-    252  1449		       4c 57 14 	      jmp	return_true
-    253  144c				   rpk
-    254  144c		       c9 0a		      cmp	#KEY_P_CHAR
-    255  144e		       d0 09		      bne	return_false
-    256  1450		       a9 1c		      lda	#KEY_A_CHAR
-    257  1452		       85 28		      sta	temp
-    258  1454		       4c 57 14 	      jmp	return_true
-    259  1457
-    260  1457				   return_true
-    261  1457		       38		      sec
-    262  1458		       60		      rts
-    263  1459
-    264  1459				   return_false
-    265  1459		       18		      clc
-    266  145a		       60		      rts
-    267  145b
-    268  145b							;-----
-    269  145b				   fall_check
-    270  145b		       c9 02		      cmp	#PLATFORM_CHAR
-    271  145d		       f0 fa		      beq	return_false
-    272  145f		       c9 03		      cmp	#WALL_CHAR
-    273  1461		       f0 f6		      beq	return_false
-    274  1463		       c9 05		      cmp	#LOCKED_EXIT_CHAR
-    275  1465		       f0 f2		      beq	return_false
-    276  1467		       c9 06		      cmp	#LOCKED_WALL_CHAR
-    277  1469		       f0 ee		      beq	return_false
-    278  146b		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
-    279  146d		       f0 ea		      beq	return_false
-    280  146f		       c9 01		      cmp	#LADDER_CHAR
-    281  1471		       f0 e6		      beq	return_false
-    282  1473		       4c 57 14 	      jmp	return_true	;
-    283  1476
-    284  1476							;-----
-    285  1476				   delete_squarebot
-    286  1476		       20 42 16 	      jsr	get_squarebot_draw_position
-    287  1479		       a2 00		      ldx	#$0
-    288  147b
-    289  147b				   delete_loop
-    290  147b		       b4 1f		      ldy	delta_addr,x
-    291  147d		       b5 16		      lda	tile_store_addr,X
-    292  147f		       91 10		      sta	(squarebot_position),y
-    293  1481		       a9 00		      lda	#0	; EVERYTHING IS BLACK
-    294  1483		       91 12		      sta	(squarebot_color_position),y
-    295  1485
-    296  1485		       e8		      inx
-    297  1486		       e0 05		      cpx	#5
-    298  1488		       d0 f1		      bne	delete_loop
-    299  148a
-    300  148a		       20 5d 16 	      jsr	get_squarebot_game_position
-    301  148d		       60		      rts
-    302  148e
-    303  148e							;-----
-    304  148e				   move_new_position
-    305  148e		       20 78 16 	      jsr	get_new_draw_position
-    306  1491
-    307  1491		       18		      clc
-    308  1492		       a5 0b		      lda	new_position
-    309  1494		       75 1f		      adc	delta_addr,x	; x is the index of the move_dir
-    310  1496		       85 0b		      sta	new_position
-    311  1498		       a5 0c		      lda	new_position+1
-    312  149a		       69 00		      adc	#0
-    313  149c		       85 0c		      sta	new_position+1
-    314  149e		       18		      clc
-    315  149f		       a5 0d		      lda	new_color_position
-    316  14a1		       75 1f		      adc	delta_addr,x
-    317  14a3		       85 0d		      sta	new_color_position
-    318  14a5		       a5 0e		      lda	new_color_position+1
-    319  14a7		       69 00		      adc	#0
-    320  14a9		       85 0e		      sta	new_color_position+1
-    321  14ab		       18		      clc
-    322  14ac		       60		      rts		; no need to undo get_new_draw_position
-    323  14ad
-    324  14ad							;-----
-    325  14ad				   get_tiles
-    326  14ad		       20 78 16 	      jsr	get_new_draw_position
-    327  14b0
-    328  14b0		       a9 01		      lda	#$01	; eor move_dir with 1 to get opposite side
-    329  14b2		       45 2c		      eor	move_dir_store
-    330  14b4		       aa		      tax
-    331  14b5		       a5 1a		      lda	tile_store+4	; get mid
-    332  14b7		       95 16		      sta	tile_store_addr,x	; set opposite dir
-    333  14b9
-    334  14b9		       a6 2c		      ldx	move_dir_store
-    335  14bb		       b5 16		      lda	tile_store_addr,x	;get dir
-    336  14bd		       85 1a		      sta	tile_store+4	; set mid
-    337  14bf
-    338  14bf		       b5 1f		      lda	delta_addr,x
-    339  14c1		       a8		      tay
-    340  14c2		       b1 0b		      lda	(new_position),y	; get tile_dir
-    341  14c4		       95 16		      sta	tile_store_addr,x	; set tile_dir
-    342  14c6
-    343  14c6		       a9 02		      lda	#$02	; get perpendicular tiles
-    344  14c8		       45 2c		      eor	move_dir_store
-    345  14ca		       aa		      tax		; eor move_dir with 2 to get perpendicular directions
-    346  14cb		       b5 1f		      lda	delta_addr,x
-    347  14cd		       a8		      tay
-    348  14ce		       b1 0b		      lda	(new_position),y
-    349  14d0		       95 16		      sta	tile_store_addr,x
-    350  14d2
-    351  14d2		       a9 03		      lda	#$03
-    352  14d4		       45 2c		      eor	move_dir_store
-    353  14d6		       aa		      tax
-    354  14d7		       b5 1f		      lda	delta_addr,x
-    355  14d9		       a8		      tay
-    356  14da		       b1 0b		      lda	(new_position),y
-    357  14dc		       95 16		      sta	tile_store_addr,x
-    358  14de
-    359  14de		       20 93 16 	      jsr	get_new_game_position
-    360  14e1		       60		      rts
-    361  14e2
-    362  14e2							;-----
-    363  14e2				   apply_powerup_logic
-    364  14e2							;call prepare_logic for index temp+3 = 0,1,2, and 3. store index in temp+3 since we change y often
-    365  14e2		       a9 00		      lda	#$0
-    366  14e4		       85 2b		      sta	temp+3
-    367  14e6		       aa		      tax
-    368  14e7		       20 05 15 	      jsr	prepare_logic
-    369  14ea		       e6 2b		      inc	temp+3
-    370  14ec		       20 05 15 	      jsr	prepare_logic
-    371  14ef		       e6 2b		      inc	temp+3
-    372  14f1		       20 05 15 	      jsr	prepare_logic
-    373  14f4		       e6 2b		      inc	temp+3
-    374  14f6		       20 05 15 	      jsr	prepare_logic
-    375  14f9		       a9 00		      lda	#$0
-    376  14fb		       85 28		      sta	temp
-    377  14fd		       85 29		      sta	temp+1
-    378  14ff		       85 2a		      sta	temp+2
-    379  1501		       85 2b		      sta	temp+3
-    380  1503		       aa		      tax		; clean up just to be safe
-    381  1504		       60		      rts
-    382  1505
-    383  1505							;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
-    384  1505				   prepare_logic
-    385  1505		       a6 2b		      ldx	temp+3
-    386  1507		       b5 1b		      lda	attached_powerups_addr,x
-    387  1509		       85 28		      sta	temp
-    388  150b		       b5 16		      lda	tile_store_addr,x
-    389  150d		       85 29		      sta	temp+1
-    390  150f		       a9 01		      lda	#$01
-    391  1511		       45 2b		      eor	temp+3
-    392  1513		       aa		      tax		; eor with 1 which gets us the tile opposite the powerup
-    393  1514		       b5 16		      lda	tile_store_addr,x
-    394  1516		       85 2a		      sta	temp+2
-    395  1518		       20 2f 15 	      jsr	powerup_logic	; perform logic
-    396  151b		       a6 2b		      ldx	temp+3
-    397  151d		       a5 28		      lda	temp
-    398  151f		       95 1b		      sta	attached_powerups_addr,x
-    399  1521		       a5 29		      lda	temp+1
-    400  1523		       95 16		      sta	tile_store_addr,x
-    401  1525		       a9 01		      lda	#$01
-    402  1527		       45 2b		      eor	temp+3
-    403  1529		       aa		      tax
-    404  152a		       a5 2a		      lda	temp+2
-    405  152c		       95 16		      sta	tile_store_addr,x
-    406  152e		       60		      rts
-    407  152f
-    408  152f							; ready booster: does nothing
-    409  152f							; ignited booster: breaks breakable walls and changes to active booster
-    410  152f							; active booster: breaks breakable walls and changes to ready booster
-    411  152f							; key: spends itself to break locked walls
-    412  152f				   powerup_logic		;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
-    413  152f		       a5 28		      lda	temp
-    414  1531		       c9 01		      cmp	#$01	; check ignited booster
-    415  1533		       d0 11		      bne	pl_b
-    416  1535		       a5 2a		      lda	temp+2	; check opposite tile
-    417  1537		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
-    418  1539		       d0 04		      bne	pl_ab
-    419  153b		       a9 00		      lda	#BLANK_TILE_CHAR
-    420  153d		       85 2a		      sta	temp+2	; delete wall
-    421  153f				   pl_ab
-    422  153f		       a9 18		      lda	#ABOOSTER_A_CHAR	; set active booster
-    423  1541		       85 28		      sta	temp
-    424  1543		       4c 7d 15 	      jmp	pl_return
-    425  1546				   pl_b
-    426  1546		       c9 18		      cmp	#ABOOSTER_A_CHAR	; check active booster
-    427  1548		       d0 11		      bne	pl_k
-    428  154a		       a5 2a		      lda	temp+2	; check opposite tile
-    429  154c		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
-    430  154e		       d0 04		      bne	pl_rb
-    431  1550		       a9 00		      lda	#BLANK_TILE_CHAR
-    432  1552		       85 2a		      sta	temp+2	; delete wall
-    433  1554				   pl_rb
-    434  1554		       a9 14		      lda	#RBOOSTER_A_CHAR	; set ready booster
-    435  1556		       85 28		      sta	temp
-    436  1558		       4c 7d 15 	      jmp	pl_return
-    437  155b				   pl_k
-    438  155b		       c9 1c		      cmp	#KEY_A_CHAR	; check key, slightly unnecessary
-    439  155d		       d0 1e		      bne	pl_return
-    440  155f		       a5 29		      lda	temp+1
-    441  1561		       c9 06		      cmp	#LOCKED_WALL_CHAR
-    442  1563		       d0 09		      bne	pl_ke
-    443  1565		       a9 00		      lda	#BLANK_TILE_CHAR
-    444  1567		       85 28		      sta	temp	; delete key
-    445  1569		       85 29		      sta	temp+1	; delete wall
-    446  156b		       4c 7d 15 	      jmp	pl_return
-    447  156e				   pl_ke
-    448  156e		       c9 05		      cmp	#LOCKED_EXIT_CHAR
-    449  1570		       d0 0b		      bne	pl_return
-    450  1572		       a9 00		      lda	#BLANK_TILE_CHAR
-    451  1574		       85 28		      sta	temp
-    452  1576		       a9 04		      lda	#EXIT_CHAR
-    453  1578		       85 29		      sta	temp+1
-    454  157a		       4c 7d 15 	      jmp	pl_return
-    455  157d				   pl_return
-    456  157d		       60		      rts
-    457  157e
-    458  157e							;-----
-    459  157e				   update_squarebot
-    460  157e		       a5 0b		      lda	new_position
-    461  1580		       85 10		      sta	squarebot_position
-    462  1582		       a5 0c		      lda	new_position+1
-    463  1584		       85 11		      sta	squarebot_position+1
-    464  1586
-    465  1586		       a5 0d		      lda	new_color_position
-    466  1588		       85 12		      sta	squarebot_color_position
-    467  158a		       a5 0e		      lda	new_color_position+1
-    468  158c		       85 13		      sta	squarebot_color_position+1
-    469  158e		       60		      rts
-    470  158f
-    471  158f							;-----
-    472  158f				   update_chars 		; chareor = tile*8,   chareor+1 = powerup*8,	chareor+2 = char*8
-    473  158f		       a2 00		      ldx	#$00
-    474  1591		       86 28		      stx	temp
-    475  1593
-    476  1593				   update_char_dir_loop
-    477  1593		       b5 16		      lda	tile_store_addr,x
-    478  1595		       0a		      asl
-    479  1596		       0a		      asl
-    480  1597		       0a		      asl		; multiply by 8 since there are 8 bytes per character
-    481  1598		       85 2d		      sta	chareor
-    482  159a		       b5 24		      lda	chars_addr,x
-    483  159c		       0a		      asl
-    484  159d		       0a		      asl
-    485  159e		       0a		      asl
-    486  159f		       85 2f		      sta	chareor+2
-    487  15a1		       b5 1b		      lda	attached_powerups_addr,x
-    488  15a3		       c9 00		      cmp	#$00
-    489  15a5		       f0 03		      beq	no_powerup
-    490  15a7		       18		      clc		;add index for rotation
-    491  15a8		       65 28		      adc	temp
-    492  15aa				   no_powerup
-    493  15aa		       0a		      asl
-    494  15ab		       0a		      asl
-    495  15ac		       0a		      asl
-    496  15ad		       85 2e		      sta	chareor+1
-    497  15af		       20 bb 15 	      jsr	update_char
-    498  15b2		       e6 28		      inc	temp
-    499  15b4		       a6 28		      ldx	temp
-    500  15b6
-    501  15b6		       e0 04		      cpx	#4
-    502  15b8		       d0 d9		      bne	update_char_dir_loop
-    503  15ba
-    504  15ba		       60		      rts
-    505  15bb
-    506  15bb				   update_char		; chareor = tile*8,   chareor+1 = powerup*8,	chareor+2 = char*8
-    507  15bb		       a9 00		      lda	#$00
-    508  15bd		       85 29		      sta	temp+1
-    509  15bf				   update_char_loop
-    510  15bf		       a5 29		      lda	temp+1
-    511  15c1		       18		      clc
-    512  15c2		       65 2d		      adc	chareor
-    513  15c4		       a8		      tay
-    514  15c5		       b9 00 1c 	      lda	character_set_begin,y
-    515  15c8		       85 2a		      sta	temp+2
-    516  15ca
-    517  15ca		       a5 29		      lda	temp+1
-    518  15cc		       18		      clc
-    519  15cd		       65 2e		      adc	chareor+1
-    520  15cf		       a8		      tay
-    521  15d0		       b9 00 1c 	      lda	character_set_begin,y
-    522  15d3		       45 2a		      eor	temp+2
-    523  15d5		       85 2a		      sta	temp+2
-    524  15d7
-    525  15d7		       a5 29		      lda	temp+1
-    526  15d9		       18		      clc
-    527  15da		       65 2f		      adc	chareor+2
-    528  15dc		       a8		      tay
-    529  15dd		       a5 2a		      lda	temp+2
-    530  15df		       99 00 1c 	      sta	character_set_begin,y
-    531  15e2
-    532  15e2		       e6 29		      inc	temp+1
-    533  15e4		       a5 29		      lda	temp+1
-    534  15e6		       c9 08		      cmp	#8
-    535  15e8		       d0 d5		      bne	update_char_loop
-    536  15ea
-    537  15ea		       60		      rts
-    538  15eb
-    539  15eb							; if there is a powerup:
-    540  15eb							; for each of 8 bytes:
-    541  15eb							; load tile byte
-    542  15eb							; eor with powerup tile byte
-    543  15eb							; store in char byte
-    544  15eb
-    545  15eb							;-----
-    546  15eb				   draw_squarebot
-    547  15eb		       20 42 16 	      jsr	get_squarebot_draw_position
-    548  15ee
-    549  15ee		       a5 24		      lda	chars	;u
-    550  15f0		       a4 1f		      ldy	delta
-    551  15f2		       91 10		      sta	(squarebot_position),y
-    552  15f4		       a9 00		      lda	#0
-    553  15f6		       91 12		      sta	(squarebot_color_position),y
-    554  15f8
-    555  15f8		       a5 25		      lda	chars+1
-    556  15fa		       a4 20		      ldy	delta+1	;d
-    557  15fc		       91 10		      sta	(squarebot_position),y
-    558  15fe		       a9 00		      lda	#0
-    559  1600		       91 12		      sta	(squarebot_color_position),y
-    560  1602
-    561  1602		       a5 26		      lda	chars+2
-    562  1604		       a4 21		      ldy	delta+2	;l
-    563  1606		       91 10		      sta	(squarebot_position),y
-    564  1608		       a9 00		      lda	#0
-    565  160a		       91 12		      sta	(squarebot_color_position),y
-    566  160c
-    567  160c		       a5 27		      lda	chars+3
-    568  160e		       a4 22		      ldy	delta+3	;r
-    569  1610		       91 10		      sta	(squarebot_position),y
-    570  1612		       a9 00		      lda	#0
-    571  1614		       91 12		      sta	(squarebot_color_position),y
-    572  1616
-    573  1616		       a9 13		      lda	#SQUAREBOT_CHAR
-    574  1618		       a4 23		      ldy	delta+4	;m
-    575  161a		       91 10		      sta	(squarebot_position),y
-    576  161c		       a9 02		      lda	#SQUAREBOT_COLOR
-    577  161e		       91 12		      sta	(squarebot_color_position),y
-    578  1620
-    579  1620		       20 5d 16 	      jsr	get_squarebot_game_position
-    580  1623		       60		      rts
+    314  129a		       20 c6 10 	      jsr	add_one_to_screen_cursor
+    315  129d		       60		      rts
+    316  129e
+    317  129e
+    318  129e				   add_and_return
+    319  129e		       18		      clc
+    320  129f		       69 01		      adc	#1
+    321  12a1		       85 30		      sta	count_chars_drawn
+    322  12a3		       60		      rts
+    323  12a4
+    324  12a4				   check_if_level_cursor_at_end 		; set carry flag if screen_cursor at position $1ff9 (8185
+    325  12a4		       a5 00		      lda	screen_cursor	; load value at screen_cursor low byte
+    326  12a6		       c9 e5		      cmp	#END_OF_LEVEL_LOW_BYTE
+    327  12a8		       d0 06		      bne	check_if_level_cursor_at_end_return_false	; if low byte doesnt match, return with carry flag as neg
+    328  12aa
+    329  12aa		       a5 01		      lda	screen_cursor+1
+    330  12ac		       c9 1f		      cmp	#END_OF_LEVEL_HIGH_BYTE
+    331  12ae		       f0 02		      beq	check_if_level_cursor_at_end_return_true	; if high byte matches, set carry flag
+    332  12b0
+    333  12b0				   check_if_level_cursor_at_end_return_false
+    334  12b0		       18		      clc
+    335  12b1		       60		      rts
+    336  12b2
+    337  12b2				   check_if_level_cursor_at_end_return_true
+    338  12b2		       38		      sec
+    339  12b3		       60		      rts
 ------- FILE main.s
 ------- FILE sound.s LEVEL 2 PASS 3
-      0  1624					      include	"sound.s"
-      1  1624		       90 0d	   SN	      =	$900d	; noise channel (these memory addresses are in the reference manual)
-      2  1624		       90 0e	   SV	      =	$900e	; volume
-      3  1624		       00 a2	   JC	      =	$00a2	; jiffy clock
-      4  1624
-      5  1624		       00 d6	   STARTM     =	214	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
-      6  1624
-      7  1624				   player_movement		; CALL THIS SUBROUTINE TO PLAY THE SOUND
-      8  1624		       a2 00		      ldx	#0
-      9  1626		       a0 d6		      ldy	#STARTM	; load the first pitch into the Y register
-     10  1628		       8c 0d 90 	      sty	SN	; write the note to the noise channel
-     11  162b				   player_movement_next
-     12  162b		       bd 3d 16 	      lda	mov_velocities,X	; get the current note velocity
-     13  162e		       8d 0e 90 	      sta	SV	; set speakers to volume in accumulator
-     14  1631							; check if we should exit on this note
-     15  1631		       f0 0e		      beq	exit_move	; if volume is 0, exit the main loop (this branches to an rts, essentially. my exit code is slightly more complicated)
-     16  1633							; we should not exit on this note
-     17  1633		       e8		      inx		; move on
-     18  1634							; set up the jiffy waiting loop
-     19  1634		       a4 a2		      ldy	JC	; load jiffy clock into Y register
-     20  1636		       c8		      iny		; Y register now stores the desired end time (one jiffy away)
-     21  1637							; wait one jiffy
-     22  1637				   jiffyM
-     23  1637		       c4 a2		      cpy	JC
-     24  1639		       d0 fc		      bne	jiffyM
-     25  163b							; move on to the next velocity value
-     26  163b		       f0 ee		      beq	player_movement_next	; restart main loop
-     27  163d
-     28  163d							; you can define the velocities here, it moves on to the next velocity after it waits a jiffy. a velocity of 0 is the delimiter (i.e. it exits when it hits 0)
-     29  163d				   mov_velocities
-     30  163d		       03 06 03 00	      dc	3, 6, 3, 0	;sound duration
-     31  1641
-     32  1641				   exit_move
-     33  1641		       60		      rts
+      0  12b4					      include	"sound.s"
+      1  12b4		       90 0d	   SN	      =	$900d	; noise channel (these memory addresses are in the reference manual)
+      2  12b4		       90 0e	   SV	      =	$900e	; volume
+      3  12b4		       00 a2	   JC	      =	$00a2	; jiffy clock
+      4  12b4
+      5  12b4		       00 d6	   STARTM     =	214	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
+      6  12b4		       00 96	   STARTC     =	150	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
+      7  12b4		       00 ff	   STARTG     =	255	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
+      8  12b4
+      9  12b4				   player_movement		; CALL THIS SUBROUTINE TO PLAY THE SOUND
+     10  12b4		       a2 00		      ldx	#0
+     11  12b6		       a0 d6		      ldy	#STARTM	; load the first pitch into the Y register
+     12  12b8		       8c 0d 90 	      sty	SN	; write the note to the noise channel
+     13  12bb				   player_movement_next
+     14  12bb		       bd cd 12 	      lda	mov_velocities,X	; get the current note velocity
+     15  12be		       8d 0e 90 	      sta	SV	; set speakers to volume in accumulator
+     16  12c1							; check if we should exit on this note
+     17  12c1		       f0 0e		      beq	exit_move	; if volume is 0, exit the main loop (this branches to an rts, essentially. my exit code is slightly more complicated)
+     18  12c3							; we should not exit on this note
+     19  12c3		       e8		      inx		; move on
+     20  12c4							; set up the jiffy waiting loop
+     21  12c4		       a4 a2		      ldy	JC	; load jiffy clock into Y register
+     22  12c6		       c8		      iny		; Y register now stores the desired end time (one jiffy away)
+     23  12c7							; wait one jiffy
+     24  12c7				   jiffyM
+     25  12c7		       c4 a2		      cpy	JC
+     26  12c9		       d0 fc		      bne	jiffyM
+     27  12cb							; move on to the next velocity value
+     28  12cb		       f0 ee		      beq	player_movement_next	; restart main loop
+     29  12cd
+     30  12cd							; you can define the velocities here, it moves on to the next velocity after it waits a jiffy. a velocity of 0 is the delimiter (i.e. it exits when it hits 0)
+     31  12cd				   mov_velocities
+     32  12cd		       03 06 03 00	      dc	3, 6, 3, 0	;sound duration
+     33  12d1
+     34  12d1				   exit_move
+     35  12d1		       60		      rts
+------- FILE main.s
+------- FILE updateGameState_new.s LEVEL 2 PASS 3
+      0  12d2					      include	"updateGameState_new.s"
+      1  12d2		       00 e4	   START_OF_FIRST_ROW_LOW_BYTE =	$e4
+      2  12d2		       00 1f	   START_OF_FIRST_ROW_HIGH_BYTE =	$1f
+      3  12d2
+      4  12d2							; main logic until line 113:
+      5  12d2				   update_game_state
+      6  12d2		       a5 10		      lda	squarebot_position	; likely unnecessary
+      7  12d4		       85 0b		      sta	new_position
+      8  12d6		       a5 11		      lda	squarebot_position+1
+      9  12d8		       85 0c		      sta	new_position+1
+     10  12da		       a5 12		      lda	squarebot_color_position
+     11  12dc		       85 0d		      sta	new_color_position
+     12  12de		       a5 13		      lda	squarebot_color_position+1
+     13  12e0		       85 0e		      sta	new_color_position+1
+     14  12e2
+     15  12e2				   jump_logic
+     16  12e2		       a5 15		      lda	jump_num
+     17  12e4		       c9 00		      cmp	#$00
+     18  12e6		       f0 31		      beq	fall_logic
+     19  12e8		       a2 00		      ldx	#0	; up
+     20  12ea		       20 cf 13 	      jsr	move_dir
+     21  12ed		       b0 07		      bcs	j_cont	; jump successful
+     22  12ef		       a9 00		      lda	#$00	; jump failed
+     23  12f1		       85 15		      sta	jump_num
+     24  12f3		       4c 53 13 	      jmp	update_return
+     25  12f6				   j_cont
+     26  12f6		       38		      sec
+     27  12f7		       c6 15		      dec	jump_num
+     28  12f9				   j_left
+     29  12f9		       a5 14		      lda	jump_dir
+     30  12fb		       c9 01		      cmp	#$01
+     31  12fd		       d0 0b		      bne	j_right
+     32  12ff		       20 12 11 	      jsr	wait_until_next_frame
+     33  1302		       a2 02		      ldx	#2	; left
+     34  1304		       20 cf 13 	      jsr	move_dir
+     35  1307		       4c 53 13 	      jmp	update_return
+     36  130a				   j_right
+     37  130a		       c9 02		      cmp	#$02
+     38  130c		       d0 45		      bne	update_return
+     39  130e		       20 12 11 	      jsr	wait_until_next_frame
+     40  1311		       a2 03		      ldx	#3	; right
+     41  1313		       20 cf 13 	      jsr	move_dir
+     42  1316		       4c 53 13 	      jmp	update_return
+     43  1319
+     44  1319				   fall_logic
+     45  1319		       a5 17		      lda	tile_store+1	; down
+     46  131b		       20 79 14 	      jsr	fall_check	; check if we hit the ground, different from collision_handler since platforms are included
+     47  131e		       90 3f		      bcc	check_if_w_pressed
+     48  1320		       a2 01		      ldx	#1	; down
+     49  1322		       20 cf 13 	      jsr	move_dir
+     50  1325		       a5 17		      lda	tile_store+1	; check if we hit ground again, if we didn't we can move in the jump_dir
+     51  1327		       20 79 14 	      jsr	fall_check
+     52  132a		       b0 07		      bcs	f_left
+     53  132c		       a9 00		      lda	#$00	; otherwise we stay still
+     54  132e		       85 14		      sta	jump_dir
+     55  1330		       4c 53 13 	      jmp	update_return
+     56  1333				   f_left
+     57  1333		       a5 14		      lda	jump_dir
+     58  1335		       c9 01		      cmp	#$01
+     59  1337		       d0 0b		      bne	f_right
+     60  1339		       20 12 11 	      jsr	wait_until_next_frame
+     61  133c		       a2 02		      ldx	#2	; left
+     62  133e		       20 cf 13 	      jsr	move_dir
+     63  1341		       4c 53 13 	      jmp	update_return
+     64  1344				   f_right
+     65  1344		       c9 02		      cmp	#$02
+     66  1346		       d0 0b		      bne	update_return
+     67  1348		       20 12 11 	      jsr	wait_until_next_frame
+     68  134b		       a2 03		      ldx	#3	; right
+     69  134d		       20 cf 13 	      jsr	move_dir
+     70  1350		       4c 53 13 	      jmp	update_return
+     71  1353
+     72  1353				   update_return
+     73  1353		       18		      clc		; reset numbers that should be
+     74  1354		       a9 00		      lda	#0
+     75  1356		       85 28		      sta	temp
+     76  1358		       85 29		      sta	temp+1
+     77  135a		       85 2a		      sta	temp+2
+     78  135c		       85 2b		      sta	temp+3
+     79  135e		       60		      rts
+     80  135f
+     81  135f				   check_if_w_pressed
+     82  135f		       a9 00		      lda	#$00
+     83  1361		       85 14		      sta	jump_dir	; double check we aren't falling in a direction
+     84  1363		       a5 c5		      lda	currently_pressed_key
+     85  1365		       c9 09		      cmp	#W_KEY
+     86  1367		       d0 12		      bne	check_if_q_pressed
+     87  1369		       a2 00		      ldx	#0	; up
+     88  136b		       20 cf 13 	      jsr	move_dir
+     89  136e		       90 e3		      bcc	update_return	; jump failed
+     90  1370		       a9 01		      lda	#JUMP_SIZE
+     91  1372		       85 15		      sta	jump_num
+     92  1374		       a9 00		      lda	#$00
+     93  1376		       85 14		      sta	jump_dir
+     94  1378		       4c 53 13 	      jmp	update_return
+     95  137b
+     96  137b				   check_if_q_pressed
+     97  137b		       c9 30		      cmp	#Q_KEY
+     98  137d		       d0 1a		      bne	check_if_e_pressed
+     99  137f		       a2 00		      ldx	#0	; up
+    100  1381		       20 cf 13 	      jsr	move_dir
+    101  1384		       90 cd		      bcc	update_return	; jump failed
+    102  1386		       a9 01		      lda	#JUMP_SIZE
+    103  1388		       85 15		      sta	jump_num
+    104  138a		       a9 01		      lda	#$01
+    105  138c		       85 14		      sta	jump_dir
+    106  138e		       20 12 11 	      jsr	wait_until_next_frame
+    107  1391		       a2 02		      ldx	#2	; left
+    108  1393		       20 cf 13 	      jsr	move_dir
+    109  1396		       4c 53 13 	      jmp	update_return
+    110  1399
+    111  1399				   check_if_e_pressed
+    112  1399		       c9 31		      cmp	#E_KEY
+    113  139b		       d0 1a		      bne	check_if_a_pressed
+    114  139d		       a2 00		      ldx	#0	; up
+    115  139f		       20 cf 13 	      jsr	move_dir
+    116  13a2		       90 af		      bcc	update_return	; jump failed
+    117  13a4		       a9 01		      lda	#JUMP_SIZE
+    118  13a6		       85 15		      sta	jump_num
+    119  13a8		       a9 02		      lda	#$02
+    120  13aa		       85 14		      sta	jump_dir
+    121  13ac		       20 12 11 	      jsr	wait_until_next_frame
+    122  13af		       a2 03		      ldx	#3	; right
+    123  13b1		       20 cf 13 	      jsr	move_dir
+    124  13b4		       4c 53 13 	      jmp	update_return
+    125  13b7
+    126  13b7				   check_if_a_pressed
+    127  13b7		       c9 11		      cmp	#A_KEY
+    128  13b9		       d0 08		      bne	check_if_d_pressed
+    129  13bb		       a2 02		      ldx	#2	; left
+    130  13bd		       20 cf 13 	      jsr	move_dir
+    131  13c0		       4c 53 13 	      jmp	update_return
+    132  13c3
+    133  13c3				   check_if_d_pressed
+    134  13c3		       c9 12		      cmp	#D_KEY
+    135  13c5		       d0 8c		      bne	update_return
+    136  13c7		       a2 03		      ldx	#3	; right
+    137  13c9		       20 cf 13 	      jsr	move_dir
+    138  13cc		       4c 53 13 	      jmp	update_return
+    139  13cf
+    140  13cf							; The rest is subroutines
+    141  13cf
+    142  13cf							;current bugs:
+    143  13cf							;attached powerup sprites are not working
+    144  13cf							;jump direction is not reset properly
+    145  13cf							;platforms get deleted sometimes
+    146  13cf							;need to replace end screen
+    147  13cf
+    148  13cf
+    149  13cf
+    150  13cf							;store tile you are moving to
+    151  13cf							;if you win, win
+    152  13cf							;check collision:
+    153  13cf							;  store powerup in temp
+    154  13cf							;  return whether you can move or not
+    155  13cf							;if you can't move, return false
+    156  13cf							;apply powerups you moved into
+    157  13cf							;get new position
+    158  13cf							;refresh tiles
+    159  13cf							;apply powerup logic
+    160  13cf							;delete old position
+    161  13cf							;update position
+    162  13cf							;redraw chars
+    163  13cf							;draw new position
+    164  13cf							;wait a jiffy maybe
+    165  13cf							;check booster if we move again
+    166  13cf				   move_dir
+    167  13cf		       86 2c		      stx	move_dir_store
+    168  13d1		       a9 00		      lda	#$00
+    169  13d3		       85 28		      sta	temp
+    170  13d5		       b5 16		      lda	tile_store_addr,x	; load colliding tile
+    171  13d7		       c9 04		      cmp	#EXIT_CHAR
+    172  13d9		       d0 09		      bne	spike_check
+    173  13db		       a9 01		      lda	#1	; level complete
+    174  13dd		       85 09		      sta	level_completed
+    175  13df		       85 08		      sta	level_reset
+    176  13e1		       4c 41 14 	      jmp	return_false_move
+    177  13e4				   spike_check
+    178  13e4		       c9 08		      cmp	#SPIKE_CHAR
+    179  13e6		       d0 07		      bne	cont_move
+    180  13e8		       a9 01		      lda	#1
+    181  13ea		       85 08		      sta	level_reset	; died
+    182  13ec		       4c 41 14 	      jmp	return_false_move
+    183  13ef				   cont_move
+    184  13ef		       20 43 14 	      jsr	collision_handler
+    185  13f2		       90 4d		      bcc	return_false_move
+    186  13f4		       a5 28		      lda	temp	; if we hit a powerup this will be its id
+    187  13f6		       c9 00		      cmp	#$00
+    188  13f8		       f0 06		      beq	post_powerup_move
+    189  13fa		       95 1b		      sta	attached_powerups_addr,x	; attach powerup
+    190  13fc		       a9 00		      lda	#$00
+    191  13fe		       95 16		      sta	tile_store_addr,x	; remove the powerup tile from the level
+    192  1400				   post_powerup_move
+    193  1400		       20 94 14 	      jsr	delete_squarebot
+    194  1403		       a6 2c		      ldx	move_dir_store
+    195  1405		       20 ac 14 	      jsr	move_new_position
+    196  1408		       20 cb 14 	      jsr	get_tiles
+    197  140b		       a9 01		      lda	#$01	; eor y with 1 to get opposite side
+    198  140d		       45 2c		      eor	move_dir_store
+    199  140f		       aa		      tax
+    200  1410		       b5 1b		      lda	attached_powerups_addr,x	; ignite ready booster
+    201  1412		       c9 14		      cmp	#RBOOSTER_A_CHAR
+    202  1414		       d0 04		      bne	post_booster
+    203  1416		       a9 01		      lda	#$01	; ignited booster is a ladder because its not shown
+    204  1418		       95 1b		      sta	attached_powerups_addr,x
+    205  141a				   post_booster
+    206  141a		       20 00 15 	      jsr	apply_powerup_logic
+    207  141d		       20 9c 15 	      jsr	update_squarebot
+    208  1420		       20 ad 15 	      jsr	update_chars
+    209  1423		       20 09 16 	      jsr	draw_squarebot
+    210  1426		       20 12 11 	      jsr	wait_until_next_frame
+    211  1429		       a9 01		      lda	#$01	; eor y with 1 to get opposite side
+    212  142b		       45 2c		      eor	move_dir_store
+    213  142d		       aa		      tax
+    214  142e		       b5 1b		      lda	attached_powerups_addr,x
+    215  1430		       c9 18		      cmp	#ABOOSTER_A_CHAR
+    216  1432		       d0 0b		      bne	return_true_move	; if booster activated go again
+    217  1434		       20 12 11 	      jsr	wait_until_next_frame	; give them time to see active booster
+    218  1437		       20 12 11 	      jsr	wait_until_next_frame
+    219  143a		       a6 2c		      ldx	move_dir_store
+    220  143c		       4c cf 13 	      jmp	move_dir
+    221  143f				   return_true_move
+    222  143f		       38		      sec
+    223  1440		       60		      rts		; return true move
+    224  1441				   return_false_move
+    225  1441		       18		      clc
+    226  1442		       60		      rts
+    227  1443
+    228  1443							;-----
+    229  1443				   collision_handler		; accumulator is the character in the position that squarebot wants to move to
+    230  1443							; set carry flag if we can move to this char, otherwise clear it
+    231  1443							; if its a powerup, set temp to be the attached_powerup id + attached_powerup id <<4, otherwise return since temp is already 0
+    232  1443		       c9 00		      cmp	#BLANK_TILE_CHAR
+    233  1445		       f0 2e		      beq	return_true
+    234  1447		       c9 02		      cmp	#PLATFORM_CHAR
+    235  1449		       f0 2a		      beq	return_true	; moving down will double check anyway
+    236  144b		       c9 01		      cmp	#LADDER_CHAR
+    237  144d		       f0 26		      beq	return_true	; not fully implemented though
+    238  144f		       c9 03		      cmp	#WALL_CHAR
+    239  1451		       f0 24		      beq	return_false
+    240  1453		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
+    241  1455		       f0 20		      beq	return_false
+    242  1457		       c9 05		      cmp	#LOCKED_EXIT_CHAR
+    243  1459		       f0 1c		      beq	return_false
+    244  145b		       c9 06		      cmp	#LOCKED_WALL_CHAR
+    245  145d		       f0 18		      beq	return_false
+    246  145f							;else its a powerup
+    247  145f		       c9 09		      cmp	#BOOSTER_P_CHAR
+    248  1461		       d0 07		      bne	rpk
+    249  1463		       a9 14		      lda	#RBOOSTER_A_CHAR
+    250  1465		       85 28		      sta	temp
+    251  1467		       4c 75 14 	      jmp	return_true
+    252  146a				   rpk
+    253  146a		       c9 0a		      cmp	#KEY_P_CHAR
+    254  146c		       d0 09		      bne	return_false
+    255  146e		       a9 1c		      lda	#KEY_A_CHAR
+    256  1470		       85 28		      sta	temp
+    257  1472		       4c 75 14 	      jmp	return_true
+    258  1475
+    259  1475				   return_true
+    260  1475		       38		      sec
+    261  1476		       60		      rts
+    262  1477
+    263  1477				   return_false
+    264  1477		       18		      clc
+    265  1478		       60		      rts
+    266  1479
+    267  1479							;-----
+    268  1479				   fall_check
+    269  1479		       c9 02		      cmp	#PLATFORM_CHAR
+    270  147b		       f0 fa		      beq	return_false
+    271  147d		       c9 03		      cmp	#WALL_CHAR
+    272  147f		       f0 f6		      beq	return_false
+    273  1481		       c9 05		      cmp	#LOCKED_EXIT_CHAR
+    274  1483		       f0 f2		      beq	return_false
+    275  1485		       c9 06		      cmp	#LOCKED_WALL_CHAR
+    276  1487		       f0 ee		      beq	return_false
+    277  1489		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
+    278  148b		       f0 ea		      beq	return_false
+    279  148d		       c9 01		      cmp	#LADDER_CHAR
+    280  148f		       f0 e6		      beq	return_false
+    281  1491		       4c 75 14 	      jmp	return_true	;
+    282  1494
+    283  1494							;-----
+    284  1494				   delete_squarebot
+    285  1494		       20 42 16 	      jsr	get_squarebot_draw_position
+    286  1497		       a2 00		      ldx	#$0
+    287  1499
+    288  1499				   delete_loop
+    289  1499		       b4 1f		      ldy	delta_addr,x
+    290  149b		       b5 16		      lda	tile_store_addr,X
+    291  149d		       91 10		      sta	(squarebot_position),y
+    292  149f		       a9 00		      lda	#0	; EVERYTHING IS BLACK
+    293  14a1		       91 12		      sta	(squarebot_color_position),y
+    294  14a3
+    295  14a3		       e8		      inx
+    296  14a4		       e0 05		      cpx	#5
+    297  14a6		       d0 f1		      bne	delete_loop
+    298  14a8
+    299  14a8		       20 5d 16 	      jsr	get_squarebot_game_position
+    300  14ab		       60		      rts
+    301  14ac
+    302  14ac							;-----
+    303  14ac				   move_new_position
+    304  14ac		       20 78 16 	      jsr	get_new_draw_position
+    305  14af
+    306  14af		       18		      clc
+    307  14b0		       a5 0b		      lda	new_position
+    308  14b2		       75 1f		      adc	delta_addr,x	; x is the index of the move_dir
+    309  14b4		       85 0b		      sta	new_position
+    310  14b6		       a5 0c		      lda	new_position+1
+    311  14b8		       69 00		      adc	#0
+    312  14ba		       85 0c		      sta	new_position+1
+    313  14bc		       18		      clc
+    314  14bd		       a5 0d		      lda	new_color_position
+    315  14bf		       75 1f		      adc	delta_addr,x
+    316  14c1		       85 0d		      sta	new_color_position
+    317  14c3		       a5 0e		      lda	new_color_position+1
+    318  14c5		       69 00		      adc	#0
+    319  14c7		       85 0e		      sta	new_color_position+1
+    320  14c9		       18		      clc
+    321  14ca		       60		      rts		; no need to undo get_new_draw_position
+    322  14cb
+    323  14cb							;-----
+    324  14cb				   get_tiles
+    325  14cb		       20 78 16 	      jsr	get_new_draw_position
+    326  14ce
+    327  14ce		       a9 01		      lda	#$01	; eor move_dir with 1 to get opposite side
+    328  14d0		       45 2c		      eor	move_dir_store
+    329  14d2		       aa		      tax
+    330  14d3		       a5 1a		      lda	tile_store+4	; get mid
+    331  14d5		       95 16		      sta	tile_store_addr,x	; set opposite dir
+    332  14d7
+    333  14d7		       a6 2c		      ldx	move_dir_store
+    334  14d9		       b5 16		      lda	tile_store_addr,x	;get dir
+    335  14db		       85 1a		      sta	tile_store+4	; set mid
+    336  14dd
+    337  14dd		       b5 1f		      lda	delta_addr,x
+    338  14df		       a8		      tay
+    339  14e0		       b1 0b		      lda	(new_position),y	; get tile_dir
+    340  14e2		       95 16		      sta	tile_store_addr,x	; set tile_dir
+    341  14e4
+    342  14e4		       a9 02		      lda	#$02	; get perpendicular tiles
+    343  14e6		       45 2c		      eor	move_dir_store
+    344  14e8		       aa		      tax		; eor move_dir with 2 to get perpendicular directions
+    345  14e9		       b5 1f		      lda	delta_addr,x
+    346  14eb		       a8		      tay
+    347  14ec		       b1 0b		      lda	(new_position),y
+    348  14ee		       95 16		      sta	tile_store_addr,x
+    349  14f0
+    350  14f0		       a9 03		      lda	#$03
+    351  14f2		       45 2c		      eor	move_dir_store
+    352  14f4		       aa		      tax
+    353  14f5		       b5 1f		      lda	delta_addr,x
+    354  14f7		       a8		      tay
+    355  14f8		       b1 0b		      lda	(new_position),y
+    356  14fa		       95 16		      sta	tile_store_addr,x
+    357  14fc
+    358  14fc		       20 93 16 	      jsr	get_new_game_position
+    359  14ff		       60		      rts
+    360  1500
+    361  1500							;-----
+    362  1500				   apply_powerup_logic
+    363  1500							;call prepare_logic for index temp+3 = 0,1,2, and 3. store index in temp+3 since we change y often
+    364  1500		       a9 00		      lda	#$0
+    365  1502		       85 2b		      sta	temp+3
+    366  1504		       aa		      tax
+    367  1505		       20 23 15 	      jsr	prepare_logic
+    368  1508		       e6 2b		      inc	temp+3
+    369  150a		       20 23 15 	      jsr	prepare_logic
+    370  150d		       e6 2b		      inc	temp+3
+    371  150f		       20 23 15 	      jsr	prepare_logic
+    372  1512		       e6 2b		      inc	temp+3
+    373  1514		       20 23 15 	      jsr	prepare_logic
+    374  1517		       a9 00		      lda	#$0
+    375  1519		       85 28		      sta	temp
+    376  151b		       85 29		      sta	temp+1
+    377  151d		       85 2a		      sta	temp+2
+    378  151f		       85 2b		      sta	temp+3
+    379  1521		       aa		      tax		; clean up just to be safe
+    380  1522		       60		      rts
+    381  1523
+    382  1523							;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
+    383  1523				   prepare_logic
+    384  1523		       a6 2b		      ldx	temp+3
+    385  1525		       b5 1b		      lda	attached_powerups_addr,x
+    386  1527		       85 28		      sta	temp
+    387  1529		       b5 16		      lda	tile_store_addr,x
+    388  152b		       85 29		      sta	temp+1
+    389  152d		       a9 01		      lda	#$01
+    390  152f		       45 2b		      eor	temp+3
+    391  1531		       aa		      tax		; eor with 1 which gets us the tile opposite the powerup
+    392  1532		       b5 16		      lda	tile_store_addr,x
+    393  1534		       85 2a		      sta	temp+2
+    394  1536		       20 4d 15 	      jsr	powerup_logic	; perform logic
+    395  1539		       a6 2b		      ldx	temp+3
+    396  153b		       a5 28		      lda	temp
+    397  153d		       95 1b		      sta	attached_powerups_addr,x
+    398  153f		       a5 29		      lda	temp+1
+    399  1541		       95 16		      sta	tile_store_addr,x
+    400  1543		       a9 01		      lda	#$01
+    401  1545		       45 2b		      eor	temp+3
+    402  1547		       aa		      tax
+    403  1548		       a5 2a		      lda	temp+2
+    404  154a		       95 16		      sta	tile_store_addr,x
+    405  154c		       60		      rts
+    406  154d
+    407  154d							; ready booster: does nothing
+    408  154d							; ignited booster: breaks breakable walls and changes to active booster 
+    409  154d							; active booster: breaks breakable walls and changes to ready booster
+    410  154d							; key: spends itself to break locked walls
+    411  154d				   powerup_logic		;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
+    412  154d		       a5 28		      lda	temp
+    413  154f		       c9 01		      cmp	#$01	; check ignited booster
+    414  1551		       d0 11		      bne	pl_b
+    415  1553		       a5 2a		      lda	temp+2	; check opposite tile
+    416  1555		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
+    417  1557		       d0 04		      bne	pl_ab
+    418  1559		       a9 00		      lda	#BLANK_TILE_CHAR
+    419  155b		       85 2a		      sta	temp+2	; delete wall
+    420  155d				   pl_ab
+    421  155d		       a9 18		      lda	#ABOOSTER_A_CHAR	; set active booster
+    422  155f		       85 28		      sta	temp
+    423  1561		       4c 9b 15 	      jmp	pl_return
+    424  1564				   pl_b
+    425  1564		       c9 18		      cmp	#ABOOSTER_A_CHAR	; check active booster
+    426  1566		       d0 11		      bne	pl_k
+    427  1568		       a5 2a		      lda	temp+2	; check opposite tile
+    428  156a		       c9 07		      cmp	#BREAKABLE_WALL_CHAR
+    429  156c		       d0 04		      bne	pl_rb
+    430  156e		       a9 00		      lda	#BLANK_TILE_CHAR
+    431  1570		       85 2a		      sta	temp+2	; delete wall
+    432  1572				   pl_rb
+    433  1572		       a9 14		      lda	#RBOOSTER_A_CHAR	; set ready booster
+    434  1574		       85 28		      sta	temp
+    435  1576		       4c 9b 15 	      jmp	pl_return
+    436  1579				   pl_k
+    437  1579		       c9 1c		      cmp	#KEY_A_CHAR	; check key, slightly unnecessary
+    438  157b		       d0 1e		      bne	pl_return
+    439  157d		       a5 29		      lda	temp+1
+    440  157f		       c9 06		      cmp	#LOCKED_WALL_CHAR
+    441  1581		       d0 09		      bne	pl_ke
+    442  1583		       a9 00		      lda	#BLANK_TILE_CHAR
+    443  1585		       85 28		      sta	temp	; delete key
+    444  1587		       85 29		      sta	temp+1	; delete wall
+    445  1589		       4c 9b 15 	      jmp	pl_return
+    446  158c				   pl_ke
+    447  158c		       c9 05		      cmp	#LOCKED_EXIT_CHAR
+    448  158e		       d0 0b		      bne	pl_return
+    449  1590		       a9 00		      lda	#BLANK_TILE_CHAR
+    450  1592		       85 28		      sta	temp
+    451  1594		       a9 04		      lda	#EXIT_CHAR
+    452  1596		       85 29		      sta	temp+1
+    453  1598		       4c 9b 15 	      jmp	pl_return
+    454  159b				   pl_return
+    455  159b		       60		      rts
+    456  159c
+    457  159c							;-----
+    458  159c				   update_squarebot
+    459  159c		       a5 0b		      lda	new_position
+    460  159e		       85 10		      sta	squarebot_position
+    461  15a0		       a5 0c		      lda	new_position+1
+    462  15a2		       85 11		      sta	squarebot_position+1
+    463  15a4
+    464  15a4		       a5 0d		      lda	new_color_position
+    465  15a6		       85 12		      sta	squarebot_color_position
+    466  15a8		       a5 0e		      lda	new_color_position+1
+    467  15aa		       85 13		      sta	squarebot_color_position+1
+    468  15ac		       60		      rts
+    469  15ad
+    470  15ad							;-----
+    471  15ad				   update_chars 		; chareor = tile*8,   chareor+1 = powerup*8,	chareor+2 = char*8
+    472  15ad		       a2 00		      ldx	#$00
+    473  15af		       86 28		      stx	temp
+    474  15b1
+    475  15b1				   update_char_dir_loop
+    476  15b1		       b5 16		      lda	tile_store_addr,x
+    477  15b3		       0a		      asl
+    478  15b4		       0a		      asl
+    479  15b5		       0a		      asl		; multiply by 8 since there are 8 bytes per character
+    480  15b6		       85 2d		      sta	chareor
+    481  15b8		       b5 24		      lda	chars_addr,x
+    482  15ba		       0a		      asl
+    483  15bb		       0a		      asl
+    484  15bc		       0a		      asl
+    485  15bd		       85 2f		      sta	chareor+2
+    486  15bf		       b5 1b		      lda	attached_powerups_addr,x
+    487  15c1		       c9 00		      cmp	#$00
+    488  15c3		       f0 03		      beq	no_powerup
+    489  15c5		       18		      clc		;add index for rotation 
+    490  15c6		       65 28		      adc	temp
+    491  15c8				   no_powerup
+    492  15c8		       0a		      asl
+    493  15c9		       0a		      asl
+    494  15ca		       0a		      asl
+    495  15cb		       85 2e		      sta	chareor+1
+    496  15cd		       20 d9 15 	      jsr	update_char
+    497  15d0		       e6 28		      inc	temp
+    498  15d2		       a6 28		      ldx	temp
+    499  15d4
+    500  15d4		       e0 04		      cpx	#4
+    501  15d6		       d0 d9		      bne	update_char_dir_loop
+    502  15d8
+    503  15d8		       60		      rts
+    504  15d9
+    505  15d9				   update_char		; chareor = tile*8,   chareor+1 = powerup*8,	chareor+2 = char*8
+    506  15d9		       a9 00		      lda	#$00
+    507  15db		       85 29		      sta	temp+1
+    508  15dd				   update_char_loop
+    509  15dd		       a5 29		      lda	temp+1
+    510  15df		       18		      clc
+    511  15e0		       65 2d		      adc	chareor
+    512  15e2		       a8		      tay
+    513  15e3		       b9 00 1c 	      lda	character_set_begin,y
+    514  15e6		       85 2a		      sta	temp+2
+    515  15e8
+    516  15e8		       a5 29		      lda	temp+1
+    517  15ea		       18		      clc
+    518  15eb		       65 2e		      adc	chareor+1
+    519  15ed		       a8		      tay
+    520  15ee		       b9 00 1c 	      lda	character_set_begin,y
+    521  15f1		       45 2a		      eor	temp+2
+    522  15f3		       85 2a		      sta	temp+2
+    523  15f5
+    524  15f5		       a5 29		      lda	temp+1
+    525  15f7		       18		      clc
+    526  15f8		       65 2f		      adc	chareor+2
+    527  15fa		       a8		      tay
+    528  15fb		       a5 2a		      lda	temp+2
+    529  15fd		       99 00 1c 	      sta	character_set_begin,y
+    530  1600
+    531  1600		       e6 29		      inc	temp+1
+    532  1602		       a5 29		      lda	temp+1
+    533  1604		       c9 08		      cmp	#8
+    534  1606		       d0 d5		      bne	update_char_loop
+    535  1608
+    536  1608		       60		      rts
+    537  1609
+    538  1609							; if there is a powerup:
+    539  1609							; for each of 8 bytes:
+    540  1609							; load tile byte
+    541  1609							; eor with powerup tile byte
+    542  1609							; store in char byte
+    543  1609
+    544  1609							;-----
+    545  1609				   draw_squarebot
+    546  1609		       20 42 16 	      jsr	get_squarebot_draw_position
+    547  160c
+    548  160c		       a5 24		      lda	chars	;u
+    549  160e		       a4 1f		      ldy	delta
+    550  1610		       91 10		      sta	(squarebot_position),y
+    551  1612		       a9 00		      lda	#0
+    552  1614		       91 12		      sta	(squarebot_color_position),y
+    553  1616
+    554  1616		       a5 25		      lda	chars+1
+    555  1618		       a4 20		      ldy	delta+1	;d
+    556  161a		       91 10		      sta	(squarebot_position),y
+    557  161c		       a9 00		      lda	#0
+    558  161e		       91 12		      sta	(squarebot_color_position),y
+    559  1620
+    560  1620		       a5 26		      lda	chars+2
+    561  1622		       a4 21		      ldy	delta+2	;l
+    562  1624		       91 10		      sta	(squarebot_position),y
+    563  1626		       a9 00		      lda	#0
+    564  1628		       91 12		      sta	(squarebot_color_position),y
+    565  162a
+    566  162a		       a5 27		      lda	chars+3
+    567  162c		       a4 22		      ldy	delta+3	;r
+    568  162e		       91 10		      sta	(squarebot_position),y
+    569  1630		       a9 00		      lda	#0
+    570  1632		       91 12		      sta	(squarebot_color_position),y
+    571  1634
+    572  1634		       a9 13		      lda	#SQUAREBOT_CHAR
+    573  1636		       a4 23		      ldy	delta+4	;m
+    574  1638		       91 10		      sta	(squarebot_position),y
+    575  163a		       a9 02		      lda	#SQUAREBOT_COLOR
+    576  163c		       91 12		      sta	(squarebot_color_position),y
+    577  163e
+    578  163e		       20 5d 16 	      jsr	get_squarebot_game_position
+    579  1641		       60		      rts
 ------- FILE main.s
 ------- FILE updateGameStateHelper.s LEVEL 2 PASS 3
       0  1642					      include	"updateGameStateHelper.s"
@@ -1405,7 +1407,7 @@
     233  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 10
     234  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 11
     235  1c90		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 12
-    236  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13
+    236  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13 
     237  1ca0
     238  1ca0							; attachments
     239  1ca0		       00 00 00 00*	      BYTE.b	0,0,0,0,195,126,126,60	; ready booster attachment up 14

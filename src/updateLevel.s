@@ -69,6 +69,7 @@ update_level
   jsr delete_squarebot
 
   ; now set current_level to next_level
+  jsr player_movement
   lda next_level
   sta current_level
   lda next_level+1

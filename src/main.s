@@ -179,8 +179,8 @@ return_check
   rts
 
   include "updateLevel.s"
-  include "updateGameState_new.s"
   include "sound.s"
+  include "updateGameState_new.s"
   include "updateGameStateHelper.s"
 
 compressed_screen_data_start
