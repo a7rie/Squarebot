@@ -194,6 +194,7 @@ level_data_start
   incbin "../data/levels/binary_levels/jesse_5"
   incbin "../data/levels/binary_levels/jesse_6"
   incbin "../data/levels/binary_levels/jesse_7"
+  incbin "../data/levels/binary_levels/end_screen"
 
   ;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
 
