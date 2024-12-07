@@ -1348,41 +1348,98 @@
     188  175e
     189  175e				   level_data_start
     190  175e							; tutorial levels -- introduce mechanics one by one
-    191  175e					      incbin	"../data/levels/binary_levels/jesse_1"
-    192  17b8					      incbin	"../data/levels/binary_levels/jesse_2"
-    193  1832					      incbin	"../data/levels/binary_levels/gui_1"
-    194  1850					      incbin	"../data/levels/binary_levels/gui_2"
-    195  1868					      incbin	"../data/levels/binary_levels/amin_1"
-    196  1892					      incbin	"../data/levels/binary_levels/amin_2"
-    197  18c0					      incbin	"../data/levels/binary_levels/amin_4"
-    198  18ec
-    199  18ec					      incbin	"../data/levels/binary_levels/jesse_4"
-    200  1932					      incbin	"../data/levels/binary_levels/amin_3"
-    201  196c							;incbin "../data/levels/binary_levels/amin_5"
-    202  196c					      incbin	"../data/levels/binary_levels/jesse_5"
-    203  19c0					      incbin	"../data/levels/binary_levels/jesse_6"
-    204  1a32					      incbin	"../data/levels/binary_levels/jesse_7"
-    205  1a8c					      incbin	"../data/levels/binary_levels/jesse_8"
-    206  1b8e					      incbin	"../data/levels/binary_levels/end_screen"
-    207  1c26
+    191  175e							;incbin "../data/levels/binary_levels/jesse_1"
+    192  175e							;incbin "../data/levels/binary_levels/jesse_2"
+    193  175e							;incbin "../data/levels/binary_levels/gui_1"
+    194  175e							;incbin "../data/levels/binary_levels/gui_2"
+    195  175e							;incbin "../data/levels/binary_levels/amin_1"
+    196  175e							;incbin "../data/levels/binary_levels/amin_2"
+    197  175e							;incbin "../data/levels/binary_levels/amin_4"
+    198  175e
+    199  175e							;incbin "../data/levels/binary_levels/jesse_4"
+    200  175e							;incbin "../data/levels/binary_levels/amin_3"
+    201  175e							;incbin "../data/levels/binary_levels/amin_5"
+    202  175e							;incbin "../data/levels/binary_levels/jesse_5"
+    203  175e							;incbin "../data/levels/binary_levels/jesse_6"
+    204  175e					      incbin	"../data/levels/binary_levels/jesse_7"
+    205  17b8					      incbin	"../data/levels/binary_levels/jesse_8"
+    206  18b6					      incbin	"../data/levels/binary_levels/end_screen"
+    207  194e
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1c26					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1c26		       0c 25	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1c26		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 3109 bytes used
-      3  1c26					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  7206
-      4  1c26					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1c26				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1c26				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1c26				  -	      err
-      8  1c26					      endif
+      0  194e					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  194e		       09 4d	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  194e		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 2381 bytes used
+      3  194e					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  6478
+      4  194e					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  194e				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  194e				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  194e				  -	      err
+      8  194e					      endif
 ------- FILE main.s
-    209  1c26
-    210  1c26
-    211  1c26							; byte 2469
-    212  1c26							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
-    213  1c26
+    209  194e
+    210  194e
+    211  194e							; byte 2469
+    212  194e							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
+    213  194e
     214  1c00					      org	character_set_begin	; starts at byte 3079 i think
-main.s (215): error: Origin Reverse-indexed.
-Aborting assembly
+    215  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
+    216  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
+    217  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
+    218  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
+    219  1c20		       00 3c 62 5e*	      BYTE.b	0,60,98,94,86,102,60,0	; exit (door) 4
+    220  1c28		       ff 81 9d a1*	      BYTE.b	255,129,157,161,173,153,129,255	; locked exit 5
+    221  1c30		       ff e7 db db*	      BYTE.b	255,231,219,219,129,129,129,255	; locked wall 6
+    222  1c38		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 7
+    223  1c40		       12 d6 7c 3f*	      BYTE.b	18,214,124,63,252,62,107,72	; spike ball 8 		    PETSCII WHY?? I CAN'T READ THIS!
+    224  1c48		       18 3c 3c 3c*	      BYTE.b	24,60,60,60,126,82,8,36	; booster powerup 9
+    225  1c50		       18 24 24 18*	      BYTE.b	24,36,36,24,16,24,16,24	; key powerup A
+    226  1c58		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty B
+    227  1c60		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty C
+    228  1c68		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty D
+    229  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty E
+    230  1c78
+    231  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU F
+    232  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 10
+    233  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 11
+    234  1c90		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 12
+    235  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13
+    236  1ca0
+    237  1ca0							; attachments
+    238  1ca0		       00 00 00 00*	      BYTE.b	0,0,0,0,195,126,126,60	; ready booster attachment up 14
+    239  1ca8		       3c 7e 7e c3*	      BYTE.b	60,126,126,195,0,0,0,0	; rb down 15
+    240  1cb0		       08 0e 07 07*	      BYTE.b	8,14,7,7,7,7,14,8	; rb left 16
+    241  1cb8		       10 70 e0 e0*	      BYTE.b	16,112,224,224,224,224,112,16	; rb right 17
+    242  1cc0		       3c 7e 3c 18*	      BYTE.b	60,126,60,24,219,126,126,60	; active booster attachment up 18
+    243  1cc8		       3c 7e 7e db*	      BYTE.b	60,126,126,219,24,60,126,60	; ab down 19
+    244  1cd0		       08 4e e7 ff*	      BYTE.b	8,78,231,255,255,231,78,8	; ab left 1A
+    245  1cd8		       10 72 e7 ff*	      BYTE.b	16,114,231,255,255,231,114,16	; ab right 1B
+    246  1ce0		       00 1e 14 1e*	      BYTE.b	0,30,20,30,24,24,24,60	; key attachment up 1C
+    247  1ce8		       3c 18 18 18*	      BYTE.b	60,24,24,24,30,20,30,0	; key down 1D
+    248  1cf0		       00 00 01 7f*	      BYTE.b	0,0,1,127,95,113,80,0	; key left 1E
+    249  1cf8		       00 00 80 fe*	      BYTE.b	0,0,128,254,250,142,10,0	; key right 1F
+    250  1d00
+    251  1d00							; for the title screen.......
+    252  1d00		       ff 80 80 80*	      BYTE.b	255,128,128,128,128,129,131,135	;20
+    253  1d08		       ff 00 00 00*	      BYTE.b	255,0,0,0,192,224,48,248	;21
+    254  1d10		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,0	;22
+    255  1d18		       ff 01 01 01*	      BYTE.b	255,1,1,1,1,1,1,1	;23
+    256  1d20		       8f 9b 83 83*	      BYTE.b	143,155,131,131,128,128,128,128	;24
+    257  1d28		       e0 e0 e0 e0*	      BYTE.b	224,224,224,224,0,0,0,0	;25
+    258  1d30		       01 07 1f 07*	      BYTE.b	1,7,31,7,7,7,0,0	;26
+    259  1d38		       f1 c1 c1 c1*	      BYTE.b	241,193,193,193,193,193,1,1	;27
+    260  1d40		       80 80 81 80*	      BYTE.b	128,128,129,128,152,152,156,143	;28
+    261  1d48		       00 00 c0 70*	      BYTE.b	0,0,192,112,30,3,0,255	;29
+    262  1d50		       00 00 00 00*	      BYTE.b	0,0,0,0,0,128,240,28	;2A
+    263  1d58		       01 01 01 01*	      BYTE.b	1,1,1,1,1,1,1,1	;2B
+    264  1d60		       8f 9f 9f 9e*	      BYTE.b	143,159,159,158,128,128,128,255	;2C
+    265  1d68		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,255	;2D
+    266  1d70		       07 00 00 00*	      BYTE.b	7,0,0,0,0,0,0,255	;2E
+    267  1d78		       81 c1 01 01*	      BYTE.b	129,193,1,1,1,1,1,255	;2F
+    268  1d80							;byte 3455
+    269  1d80
+    270  1d80							;possible optimizations:
+    271  1d80							;shift character set begin as far as i can
+    272  1d80							;generalize 16 bit arithmetic
+    273  1d80							;reuse switch statements
