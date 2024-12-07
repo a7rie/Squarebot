@@ -1,10 +1,10 @@
 # set paths to dasm and xvic
-DASM = dasm
-XVIC = xvic
-PYTHON = python
+DASM = /Users/amine/Downloads/dasm-2.20.14.1-osx-x64/dasm
+XVIC = /opt/homebrew/bin/xvic
+PYTHON = /opt/homebrew/bin/python3
 
-BINARY_LEVELS_DIR := data/levels/binary_levels
-ASCII_LEVELS_DIR := data/levels/ascii_levels
+BINARY_LEVELS_DIR := /Users/amine/Documents/GitHub/Squarebot/data/levels/ascii_levels
+ASCII_LEVELS_DIR := /Users/amine/Documents/GitHub/Squarebot/data/levels/binary_levels
 
 ASCII_LEVELS := $(wildcard $(ASCII_LEVELS_DIR)/*)
 BINARY_LEVELS := $(patsubst $(ASCII_LEVELS_DIR)/%, $(BINARY_LEVELS_DIR)/%, $(ASCII_LEVELS))
