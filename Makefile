@@ -1,7 +1,7 @@
 # set paths to dasm and xvic
-DASM = dasm
-XVIC = xvic
-PYTHON = python
+DASM = ~aycock/599.82/bin/dasm
+XVIC = ~aycock/599.82/bin/xvic
+PYTHON = /usr/bin/python
 
 BINARY_LEVELS_DIR := data/levels/binary_levels
 ASCII_LEVELS_DIR := data/levels/ascii_levels
@@ -16,11 +16,11 @@ out/main.prg: src/* ${BINARY_LEVELS}
 
 
 ${BINARY_LEVELS_DIR}/%: ${ASCII_LEVELS_DIR}/%
-	${PYTHON} .\data\levels\generateLevelBinary.py $< $@
+	${PYTHON} ./data/levels/generateLevelBinary.py $< $@
 
 run: 
 	${XVIC} out/main.prg
 
-clean: 
-	del /f /q out\*
-	del /f /q \data\levels\binary_levels\*
+clean:
+	rm -f out/*
+	rm -f ${BINARY_LEVELS_DIR}/*

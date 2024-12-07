@@ -1348,41 +1348,41 @@
     188  175e
     189  175e				   level_data_start
     190  175e							; tutorial levels -- introduce mechanics one by one
-    191  175e							;incbin "../data/levels/binary_levels/jesse_1"
-    192  175e							;incbin "../data/levels/binary_levels/jesse_2"
-    193  175e							;incbin "../data/levels/binary_levels/gui_1"
-    194  175e							;incbin "../data/levels/binary_levels/gui_2"
-    195  175e							;incbin "../data/levels/binary_levels/amin_1"
-    196  175e							;incbin "../data/levels/binary_levels/amin_2"
-    197  175e							;incbin "../data/levels/binary_levels/amin_4"
-    198  175e
-    199  175e							;incbin "../data/levels/binary_levels/jesse_4"
-    200  175e							;incbin "../data/levels/binary_levels/amin_3"
-    201  175e							;incbin "../data/levels/binary_levels/amin_5"
-    202  175e							;incbin "../data/levels/binary_levels/jesse_5"
-    203  175e							;incbin "../data/levels/binary_levels/jesse_6"
-    204  175e					      incbin	"../data/levels/binary_levels/jesse_7"
-    205  17b8					      incbin	"../data/levels/binary_levels/jesse_8"
-    206  18b6					      incbin	"../data/levels/binary_levels/end_screen"
-    207  194e
+    191  175e					      incbin	"../data/levels/binary_levels/jesse_1"
+    192  17b8					      incbin	"../data/levels/binary_levels/jesse_2"
+    193  1832					      incbin	"../data/levels/binary_levels/gui_1"
+    194  1850					      incbin	"../data/levels/binary_levels/gui_2"
+    195  1868					      incbin	"../data/levels/binary_levels/amin_1"
+    196  1892					      incbin	"../data/levels/binary_levels/amin_2"
+    197  18c0					      incbin	"../data/levels/binary_levels/amin_4"
+    198  18ec
+    199  18ec					      incbin	"../data/levels/binary_levels/jesse_4"
+    200  1932					      incbin	"../data/levels/binary_levels/amin_3"
+    201  196c					      incbin	"../data/levels/binary_levels/amin_5"
+    202  19aa					      incbin	"../data/levels/binary_levels/jesse_5"
+    203  19fe					      incbin	"../data/levels/binary_levels/jesse_6"
+    204  1a70					      incbin	"../data/levels/binary_levels/jesse_7"
+    205  1aca							;incbin "../data/levels/binary_levels/jesse_8"
+    206  1aca					      incbin	"../data/levels/binary_levels/end_screen"
+    207  1b62
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  194e					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  194e		       09 4d	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  194e		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 2381 bytes used
-      3  194e					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  6478
-      4  194e					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  194e				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  194e				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  194e				  -	      err
-      8  194e					      endif
+      0  1b62					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  1b62		       0b 61	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  1b62		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 2913 bytes used
+      3  1b62					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  7010
+      4  1b62					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  1b62				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  1b62				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  1b62				  -	      err
+      8  1b62					      endif
 ------- FILE main.s
-    209  194e
-    210  194e
-    211  194e							; byte 2469
-    212  194e							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
-    213  194e
+    209  1b62
+    210  1b62
+    211  1b62							; byte 2469
+    212  1b62							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
+    213  1b62
     214  1c00					      org	character_set_begin	; starts at byte 3079 i think
     215  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
     216  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
