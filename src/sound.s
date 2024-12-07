@@ -2,9 +2,7 @@ SN      = $900d                 ; noise channel (these memory addresses are in t
 SV      = $900e                 ; volume
 JC      = $00a2                 ; jiffy clock
 
-STARTM  = 214                   ; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
-STARTC  = 150                   ; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
-STARTG  = 255                   ; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
+STARTM  = 240                   ; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
 
 player_movement                 ; CALL THIS SUBROUTINE TO PLAY THE SOUND
         ldx #0
@@ -29,7 +27,7 @@ jiffyM
 
 ; you can define the velocities here, it moves on to the next velocity after it waits a jiffy. a velocity of 0 is the delimiter (i.e. it exits when it hits 0)
 mov_velocities
-        dc  3, 6, 3, 0           ;sound duration
+        dc  3, 6, 6, 0           ;sound duration
 
 exit_move
         rts

@@ -658,37 +658,35 @@
       2  12b4		       90 0e	   SV	      =	$900e	; volume
       3  12b4		       00 a2	   JC	      =	$00a2	; jiffy clock
       4  12b4
-      5  12b4		       00 d6	   STARTM     =	214	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
-      6  12b4		       00 96	   STARTC     =	150	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
-      7  12b4		       00 ff	   STARTG     =	255	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
-      8  12b4
-      9  12b4				   player_movement		; CALL THIS SUBROUTINE TO PLAY THE SOUND
-     10  12b4		       a2 00		      ldx	#0
-     11  12b6		       a0 d6		      ldy	#STARTM	; load the first pitch into the Y register
-     12  12b8		       8c 0d 90 	      sty	SN	; write the note to the noise channel
-     13  12bb				   player_movement_next
-     14  12bb		       bd cd 12 	      lda	mov_velocities,X	; get the current note velocity
-     15  12be		       8d 0e 90 	      sta	SV	; set speakers to volume in accumulator
-     16  12c1							; check if we should exit on this note
-     17  12c1		       f0 0e		      beq	exit_move	; if volume is 0, exit the main loop (this branches to an rts, essentially. my exit code is slightly more complicated)
-     18  12c3							; we should not exit on this note
-     19  12c3		       e8		      inx		; move on
-     20  12c4							; set up the jiffy waiting loop
-     21  12c4		       a4 a2		      ldy	JC	; load jiffy clock into Y register
-     22  12c6		       c8		      iny		; Y register now stores the desired end time (one jiffy away)
-     23  12c7							; wait one jiffy
-     24  12c7				   jiffyM
-     25  12c7		       c4 a2		      cpy	JC
-     26  12c9		       d0 fc		      bne	jiffyM
-     27  12cb							; move on to the next velocity value
-     28  12cb		       f0 ee		      beq	player_movement_next	; restart main loop
-     29  12cd
-     30  12cd							; you can define the velocities here, it moves on to the next velocity after it waits a jiffy. a velocity of 0 is the delimiter (i.e. it exits when it hits 0)
-     31  12cd				   mov_velocities
-     32  12cd		       03 06 03 00	      dc	3, 6, 3, 0	;sound duration
-     33  12d1
-     34  12d1				   exit_move
-     35  12d1		       60		      rts
+      5  12b4		       00 f0	   STARTM     =	240	; initial pitch of move (must be between 129 and 255 ish, but you should already know that)
+      6  12b4
+      7  12b4				   player_movement		; CALL THIS SUBROUTINE TO PLAY THE SOUND
+      8  12b4		       a2 00		      ldx	#0
+      9  12b6		       a0 f0		      ldy	#STARTM	; load the first pitch into the Y register
+     10  12b8		       8c 0d 90 	      sty	SN	; write the note to the noise channel
+     11  12bb				   player_movement_next
+     12  12bb		       bd cd 12 	      lda	mov_velocities,X	; get the current note velocity
+     13  12be		       8d 0e 90 	      sta	SV	; set speakers to volume in accumulator
+     14  12c1							; check if we should exit on this note
+     15  12c1		       f0 0e		      beq	exit_move	; if volume is 0, exit the main loop (this branches to an rts, essentially. my exit code is slightly more complicated)
+     16  12c3							; we should not exit on this note
+     17  12c3		       e8		      inx		; move on
+     18  12c4							; set up the jiffy waiting loop
+     19  12c4		       a4 a2		      ldy	JC	; load jiffy clock into Y register
+     20  12c6		       c8		      iny		; Y register now stores the desired end time (one jiffy away)
+     21  12c7							; wait one jiffy
+     22  12c7				   jiffyM
+     23  12c7		       c4 a2		      cpy	JC
+     24  12c9		       d0 fc		      bne	jiffyM
+     25  12cb							; move on to the next velocity value
+     26  12cb		       f0 ee		      beq	player_movement_next	; restart main loop
+     27  12cd
+     28  12cd							; you can define the velocities here, it moves on to the next velocity after it waits a jiffy. a velocity of 0 is the delimiter (i.e. it exits when it hits 0)
+     29  12cd				   mov_velocities
+     30  12cd		       03 06 06 00	      dc	3, 6, 6, 0	;sound duration
+     31  12d1
+     32  12d1				   exit_move
+     33  12d1		       60		      rts
 ------- FILE main.s
 ------- FILE updateGameState_new.s LEVEL 2 PASS 3
       0  12d2					      include	"updateGameState_new.s"
