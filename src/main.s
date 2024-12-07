@@ -183,6 +183,7 @@ compressed_screen_data_start
   incbin "../data/titleScreenData_compressed" 
 
 level_data_start
+; tutorial levels -- introduce mechanics one by one
   incbin "../data/levels/binary_levels/jesse_1"
   incbin "../data/levels/binary_levels/jesse_2"
   incbin "../data/levels/binary_levels/jesse_3"
@@ -190,6 +191,9 @@ level_data_start
   incbin "../data/levels/binary_levels/amin_2"
   incbin "../data/levels/binary_levels/amin_3"
   incbin "../data/levels/binary_levels/amin_4"
+
+
+  incbin "../data/levels/binary_levels/amin_5"
   incbin "../data/levels/binary_levels/jesse_4"
   incbin "../data/levels/binary_levels/jesse_5"
   incbin "../data/levels/binary_levels/jesse_6"
