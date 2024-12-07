@@ -21,11 +21,13 @@ To compile the code into your own .prg and .lst files, you will need [`dasm`](ht
 
 ## Gameplay and Controls
 
-At the title screen, press `Spacebar` to begin the first level. 
+At the title screen, press `Enter` to begin the first level. 
 - `A` to move left, `D` move right.
-- `Q` to jump to the left, `R` to jump to the right, `Spacebar` for an undirected jump.
+- `Q` for a left diagonal jump, `W` go jump straight upwards, `E` for a right diagonal jump.
+- `O`: Press this to reset the entire game, and start over from the title screen.
+- `T`: Press this to immediately reset the current level.
+- `O`: Press this to reset the entire game, and start over from the title screen.
 - `P`: Press this to immediately skip to the next level.
-- `R`: Press this to immediately reset the current level.
 
 
 The goal of each level is to move Squarebot into the position of the exit door. The way to do this various with each level, and will often require the use of one or more powerups.
