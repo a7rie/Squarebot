@@ -79,9 +79,9 @@
       0  1001					      include	"stub.s"	; stub contains BASIC sys cmd to run the machine language code
       1  1001		       00 9e	   SYS_CMD_TOKEN =	$9e
       2  1001		       00 0a	   STUB_LINE_NUMBER =	10
-      3  1001							; BASIC stub -- SYS cmd to run machine language 
+      3  1001							; BASIC stub -- SYS cmd to run machine language
       4  1001		       0b 10		      dc.w	nextstmt	; link; beginning of basic
-      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number 
+      5  1003		       0a 00		      dc.w	STUB_LINE_NUMBER	; line number
       6  1005		       9e 34 31 30*	      dc.b	SYS_CMD_TOKEN, [start]d, 0	; token for sys with operand as address to "start" label
       7  100b				   nextstmt
       8  100b		       00 00		      dc.w	0
@@ -179,7 +179,7 @@
      36  1097		       90 f3		      bcc	draw_title_screen_chars_loop
      37  1099		       60		      rts
      38  109a
-     39  109a				   back_to_start		;if menu button is pressed go back to start 
+     39  109a				   back_to_start		;if menu button is pressed go back to start
      40  109a		       4c 0d 10 	      jmp	start
      41  109d
      42  109d							; draw the character in Y register for (value of accumulator) number of times
@@ -439,7 +439,7 @@
     125  11a2		       b0 10		      bcs	update_level_return
     126  11a4
     127  11a4		       a4 0a		      ldy	level_data_index
-    128  11a6		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte  
+    128  11a6		       b1 04		      lda	(current_level),y	; accumulator stores the number of times to repeat the next byte
     129  11a8
     130  11a8		       20 c2 11 	      jsr	draw_sequence
     131  11ab
@@ -1097,7 +1097,7 @@
     405  154c		       60		      rts
     406  154d
     407  154d							; ready booster: does nothing
-    408  154d							; ignited booster: breaks breakable walls and changes to active booster 
+    408  154d							; ignited booster: breaks breakable walls and changes to active booster
     409  154d							; active booster: breaks breakable walls and changes to ready booster
     410  154d							; key: spends itself to break locked walls
     411  154d				   powerup_logic		;temp = powerup,   temp+1 = tile behind powerup,   temp+2 = tile opposite powerup
@@ -1178,7 +1178,7 @@
     486  15bf		       b5 1b		      lda	attached_powerups_addr,x
     487  15c1		       c9 00		      cmp	#$00
     488  15c3		       f0 03		      beq	no_powerup
-    489  15c5		       18		      clc		;add index for rotation 
+    489  15c5		       18		      clc		;add index for rotation
     490  15c6		       65 28		      adc	temp
     491  15c8				   no_powerup
     492  15c8		       0a		      asl
@@ -1352,97 +1352,37 @@
     192  17b8					      incbin	"../data/levels/binary_levels/jesse_2"
     193  1832					      incbin	"../data/levels/binary_levels/gui_1"
     194  1850					      incbin	"../data/levels/binary_levels/gui_2"
-    195  186a					      incbin	"../data/levels/binary_levels/jesse_3"
-    196  18ae					      incbin	"../data/levels/binary_levels/amin_1"
-    197  18d2					      incbin	"../data/levels/binary_levels/amin_2"
-    198  1904					      incbin	"../data/levels/binary_levels/amin_3"
-    199  193e					      incbin	"../data/levels/binary_levels/amin_4"
-    200  196a
-    201  196a
-    202  196a					      incbin	"../data/levels/binary_levels/amin_5"
-    203  19a8					      incbin	"../data/levels/binary_levels/jesse_4"
-    204  19ee					      incbin	"../data/levels/binary_levels/jesse_5"
-    205  1a42					      incbin	"../data/levels/binary_levels/jesse_6"
-    206  1ab4					      incbin	"../data/levels/binary_levels/jesse_7"
-    207  1b10					      incbin	"../data/levels/binary_levels/end_screen"
-    208  1ba8
-    209  1ba8
-    210  1ba8
+    195  1868					      incbin	"../data/levels/binary_levels/amin_1"
+    196  1892					      incbin	"../data/levels/binary_levels/amin_2"
+    197  18c0					      incbin	"../data/levels/binary_levels/amin_4"
+    198  18ec
+    199  18ec					      incbin	"../data/levels/binary_levels/jesse_4"
+    200  1932					      incbin	"../data/levels/binary_levels/amin_3"
+    201  196c							;incbin "../data/levels/binary_levels/amin_5"
+    202  196c					      incbin	"../data/levels/binary_levels/jesse_5"
+    203  19c0					      incbin	"../data/levels/binary_levels/jesse_6"
+    204  1a32					      incbin	"../data/levels/binary_levels/jesse_7"
+    205  1a8c					      incbin	"../data/levels/binary_levels/jesse_8"
+    206  1b8e					      incbin	"../data/levels/binary_levels/end_screen"
+    207  1c26
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1ba8					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1ba8		       0b a7	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1ba8		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 2983 bytes used
-      3  1ba8					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  7080
-      4  1ba8					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1ba8				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1ba8				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1ba8				  -	      err
-      8  1ba8					      endif
+      0  1c26					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  1c26		       0c 25	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  1c26		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 3109 bytes used
+      3  1c26					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  7206
+      4  1c26					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  1c26				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  1c26				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  1c26				  -	      err
+      8  1c26					      endif
 ------- FILE main.s
-    212  1ba8
-    213  1ba8
-    214  1ba8							; byte 2469
-    215  1ba8							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
-    216  1ba8
-    217  1c00					      org	character_set_begin	; starts at byte 3079 i think
-    218  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
-    219  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
-    220  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
-    221  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
-    222  1c20		       00 3c 62 5e*	      BYTE.b	0,60,98,94,86,102,60,0	; exit (door) 4
-    223  1c28		       ff 81 9d a1*	      BYTE.b	255,129,157,161,173,153,129,255	; locked exit 5
-    224  1c30		       ff e7 db db*	      BYTE.b	255,231,219,219,129,129,129,255	; locked wall 6
-    225  1c38		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 7
-    226  1c40		       12 d6 7c 3f*	      BYTE.b	18,214,124,63,252,62,107,72	; spike ball 8 		    PETSCII WHY?? I CAN'T READ THIS!
-    227  1c48		       18 3c 3c 3c*	      BYTE.b	24,60,60,60,126,82,8,36	; booster powerup 9
-    228  1c50		       18 24 24 18*	      BYTE.b	24,36,36,24,16,24,16,24	; key powerup A
-    229  1c58		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty B
-    230  1c60		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty C
-    231  1c68		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty D
-    232  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty E
-    233  1c78
-    234  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU F
-    235  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 10
-    236  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 11
-    237  1c90		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 12
-    238  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13 
-    239  1ca0
-    240  1ca0							; attachments
-    241  1ca0		       00 00 00 00*	      BYTE.b	0,0,0,0,195,126,126,60	; ready booster attachment up 14
-    242  1ca8		       3c 7e 7e c3*	      BYTE.b	60,126,126,195,0,0,0,0	; rb down 15
-    243  1cb0		       08 0e 07 07*	      BYTE.b	8,14,7,7,7,7,14,8	; rb left 16
-    244  1cb8		       10 70 e0 e0*	      BYTE.b	16,112,224,224,224,224,112,16	; rb right 17
-    245  1cc0		       3c 7e 3c 18*	      BYTE.b	60,126,60,24,219,126,126,60	; active booster attachment up 18
-    246  1cc8		       3c 7e 7e db*	      BYTE.b	60,126,126,219,24,60,126,60	; ab down 19
-    247  1cd0		       08 4e e7 ff*	      BYTE.b	8,78,231,255,255,231,78,8	; ab left 1A
-    248  1cd8		       10 72 e7 ff*	      BYTE.b	16,114,231,255,255,231,114,16	; ab right 1B
-    249  1ce0		       00 1e 14 1e*	      BYTE.b	0,30,20,30,24,24,24,60	; key attachment up 1C
-    250  1ce8		       3c 18 18 18*	      BYTE.b	60,24,24,24,30,20,30,0	; key down 1D
-    251  1cf0		       00 00 01 7f*	      BYTE.b	0,0,1,127,95,113,80,0	; key left 1E
-    252  1cf8		       00 00 80 fe*	      BYTE.b	0,0,128,254,250,142,10,0	; key right 1F
-    253  1d00
-    254  1d00							; for the title screen.......
-    255  1d00		       ff 80 80 80*	      BYTE.b	255,128,128,128,128,129,131,135	;20
-    256  1d08		       ff 00 00 00*	      BYTE.b	255,0,0,0,192,224,48,248	;21
-    257  1d10		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,0	;22
-    258  1d18		       ff 01 01 01*	      BYTE.b	255,1,1,1,1,1,1,1	;23
-    259  1d20		       8f 9b 83 83*	      BYTE.b	143,155,131,131,128,128,128,128	;24
-    260  1d28		       e0 e0 e0 e0*	      BYTE.b	224,224,224,224,0,0,0,0	;25
-    261  1d30		       01 07 1f 07*	      BYTE.b	1,7,31,7,7,7,0,0	;26
-    262  1d38		       f1 c1 c1 c1*	      BYTE.b	241,193,193,193,193,193,1,1	;27
-    263  1d40		       80 80 81 80*	      BYTE.b	128,128,129,128,152,152,156,143	;28
-    264  1d48		       00 00 c0 70*	      BYTE.b	0,0,192,112,30,3,0,255	;29
-    265  1d50		       00 00 00 00*	      BYTE.b	0,0,0,0,0,128,240,28	;2A
-    266  1d58		       01 01 01 01*	      BYTE.b	1,1,1,1,1,1,1,1	;2B
-    267  1d60		       8f 9f 9f 9e*	      BYTE.b	143,159,159,158,128,128,128,255	;2C
-    268  1d68		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,255	;2D
-    269  1d70		       07 00 00 00*	      BYTE.b	7,0,0,0,0,0,0,255	;2E
-    270  1d78		       81 c1 01 01*	      BYTE.b	129,193,1,1,1,1,1,255	;2F
-    271  1d80							;byte 3455
-    272  1d80
-    273  1d80							;possible optimizations:
-    274  1d80							;shift character set begin as far as i can
-    275  1d80							;generalize 16 bit arithmetic
-    276  1d80							;reuse switch statements
+    209  1c26
+    210  1c26
+    211  1c26							; byte 2469
+    212  1c26							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
+    213  1c26
+    214  1c00					      org	character_set_begin	; starts at byte 3079 i think
+main.s (215): error: Origin Reverse-indexed.
+Aborting assembly

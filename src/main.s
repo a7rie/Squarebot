@@ -192,21 +192,18 @@ level_data_start
   incbin "../data/levels/binary_levels/jesse_2"
   incbin "../data/levels/binary_levels/gui_1"
   incbin "../data/levels/binary_levels/gui_2"
-  incbin "../data/levels/binary_levels/jesse_3"
   incbin "../data/levels/binary_levels/amin_1"
   incbin "../data/levels/binary_levels/amin_2"
-  incbin "../data/levels/binary_levels/amin_3"
   incbin "../data/levels/binary_levels/amin_4"
 
-
-  incbin "../data/levels/binary_levels/amin_5"
   incbin "../data/levels/binary_levels/jesse_4"
+  incbin "../data/levels/binary_levels/amin_3"
+  incbin "../data/levels/binary_levels/amin_5"
   incbin "../data/levels/binary_levels/jesse_5"
   incbin "../data/levels/binary_levels/jesse_6"
   incbin "../data/levels/binary_levels/jesse_7"
+  ;incbin "../data/levels/binary_levels/jesse_8"
   incbin "../data/levels/binary_levels/end_screen"
-  
-
   
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
   
