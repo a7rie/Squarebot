@@ -1349,98 +1349,100 @@
     189  175e				   level_data_start
     190  175e							; tutorial levels -- introduce mechanics one by one
     191  175e					      incbin	"../data/levels/binary_levels/jesse_1"
-    192  1768					      incbin	"../data/levels/binary_levels/jesse_2"
-    193  1780					      incbin	"../data/levels/binary_levels/jesse_3"
-    194  17c4					      incbin	"../data/levels/binary_levels/amin_1"
-    195  17e8					      incbin	"../data/levels/binary_levels/amin_2"
-    196  181a					      incbin	"../data/levels/binary_levels/amin_3"
-    197  1854					      incbin	"../data/levels/binary_levels/amin_4"
-    198  1880
-    199  1880
-    200  1880					      incbin	"../data/levels/binary_levels/amin_5"
-    201  18be					      incbin	"../data/levels/binary_levels/jesse_4"
-    202  1904					      incbin	"../data/levels/binary_levels/jesse_5"
-    203  1958					      incbin	"../data/levels/binary_levels/jesse_6"
-    204  19ca					      incbin	"../data/levels/binary_levels/jesse_7"
-    205  1a26					      incbin	"../data/levels/binary_levels/end_screen"
-    206  1abe
-    207  1abe
-    208  1abe
+    192  17b8					      incbin	"../data/levels/binary_levels/jesse_2"
+    193  1832					      incbin	"../data/levels/binary_levels/gui_1"
+    194  1850					      incbin	"../data/levels/binary_levels/gui_2"
+    195  186a					      incbin	"../data/levels/binary_levels/jesse_3"
+    196  18ae					      incbin	"../data/levels/binary_levels/amin_1"
+    197  18d2					      incbin	"../data/levels/binary_levels/amin_2"
+    198  1904					      incbin	"../data/levels/binary_levels/amin_3"
+    199  193e					      incbin	"../data/levels/binary_levels/amin_4"
+    200  196a
+    201  196a
+    202  196a					      incbin	"../data/levels/binary_levels/amin_5"
+    203  19a8					      incbin	"../data/levels/binary_levels/jesse_4"
+    204  19ee					      incbin	"../data/levels/binary_levels/jesse_5"
+    205  1a42					      incbin	"../data/levels/binary_levels/jesse_6"
+    206  1ab4					      incbin	"../data/levels/binary_levels/jesse_7"
+    207  1b10					      incbin	"../data/levels/binary_levels/end_screen"
+    208  1ba8
+    209  1ba8
+    210  1ba8
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1abe					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1abe		       0a bd	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1abe		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 2749 bytes used
-      3  1abe					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  6846
-      4  1abe					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1abe				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1abe				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1abe				  -	      err
-      8  1abe					      endif
+      0  1ba8					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  1ba8		       0b a7	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  1ba8		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 2983 bytes used
+      3  1ba8					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  7080
+      4  1ba8					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  1ba8				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  1ba8				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  1ba8				  -	      err
+      8  1ba8					      endif
 ------- FILE main.s
-    210  1abe
-    211  1abe
-    212  1abe							; byte 2469
-    213  1abe							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
-    214  1abe
-    215  1c00					      org	character_set_begin	; starts at byte 3079 i think
-    216  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
-    217  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
-    218  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
-    219  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
-    220  1c20		       00 3c 62 5e*	      BYTE.b	0,60,98,94,86,102,60,0	; exit (door) 4
-    221  1c28		       ff 81 9d a1*	      BYTE.b	255,129,157,161,173,153,129,255	; locked exit 5
-    222  1c30		       ff e7 db db*	      BYTE.b	255,231,219,219,129,129,129,255	; locked wall 6
-    223  1c38		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 7
-    224  1c40		       12 d6 7c 3f*	      BYTE.b	18,214,124,63,252,62,107,72	; spike ball 8 		    PETSCII WHY?? I CAN'T READ THIS!
-    225  1c48		       18 3c 3c 3c*	      BYTE.b	24,60,60,60,126,82,8,36	; booster powerup 9
-    226  1c50		       18 24 24 18*	      BYTE.b	24,36,36,24,16,24,16,24	; key powerup A
-    227  1c58		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty B
-    228  1c60		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty C
-    229  1c68		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty D
-    230  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty E
-    231  1c78
-    232  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU F
-    233  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 10
-    234  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 11
-    235  1c90		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 12
-    236  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13 
-    237  1ca0
-    238  1ca0							; attachments
-    239  1ca0		       00 00 00 00*	      BYTE.b	0,0,0,0,195,126,126,60	; ready booster attachment up 14
-    240  1ca8		       3c 7e 7e c3*	      BYTE.b	60,126,126,195,0,0,0,0	; rb down 15
-    241  1cb0		       08 0e 07 07*	      BYTE.b	8,14,7,7,7,7,14,8	; rb left 16
-    242  1cb8		       10 70 e0 e0*	      BYTE.b	16,112,224,224,224,224,112,16	; rb right 17
-    243  1cc0		       3c 7e 3c 18*	      BYTE.b	60,126,60,24,219,126,126,60	; active booster attachment up 18
-    244  1cc8		       3c 7e 7e db*	      BYTE.b	60,126,126,219,24,60,126,60	; ab down 19
-    245  1cd0		       08 4e e7 ff*	      BYTE.b	8,78,231,255,255,231,78,8	; ab left 1A
-    246  1cd8		       10 72 e7 ff*	      BYTE.b	16,114,231,255,255,231,114,16	; ab right 1B
-    247  1ce0		       00 1e 14 1e*	      BYTE.b	0,30,20,30,24,24,24,60	; key attachment up 1C
-    248  1ce8		       3c 18 18 18*	      BYTE.b	60,24,24,24,30,20,30,0	; key down 1D
-    249  1cf0		       00 00 01 7f*	      BYTE.b	0,0,1,127,95,113,80,0	; key left 1E
-    250  1cf8		       00 00 80 fe*	      BYTE.b	0,0,128,254,250,142,10,0	; key right 1F
-    251  1d00
-    252  1d00							; for the title screen.......
-    253  1d00		       ff 80 80 80*	      BYTE.b	255,128,128,128,128,129,131,135	;20
-    254  1d08		       ff 00 00 00*	      BYTE.b	255,0,0,0,192,224,48,248	;21
-    255  1d10		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,0	;22
-    256  1d18		       ff 01 01 01*	      BYTE.b	255,1,1,1,1,1,1,1	;23
-    257  1d20		       8f 9b 83 83*	      BYTE.b	143,155,131,131,128,128,128,128	;24
-    258  1d28		       e0 e0 e0 e0*	      BYTE.b	224,224,224,224,0,0,0,0	;25
-    259  1d30		       01 07 1f 07*	      BYTE.b	1,7,31,7,7,7,0,0	;26
-    260  1d38		       f1 c1 c1 c1*	      BYTE.b	241,193,193,193,193,193,1,1	;27
-    261  1d40		       80 80 81 80*	      BYTE.b	128,128,129,128,152,152,156,143	;28
-    262  1d48		       00 00 c0 70*	      BYTE.b	0,0,192,112,30,3,0,255	;29
-    263  1d50		       00 00 00 00*	      BYTE.b	0,0,0,0,0,128,240,28	;2A
-    264  1d58		       01 01 01 01*	      BYTE.b	1,1,1,1,1,1,1,1	;2B
-    265  1d60		       8f 9f 9f 9e*	      BYTE.b	143,159,159,158,128,128,128,255	;2C
-    266  1d68		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,255	;2D
-    267  1d70		       07 00 00 00*	      BYTE.b	7,0,0,0,0,0,0,255	;2E
-    268  1d78		       81 c1 01 01*	      BYTE.b	129,193,1,1,1,1,1,255	;2F
-    269  1d80							;byte 3455
-    270  1d80
-    271  1d80							;possible optimizations:
-    272  1d80							;shift character set begin as far as i can
-    273  1d80							;generalize 16 bit arithmetic
-    274  1d80							;reuse switch statements
+    212  1ba8
+    213  1ba8
+    214  1ba8							; byte 2469
+    215  1ba8							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
+    216  1ba8
+    217  1c00					      org	character_set_begin	; starts at byte 3079 i think
+    218  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
+    219  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
+    220  1c10		       ff 5a 00 00*	      BYTE.b	$FF, $5A, $00, $00, $00, $00, $00, $00	; platform 2
+    221  1c18		       ff ff ff ff*	      BYTE.b	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF	; wall 3
+    222  1c20		       00 3c 62 5e*	      BYTE.b	0,60,98,94,86,102,60,0	; exit (door) 4
+    223  1c28		       ff 81 9d a1*	      BYTE.b	255,129,157,161,173,153,129,255	; locked exit 5
+    224  1c30		       ff e7 db db*	      BYTE.b	255,231,219,219,129,129,129,255	; locked wall 6
+    225  1c38		       ff ee f1 ef*	      BYTE.b	$FF, $EE, $F1, $EF, $57, $8F, $F3, $FF	; breakable wall 7
+    226  1c40		       12 d6 7c 3f*	      BYTE.b	18,214,124,63,252,62,107,72	; spike ball 8 		    PETSCII WHY?? I CAN'T READ THIS!
+    227  1c48		       18 3c 3c 3c*	      BYTE.b	24,60,60,60,126,82,8,36	; booster powerup 9
+    228  1c50		       18 24 24 18*	      BYTE.b	24,36,36,24,16,24,16,24	; key powerup A
+    229  1c58		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty B
+    230  1c60		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty C
+    231  1c68		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty D
+    232  1c70		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; empty E
+    233  1c78
+    234  1c78		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charU F
+    235  1c80		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charD 10
+    236  1c88		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charL 11
+    237  1c90		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; charR 12
+    238  1c98		       ff 81 a5 81*	      BYTE.b	$FF, $81, $A5, $81, $BD, $81, $81, $FF	; squarebot 13 
+    239  1ca0
+    240  1ca0							; attachments
+    241  1ca0		       00 00 00 00*	      BYTE.b	0,0,0,0,195,126,126,60	; ready booster attachment up 14
+    242  1ca8		       3c 7e 7e c3*	      BYTE.b	60,126,126,195,0,0,0,0	; rb down 15
+    243  1cb0		       08 0e 07 07*	      BYTE.b	8,14,7,7,7,7,14,8	; rb left 16
+    244  1cb8		       10 70 e0 e0*	      BYTE.b	16,112,224,224,224,224,112,16	; rb right 17
+    245  1cc0		       3c 7e 3c 18*	      BYTE.b	60,126,60,24,219,126,126,60	; active booster attachment up 18
+    246  1cc8		       3c 7e 7e db*	      BYTE.b	60,126,126,219,24,60,126,60	; ab down 19
+    247  1cd0		       08 4e e7 ff*	      BYTE.b	8,78,231,255,255,231,78,8	; ab left 1A
+    248  1cd8		       10 72 e7 ff*	      BYTE.b	16,114,231,255,255,231,114,16	; ab right 1B
+    249  1ce0		       00 1e 14 1e*	      BYTE.b	0,30,20,30,24,24,24,60	; key attachment up 1C
+    250  1ce8		       3c 18 18 18*	      BYTE.b	60,24,24,24,30,20,30,0	; key down 1D
+    251  1cf0		       00 00 01 7f*	      BYTE.b	0,0,1,127,95,113,80,0	; key left 1E
+    252  1cf8		       00 00 80 fe*	      BYTE.b	0,0,128,254,250,142,10,0	; key right 1F
+    253  1d00
+    254  1d00							; for the title screen.......
+    255  1d00		       ff 80 80 80*	      BYTE.b	255,128,128,128,128,129,131,135	;20
+    256  1d08		       ff 00 00 00*	      BYTE.b	255,0,0,0,192,224,48,248	;21
+    257  1d10		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,0	;22
+    258  1d18		       ff 01 01 01*	      BYTE.b	255,1,1,1,1,1,1,1	;23
+    259  1d20		       8f 9b 83 83*	      BYTE.b	143,155,131,131,128,128,128,128	;24
+    260  1d28		       e0 e0 e0 e0*	      BYTE.b	224,224,224,224,0,0,0,0	;25
+    261  1d30		       01 07 1f 07*	      BYTE.b	1,7,31,7,7,7,0,0	;26
+    262  1d38		       f1 c1 c1 c1*	      BYTE.b	241,193,193,193,193,193,1,1	;27
+    263  1d40		       80 80 81 80*	      BYTE.b	128,128,129,128,152,152,156,143	;28
+    264  1d48		       00 00 c0 70*	      BYTE.b	0,0,192,112,30,3,0,255	;29
+    265  1d50		       00 00 00 00*	      BYTE.b	0,0,0,0,0,128,240,28	;2A
+    266  1d58		       01 01 01 01*	      BYTE.b	1,1,1,1,1,1,1,1	;2B
+    267  1d60		       8f 9f 9f 9e*	      BYTE.b	143,159,159,158,128,128,128,255	;2C
+    268  1d68		       ff 00 00 00*	      BYTE.b	255,0,0,0,0,0,0,255	;2D
+    269  1d70		       07 00 00 00*	      BYTE.b	7,0,0,0,0,0,0,255	;2E
+    270  1d78		       81 c1 01 01*	      BYTE.b	129,193,1,1,1,1,1,255	;2F
+    271  1d80							;byte 3455
+    272  1d80
+    273  1d80							;possible optimizations:
+    274  1d80							;shift character set begin as far as i can
+    275  1d80							;generalize 16 bit arithmetic
+    276  1d80							;reuse switch statements

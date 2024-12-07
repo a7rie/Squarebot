@@ -190,6 +190,8 @@ level_data_start
 ; tutorial levels -- introduce mechanics one by one
   incbin "../data/levels/binary_levels/jesse_1"
   incbin "../data/levels/binary_levels/jesse_2"
+  incbin "../data/levels/binary_levels/gui_1"
+  incbin "../data/levels/binary_levels/gui_2"
   incbin "../data/levels/binary_levels/jesse_3"
   incbin "../data/levels/binary_levels/amin_1"
   incbin "../data/levels/binary_levels/amin_2"
