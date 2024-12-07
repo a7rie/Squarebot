@@ -58,7 +58,7 @@
      57  1d80 ????	       00 12	   D_KEY      =	$12
      58  1d80 ????	       00 0d	   SKIP_KEY   =	$0d	; press P to skip to next  level
      59  1d80 ????	       00 34	   MENU_KEY   =	$34	; press O to return to menu
-     60  1d80 ????	       00 0a	   RESET_KEY  =	$0a	; press R to restart level i assume
+     60  1d80 ????	       00 32	   RESET_KEY  =	$32	; press T to restart level i assume
      61  1d80 ????	       00 01	   JUMP_SIZE  =	$01	; number of characters a jump causes
      62  1d80 ????	       00 16	   ROW_SIZE   =	$16
      63  1d80 ????
@@ -286,7 +286,7 @@
     154  111b
     155  111b				   check_extra_keys
     156  111b		       a5 c5		      lda	currently_pressed_key
-    157  111d		       c9 0a		      cmp	#RESET_KEY
+    157  111d		       c9 32		      cmp	#RESET_KEY
     158  111f		       d0 0a		      bne	check_skip
     159  1121		       20 76 14 	      jsr	delete_squarebot
     160  1124		       a9 01		      lda	#1
@@ -1350,40 +1350,40 @@
     190  175e							; tutorial levels -- introduce mechanics one by one
     191  175e					      incbin	"../data/levels/binary_levels/jesse_1"
     192  1768					      incbin	"../data/levels/binary_levels/jesse_2"
-    193  1782					      incbin	"../data/levels/binary_levels/jesse_3"
-    194  17cc					      incbin	"../data/levels/binary_levels/amin_1"
-    195  17f0					      incbin	"../data/levels/binary_levels/amin_2"
-    196  1824					      incbin	"../data/levels/binary_levels/amin_3"
-    197  1860					      incbin	"../data/levels/binary_levels/amin_4"
-    198  188e
-    199  188e
-    200  188e					      incbin	"../data/levels/binary_levels/amin_5"
-    201  18cc					      incbin	"../data/levels/binary_levels/jesse_4"
-    202  1912					      incbin	"../data/levels/binary_levels/jesse_5"
-    203  196c					      incbin	"../data/levels/binary_levels/jesse_6"
-    204  19de					      incbin	"../data/levels/binary_levels/jesse_7"
-    205  19f8					      incbin	"../data/levels/binary_levels/end_screen"
-    206  1aee
-    207  1aee
-    208  1aee
+    193  1780					      incbin	"../data/levels/binary_levels/jesse_3"
+    194  17c4					      incbin	"../data/levels/binary_levels/amin_1"
+    195  17e8					      incbin	"../data/levels/binary_levels/amin_2"
+    196  181a					      incbin	"../data/levels/binary_levels/amin_3"
+    197  1854					      incbin	"../data/levels/binary_levels/amin_4"
+    198  1880
+    199  1880
+    200  1880					      incbin	"../data/levels/binary_levels/amin_5"
+    201  18be					      incbin	"../data/levels/binary_levels/jesse_4"
+    202  1904					      incbin	"../data/levels/binary_levels/jesse_5"
+    203  1958					      incbin	"../data/levels/binary_levels/jesse_6"
+    204  19ca					      incbin	"../data/levels/binary_levels/jesse_7"
+    205  1a26					      incbin	"../data/levels/binary_levels/end_screen"
+    206  1abe
+    207  1abe
+    208  1abe
 ------- FILE memoryCheck.s LEVEL 2 PASS 3
-      0  1aee					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
-      1  1aee		       0a ed	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
-      2  1aee		       1e 00	   SCREEN_MEMORY_START =	$1e00
- 2797 bytes used
-      3  1aee					      echo	[BYTES_USED]d, "bytes used"
- Ending program at memory location (base 10):  6894
-      4  1aee					      echo	"Ending program at memory location (base 10): ", [.]d
-      5  1aee				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
-      6  1aee				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
-      7  1aee				  -	      err
-      8  1aee					      endif
+      0  1abe					      include	"memoryCheck.s"	; code to make sure the program isn't too large and enters screen memory
+      1  1abe		       0a bd	   BYTES_USED =	.-$1001	; location counter minus starting location = total bytes used
+      2  1abe		       1e 00	   SCREEN_MEMORY_START =	$1e00
+ 2749 bytes used
+      3  1abe					      echo	[BYTES_USED]d, "bytes used"
+ Ending program at memory location (base 10):  6846
+      4  1abe					      echo	"Ending program at memory location (base 10): ", [.]d
+      5  1abe				  -	      if	. >= SCREEN_MEMORY_START	; if program entering screen memory
+      6  1abe				  -	      echo	"Throwing error because program is too large, and has entered screen memory!"
+      7  1abe				  -	      err
+      8  1abe					      endif
 ------- FILE main.s
-    210  1aee
-    211  1aee
-    212  1aee							; byte 2469
-    213  1aee							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
-    214  1aee
+    210  1abe
+    211  1abe
+    212  1abe							; byte 2469
+    213  1abe							;copy paste script: python generateLevelBinary.py ascii_levels/<> binary_levels/<>
+    214  1abe
     215  1c00					      org	character_set_begin	; starts at byte 3079 i think
     216  1c00		       00 00 00 00*	      BYTE.b	$00, $00, $00, $00, $00, $00, $00, $00	; blank 0
     217  1c08		       7e 42 7e 42*	      BYTE.b	$7E, $42, $7E, $42, $7E, $42, $7E, $42	; ladder 1
