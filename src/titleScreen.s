@@ -36,6 +36,8 @@ draw_title_screen_chars_loop
   bcc draw_title_screen_chars_loop
   rts
 
+back_to_start ;if menu button is pressed go back to start 
+  jmp start
 
 ; draw the character in Y register for (value of accumulator) number of times
 draw_character

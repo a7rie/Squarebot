@@ -55,8 +55,9 @@ E_KEY = $31
 A_KEY = $11
 S_KEY = $29
 D_KEY = $12
-SECRET_KEY = $0d ; press P to skip to next  level
-RESET_KEY = $0a ; press R to restart level i assume
+SKIP_KEY = $0d ; press P to skip to next  level
+MENU_KEY = $34 ; press O to return to menu
+RESET_KEY = $32 ; press T to restart level i assume
 JUMP_SIZE = $01 ; number of characters a jump causes
 ROW_SIZE = $16
 
@@ -135,15 +136,14 @@ gameLoop
   lda #0
   sta level_reset
   jsr update_game_state
-  jsr check_for_secret_key
-  jsr check_for_reset_key
+  jsr check_extra_keys
+  bcs back_to_start
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jsr wait_until_next_frame
   jmp gameLoop
-
 
 wait_until_next_frame ; wait one jiffy before completing game loop
   lda jiffy_clock+2
@@ -152,27 +152,30 @@ wait_until_next_frame ; wait one jiffy before completing game loop
   sta current_time
   rts
 
-; update level_completed and level_reset if secret_key pressed
-check_for_secret_key
+check_extra_keys
   lda currently_pressed_key
-  cmp #SECRET_KEY
-  bne check_for_secret_key_return
+  cmp #RESET_KEY
+  bne check_skip
+  jsr delete_squarebot
+  lda #1
+  sta level_reset
+  jmp return_check
+check_skip
+  cmp #SKIP_KEY
+  bne check_menu
   jsr delete_squarebot
   lda #1
   sta level_completed
-  lda #1
   sta level_reset
-check_for_secret_key_return
-  rts
-
-check_for_reset_key
-  lda currently_pressed_key
-  cmp #RESET_KEY
-  bne check_for_secret_key_return ; todo -- reset  a bunch of state (has_key, )
+  jmp return_check
+check_menu
+  cmp #MENU_KEY
+  bne return_check
   jsr delete_squarebot
-  lda #1
-  sta level_reset
-check_for_reset_key_return
+  sec
+  rts ; tell them to restart
+return_check
+  clc
   rts
 
   include "updateLevel.s"
@@ -201,6 +204,7 @@ level_data_start
   incbin "../data/levels/binary_levels/jesse_7"
   incbin "../data/levels/binary_levels/end_screen"
   
+
   
   include "memoryCheck.s" ; code to make sure the program isn't too large and enters screen memory
   
