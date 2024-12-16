@@ -2,6 +2,10 @@
 
 Retro puzzle game for the unexpanded VIC-20, written in 6502 Assembly. Developed by Amin Elnasri, Jesse Dirks, and Gui Marques.
 
+## Demo Video
+
+To see some gameplay: https://www.youtube.com/watch?v=Vc4M3mq5Akg
+
 
 ## How to Run
 To just run the executable, only [`xvic`](https://vice-emu.sourceforge.io/), a VIC-20 emulator, is required. In the base directory of this repository, simply run the `<path to xvic> ./out/main.prg`.
